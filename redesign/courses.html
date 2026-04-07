@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>課程內容 - 代間共學互動平台</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .courses-header {
+      text-align: center;
+      padding: var(--space-2xl) var(--space-xl) var(--space-lg);
+    }
+
+    .courses-header .icon-box {
+      margin: 0 auto var(--space-md);
+    }
+
+    .courses-header h1 {
+      font-size: var(--font-size-3xl);
+      font-weight: 800;
+    }
+
+    .courses-header p {
+      color: var(--color-text-muted);
+      font-size: var(--font-size-lg);
+      margin-top: var(--space-xs);
+    }
+
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg);
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 var(--space-xl) var(--space-2xl);
+    }
+
+    .course-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .course-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .course-card:active {
+      transform: translateY(0);
+    }
+
+    .course-week {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      font-weight: 700;
+      margin-bottom: var(--space-md);
+      width: fit-content;
+    }
+
+    .course-card:nth-child(1) .course-week { background: #E8F5E8; color: #2E7D32; }
+    .course-card:nth-child(2) .course-week { background: #F0ECF8; color: #6A5BAD; }
+    .course-card:nth-child(3) .course-week { background: #FFF3E0; color: #E65100; }
+    .course-card:nth-child(4) .course-week { background: #FFE4E4; color: #C62828; }
+    .course-card:nth-child(5) .course-week { background: var(--color-happy-light); color: #9A7400; }
+    .course-card:nth-child(6) .course-week { background: var(--color-sad-light); color: #1565C0; }
+    .course-card:nth-child(7) .course-week { background: var(--color-secondary-lighter); color: var(--color-secondary-dark); }
+    .course-card:nth-child(8) .course-week { background: var(--color-primary-lighter); color: var(--color-primary-dark); }
+    .course-card:nth-child(9) .course-week { background: #F3E5F5; color: #7B1FA2; }
+
+    .course-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-md);
+      background: var(--color-surface);
+      color: var(--color-text-secondary);
+    }
+
+    .course-name {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+      line-height: 1.3;
+    }
+
+    .course-desc {
+      font-size: var(--font-size-base);
+      color: var(--color-text-muted);
+      flex: 1;
+    }
+
+    .course-arrow {
+      margin-top: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      transition: all var(--transition-fast);
+    }
+
+    .course-card:hover .course-arrow {
+      color: var(--color-primary);
+      transform: translateX(4px);
+    }
+
+    .courses-back {
+      text-align: center;
+      padding: 0 0 var(--space-2xl);
+    }
+
+    @media (max-width: 768px) {
+      .courses-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .courses-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="courses-header">
+      <div class="icon-box icon-box-lg" style="background:#F0ECF8;color:#8B7EC8;margin:0 auto var(--space-md)">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+          <path d="M8 7h6"/>
+          <path d="M8 11h8"/>
+        </svg>
+      </div>
+      <h1>課程內容</h1>
+      <p>9 週代間共學精彩課程</p>
+    </div>
+
+    <div class="courses-grid stagger" id="courses-grid"></div>
+
+    <div class="courses-back">
+      <a href="index.html" class="back-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        返回首頁
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const courses = [
+      { week: 0, name: '課前預習', desc: '認識彼此、破冰遊戲', icon: 'sparkles' },
+      { week: 1, name: '初次見面', desc: '自我介紹與團隊建立', icon: 'handshake' },
+      { week: 2, name: '情緒認識', desc: '認識情緒、情緒輪盤', icon: 'heart' },
+      { week: 3, name: '生活智慧', desc: '生活技能分享與工具箱', icon: 'lightbulb' },
+      { week: 4, name: '才藝展演', desc: '才藝表演與互相欣賞', icon: 'music' },
+      { week: 5, name: '故事時光', desc: '玩具分享與故事書', icon: 'book' },
+      { week: 6, name: '猜猜看', desc: '猜腳丫遊戲與互動', icon: 'help-circle' },
+      { week: 7, name: '回憶錄', desc: '故事書與回憶分享', icon: 'camera' },
+      { week: 8, name: '成果發表', desc: '課程回顧與成果展', icon: 'award' },
+    ];
+
+    const iconSvgs = {
+      sparkles: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>',
+      handshake: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+      heart: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
+      lightbulb: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>',
+      music: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+      book: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>',
+      'help-circle': '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+      camera: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>',
+      award: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>',
+    };
+
+    const grid = document.getElementById('courses-grid');
+    grid.innerHTML = courses.map((c, i) => `
+      <div class="course-card animate-fade-in" style="animation-delay:${i * 60}ms"
+           onclick="location.href='course-detail.html?week=${c.week}'">
+        <div class="course-week">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          第 ${c.week} 週
+        </div>
+        <div class="course-icon">${iconSvgs[c.icon]}</div>
+        <div class="course-name">${c.name}</div>
+        <div class="course-desc">${c.desc}</div>
+        <div class="course-arrow">
+          查看內容
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </div>
+    `).join('');
+  </script>
+</body>
+</html>

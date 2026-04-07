@@ -1,0 +1,128 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+  TESTER
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  displayName  String
+  role         Role      @default(STUDENT)
+  isTester     Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  enrollments Enrollment[]
+  textPosts   TextPost[]
+  voicePosts  VoicePost[]
+  moods       Mood[]
+  checkins    Checkin[]
+}
+
+model Course {
+  id          String        @id @default(cuid())
+  title       String
+  description String
+  startsAt    DateTime?
+  endsAt      DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  enrollments Enrollment[]
+  textPosts   TextPost[]
+  voicePosts  VoicePost[]
+  moods       Mood[]
+  checkins    Checkin[]
+}
+
+model Enrollment {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+model TextPost {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  authorId  String
+  courseId  String?
+
+  author User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  course Course? @relation(fields: [courseId], references: [id])
+}
+
+model VoicePost {
+  id        String   @id @default(cuid())
+  title     String
+  audioUrl  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  authorId  String
+  courseId  String?
+
+  author User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  course Course? @relation(fields: [courseId], references: [id])
+}
+
+model Mood {
+  id         String   @id @default(cuid())
+  value      Int      // 心情數值 (1-10)
+  note       String?  // 心情備註
+  recordedAt DateTime @default(now())
+  userId     String
+  courseId   String?
+  sessionId  String?  // 會話ID，用於追蹤
+  deviceInfo String?  // 設備資訊
+  location   String?  // 位置資訊
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course? @relation(fields: [courseId], references: [id])
+
+  @@index([userId, recordedAt])
+  @@index([courseId, recordedAt])
+}
+
+model Checkin {
+  id        String   @id @default(cuid())
+  date      DateTime
+  userId    String
+  courseId  String?
+  sessionId String?  // 會話ID，用於追蹤
+  deviceInfo String? // 設備資訊
+  location  String?  // 位置資訊
+  checkinType String @default("MANUAL") // 簽到類型: MANUAL, AUTO, QR_CODE
+  status    String   @default("PRESENT") // 狀態: PRESENT, LATE, ABSENT
+  notes     String?  // 備註
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course? @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, date])
+  @@index([userId, date])
+  @@index([courseId, date])
+  @@index([date])
+}

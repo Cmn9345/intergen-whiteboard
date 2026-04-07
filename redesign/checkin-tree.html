@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>簽到樹 - 代間共學互動平台</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    body { overflow: hidden; margin: 0; }
+
+    .tree-page {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      user-select: none;
+      /* Warm sky gradient */
+      background: linear-gradient(180deg, #C9E8F5 0%, #E8F4EC 40%, #D5E8C8 70%, #A8C890 100%);
+    }
+
+    /* Ground */
+    .ground {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 12%;
+      background: linear-gradient(180deg, #8CB56A, #6D9B4A);
+      z-index: 1;
+    }
+
+    .ground::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: -5%;
+      right: -5%;
+      height: 40px;
+      background: #8CB56A;
+      border-radius: 50%;
+    }
+
+    /* Top bar */
+    .top-bar {
+      position: absolute;
+      top: var(--space-lg);
+      left: var(--space-lg);
+      right: var(--space-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      z-index: 20;
+    }
+
+    .glass-card {
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    .clock-card {
+      padding: var(--space-sm) var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .clock-time {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .clock-date {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    .week-bar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px;
+      border-radius: var(--radius-full);
+    }
+
+    .week-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      background: transparent;
+      border: none;
+    }
+
+    .week-btn:hover { background: rgba(0,0,0,0.05); color: var(--color-text-primary); }
+    .week-btn.active {
+      background: var(--color-secondary);
+      color: white;
+      box-shadow: 0 2px 8px rgba(61,171,181,0.35);
+    }
+
+    /* === Tree image container === */
+    .tree-container {
+      position: absolute;
+      bottom: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      height: 95vh;
+      aspect-ratio: 16 / 9;
+    }
+
+    .tree-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      filter: drop-shadow(0 8px 24px rgba(60, 40, 20, 0.15));
+    }
+
+    /* === Branch click spots === */
+    .spot {
+      position: absolute;
+      width: 72px;
+      height: 72px;
+      margin-left: -36px;
+      margin-top: -36px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      z-index: 5;
+      background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.08) 60%, transparent 75%);
+      border: 2.5px dashed rgba(255,255,255,0.45);
+      animation: spotPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes spotPulse {
+      0%, 100% { border-color: rgba(255,255,255,0.35); transform: scale(1); }
+      50% { border-color: rgba(255,255,255,0.7); transform: scale(1.08); }
+    }
+
+    .spot:hover {
+      background: radial-gradient(circle, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.15) 60%, transparent 75%);
+      border-color: white;
+      transform: scale(1.18);
+      animation: none;
+      box-shadow: 0 0 16px rgba(255,255,255,0.4);
+    }
+
+    .spot.occupied {
+      cursor: default;
+      background: none;
+      border: none;
+      pointer-events: none;
+      animation: none;
+    }
+
+    /* === Stamp (avatar on tree) === */
+    .stamp {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-left: -26px;
+      margin-top: -26px;
+      z-index: 6;
+      animation: stampPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+      pointer-events: none;
+    }
+
+    @keyframes stampPop {
+      0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+
+    .stamp-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: white;
+      border: 3px solid white;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    .stamp-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .stamp-label {
+      margin-top: 3px;
+      padding: 2px 10px;
+      background: rgba(255,255,255,0.92);
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-text-primary);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      white-space: nowrap;
+    }
+
+    /* === Floating picker === */
+    .picker-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+    }
+
+    .picker-overlay.open { display: block; }
+
+    .picker-backdrop {
+      position: absolute;
+      inset: 0;
+    }
+
+    .picker {
+      position: absolute;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl), 0 0 0 1px rgba(0,0,0,0.05);
+      width: 280px;
+      max-height: 420px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: pickerIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes pickerIn {
+      from { opacity: 0; transform: scale(0.92) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .picker-header {
+      padding: var(--space-md);
+      border-bottom: 1px solid var(--color-border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .picker-title {
+      font-weight: 700;
+      font-size: var(--font-size-base);
+    }
+
+    .picker-tabs {
+      display: flex;
+      gap: 2px;
+      padding: var(--space-sm) var(--space-md) 0;
+      overflow-x: auto;
+    }
+
+    .picker-tab {
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+      background: transparent;
+      border: none;
+    }
+
+    .picker-tab:hover { background: var(--color-surface); }
+    .picker-tab.active { background: var(--color-primary); color: white; }
+
+    .picker-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-sm);
+    }
+
+    .picker-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      border: 2px solid transparent;
+    }
+
+    .picker-item:hover {
+      background: var(--color-primary-lighter);
+      border-color: var(--color-primary-light);
+    }
+
+    .picker-item.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .picker-item.disabled:hover {
+      background: transparent;
+      border-color: transparent;
+    }
+
+    .picker-item-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--color-primary-lighter);
+      color: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: var(--font-size-sm);
+      flex-shrink: 0;
+    }
+
+    .picker-item-name {
+      font-weight: 600;
+      font-size: var(--font-size-base);
+      flex: 1;
+    }
+
+    .picker-item-check {
+      color: var(--color-success);
+    }
+
+    /* === Success flash === */
+    .success-flash {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .success-flash.show { opacity: 1; }
+
+    .success-flash-inner {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl) var(--space-2xl);
+      box-shadow: var(--shadow-xl);
+      text-align: center;
+      animation: celebrate 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .success-flash-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--color-success-light);
+      color: var(--color-success);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-md);
+    }
+
+    .success-flash h3 {
+      font-size: var(--font-size-2xl);
+      font-weight: 700;
+    }
+
+    .success-flash p {
+      color: var(--color-text-muted);
+      margin-top: var(--space-xs);
+    }
+
+    /* Bottom info bar */
+    .info-bar {
+      position: absolute;
+      bottom: var(--space-lg);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-full);
+    }
+
+    .info-bar-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      font-weight: 500;
+    }
+
+    .info-bar-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    @media (max-width: 768px) {
+      .tree-container { height: 65vh; }
+      .spot { width: 60px; height: 60px; margin-left: -30px; margin-top: -30px; }
+      .stamp-circle { width: 40px; height: 40px; font-size: 15px; }
+      .stamp { margin-left: -22px; margin-top: -22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="tree-page">
+    <div class="ground"></div>
+
+    <!-- Top bar -->
+    <div class="top-bar">
+      <div>
+        <a href="index.html" class="back-btn" style="margin-bottom:var(--space-sm);background:rgba(255,255,255,0.88);backdrop-filter:blur(10px)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          返回
+        </a>
+        <div class="glass-card clock-card">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div>
+            <div class="clock-time" id="clock-time">--:--</div>
+            <div class="clock-date" id="clock-date"></div>
+          </div>
+        </div>
+      </div>
+      <div class="glass-card week-bar" id="week-bar"></div>
+    </div>
+
+    <!-- Tree image + click spots + stamps -->
+    <div class="tree-container" id="tree-container">
+      <img class="tree-img" src="tree-nobg.png" alt="簽到樹">
+      <!-- Spots and stamps are absolutely positioned inside here by JS -->
+    </div>
+
+    <!-- Floating member picker -->
+    <div class="picker-overlay" id="picker-overlay">
+      <div class="picker-backdrop" onclick="closePicker()"></div>
+      <div class="picker" id="picker">
+        <div class="picker-header">
+          <span class="picker-title">選擇成員簽到</span>
+          <button style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:var(--color-text-muted)" onclick="closePicker()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="picker-tabs" id="picker-tabs"></div>
+        <div class="picker-list" id="picker-list"></div>
+      </div>
+    </div>
+
+    <!-- Success flash -->
+    <div class="success-flash" id="success-flash">
+      <div class="success-flash-inner">
+        <div class="success-flash-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3 id="success-msg">簽到成功</h3>
+        <p>已掛上簽到樹</p>
+      </div>
+    </div>
+
+    <!-- Bottom info -->
+    <div class="glass-card info-bar">
+      <div class="info-bar-item">
+        <div class="info-bar-dot" style="background:var(--color-success)"></div>
+        已簽到 <strong id="checked-count">0</strong> 人
+      </div>
+      <div class="info-bar-item">
+        <div class="info-bar-dot" style="background:var(--color-border)"></div>
+        共 <strong id="total-count">0</strong> 人
+      </div>
+      <div class="info-bar-item" style="color:var(--color-text-muted)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 15l-2 5L9 9l11 4-5 2z"/></svg>
+        點擊樹枝簽到
+      </div>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    let students = [];
+    let grouped = {};
+    let checkedMap = {};
+    let currentWeek = 1;
+    let pickerGroup = '1';
+    let activeSpotIdx = null;
+
+    // 20 branch-tip positions as % of tree image (2816x1536)
+    // v3 - all pulled well inside the canopy
+    const SPOTS = [
+      // === Top crown ===
+      { x: 42, y:  9 },   // 0  - crown top-left
+      { x: 50, y:  6 },   // 1  - crown top-center
+      { x: 57, y:  9 },   // 2  - crown top-right
+
+      // === Upper-left branches ===
+      { x: 30, y: 17 },   // 3  - upper-left branch
+      { x: 24, y: 25 },   // 4  - left branch
+
+      // === Upper-right branches ===
+      { x: 68, y: 17 },   // 5  - upper-right branch
+      { x: 73, y: 25 },   // 6  - right branch
+
+      // === Mid-left branches ===
+      { x: 19, y: 33 },   // 7  - mid-left branch
+      { x: 17, y: 42 },   // 8  - lower-left branch
+      { x: 24, y: 38 },   // 9  - mid-left short
+
+      // === Mid-right branches ===
+      { x: 79, y: 32 },   // 10 - mid-right branch
+      { x: 80, y: 41 },   // 11 - lower-right branch
+      { x: 74, y: 37 },   // 12 - mid-right short
+
+      // === Inner canopy forks ===
+      { x: 36, y: 23 },   // 13 - inner-left fork
+      { x: 63, y: 22 },   // 14 - inner-right fork
+      { x: 50, y: 19 },   // 15 - center above trunk
+
+      // === Lower leaf clusters ===
+      { x: 21, y: 49 },   // 16 - bottom-left leaves
+      { x: 77, y: 48 },   // 17 - bottom-right leaves
+
+      // === Near trunk base ===
+      { x: 36, y: 53 },   // 18 - left of trunk base
+      { x: 63, y: 52 },   // 19 - right of trunk base
+    ];
+
+    const COLORS = [
+      '#E8734A','#3DABB5','#8B7EC8','#E06B6B','#5CB85C',
+      '#F5C842','#5B9BD5','#D4A017','#C85A32','#2A8A93',
+      '#E091C0','#7BA856','#D98A3C','#6A8FC7','#C75B8F',
+      '#8BC34A','#FF7043','#26A69A','#AB47BC','#5C6BC0'
+    ];
+
+    async function init() {
+      startClock();
+      renderWeekBar();
+      createSpots();
+      students = await api.getStudents() || [];
+      grouped = api.groupStudents(students);
+      document.getElementById('total-count').textContent = students.length;
+      await loadCheckins();
+    }
+
+    function startClock() {
+      function tick() {
+        const now = new Date();
+        document.getElementById('clock-time').textContent =
+          now.toLocaleTimeString('zh-TW', { hour:'2-digit', minute:'2-digit' });
+        document.getElementById('clock-date').textContent =
+          now.toLocaleDateString('zh-TW', { month:'long', day:'numeric', weekday:'short' });
+      }
+      tick(); setInterval(tick, 1000);
+    }
+
+    function renderWeekBar() {
+      const c = document.getElementById('week-bar');
+      c.innerHTML = '';
+      for (let w = 1; w <= 9; w++) {
+        const b = document.createElement('button');
+        b.className = 'week-btn' + (w === currentWeek ? ' active' : '');
+        b.textContent = w;
+        b.onclick = () => { currentWeek = w; renderWeekBar(); loadCheckins(); };
+        c.appendChild(b);
+      }
+    }
+
+    function createSpots() {
+      const container = document.getElementById('tree-container');
+      SPOTS.forEach((pos, i) => {
+        const el = document.createElement('div');
+        el.className = 'spot';
+        el.id = 'spot-' + i;
+        el.style.left = pos.x + '%';
+        el.style.top = pos.y + '%';
+        el.onclick = (e) => onSpotClick(i, e);
+        container.appendChild(el);
+      });
+    }
+
+    async function loadCheckins() {
+      const records = await api.getCheckins(String(currentWeek));
+      checkedMap = {};
+      records.forEach(r => checkedMap[r.Name] = r);
+      document.getElementById('checked-count').textContent = records.length;
+      renderStamps();
+    }
+
+    function renderStamps() {
+      // Remove old stamps
+      document.querySelectorAll('.stamp').forEach(s => s.remove());
+      // Reset all spots
+      document.querySelectorAll('.spot').forEach(s => s.classList.remove('occupied'));
+
+      const names = Object.keys(checkedMap);
+      const container = document.getElementById('tree-container');
+
+      names.forEach((name, i) => {
+        if (i >= SPOTS.length) return;
+        const pos = SPOTS[i];
+        const color = COLORS[i % COLORS.length];
+
+        // Mark spot as occupied
+        const spotEl = document.getElementById('spot-' + i);
+        if (spotEl) spotEl.classList.add('occupied');
+
+        // Create stamp
+        const stamp = document.createElement('div');
+        stamp.className = 'stamp';
+        stamp.style.left = pos.x + '%';
+        stamp.style.top = pos.y + '%';
+        stamp.style.animationDelay = (i * 60) + 'ms';
+        stamp.innerHTML = `
+          <div class="stamp-circle" style="background:${color}">${name[0]}</div>
+          <div class="stamp-label">${name}</div>
+        `;
+        container.appendChild(stamp);
+      });
+    }
+
+    function onSpotClick(idx, event) {
+      event.stopPropagation();
+      const spotEl = document.getElementById('spot-' + idx);
+      if (spotEl.classList.contains('occupied')) return;
+
+      activeSpotIdx = idx;
+
+      // Position picker near click
+      const picker = document.getElementById('picker');
+      const overlay = document.getElementById('picker-overlay');
+      const rect = spotEl.getBoundingClientRect();
+
+      let left = rect.left + rect.width / 2 - 140;
+      let top = rect.bottom + 10;
+
+      if (left < 12) left = 12;
+      if (left + 280 > window.innerWidth - 12) left = window.innerWidth - 292;
+      if (top + 380 > window.innerHeight - 12) top = rect.top - 390;
+
+      picker.style.left = left + 'px';
+      picker.style.top = top + 'px';
+
+      overlay.classList.add('open');
+      renderPickerTabs();
+      renderPickerList();
+    }
+
+    function closePicker() {
+      document.getElementById('picker-overlay').classList.remove('open');
+      activeSpotIdx = null;
+    }
+
+    function renderPickerTabs() {
+      const groups = Object.keys(grouped).sort();
+      document.getElementById('picker-tabs').innerHTML = groups.map(g =>
+        `<button class="picker-tab ${g === pickerGroup ? 'active' : ''}"
+                 onclick="event.stopPropagation(); pickerGroup='${g}'; renderPickerTabs(); renderPickerList();">
+           第${g}組
+         </button>`
+      ).join('');
+    }
+
+    function renderPickerList() {
+      const members = grouped[pickerGroup] || [];
+      document.getElementById('picker-list').innerHTML = members.map(m => {
+        const name = m.Name || m.name;
+        const checked = !!checkedMap[name];
+        return `
+          <div class="picker-item ${checked ? 'disabled' : ''}"
+               onclick="${checked ? '' : `doCheckin('${name}', '${m.group || m.Group || pickerGroup}')`}">
+            <div class="picker-item-avatar">${name[0]}</div>
+            <div class="picker-item-name">${name}</div>
+            ${checked ? '<span class="picker-item-check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>' : ''}
+          </div>`;
+      }).join('');
+    }
+
+    async function doCheckin(name, group) {
+      try {
+        await api.checkin(name, group, String(currentWeek));
+        closePicker();
+
+        document.getElementById('success-msg').textContent = `${name} 簽到成功！`;
+        const flash = document.getElementById('success-flash');
+        flash.classList.add('show');
+        setTimeout(() => flash.classList.remove('show'), 1500);
+
+        await loadCheckins();
+      } catch (err) {
+        if (err.message === 'DUPLICATE') {
+          showToast(`${name} 本週已簽到過了`, 'warning');
+        } else {
+          showToast('簽到失敗，請重試', 'error');
+        }
+        closePicker();
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

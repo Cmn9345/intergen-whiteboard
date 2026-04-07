@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>代間共學互動平台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .hero {
+      text-align: center;
+      padding: var(--space-3xl) var(--space-xl) var(--space-xl);
+    }
+
+    .hero-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto var(--space-lg);
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      box-shadow: 0 8px 24px rgba(232, 115, 74, 0.25);
+    }
+
+    .hero h1 {
+      font-size: var(--font-size-4xl);
+      font-weight: 900;
+      color: var(--color-text-primary);
+      letter-spacing: -1px;
+      margin-bottom: var(--space-sm);
+    }
+
+    .hero p {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-muted);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-xl);
+      max-width: 720px;
+      margin: var(--space-2xl) auto 0;
+      padding: 0 var(--space-xl);
+    }
+
+    .feature-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl) var(--space-lg);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      transition: height var(--transition-normal);
+    }
+
+    .feature-card:nth-child(1)::before { background: var(--color-secondary); }
+    .feature-card:nth-child(2)::before { background: var(--color-happy); }
+    .feature-card:nth-child(3)::before { background: #8B7EC8; }
+    .feature-card:nth-child(4)::before { background: var(--color-primary); }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .feature-card:hover::before {
+      height: 6px;
+    }
+
+    .feature-card:active {
+      transform: translateY(-1px);
+    }
+
+    .feature-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-lg);
+    }
+
+    .feature-card:nth-child(1) .feature-icon {
+      background: var(--color-secondary-lighter);
+      color: var(--color-secondary);
+    }
+    .feature-card:nth-child(2) .feature-icon {
+      background: var(--color-happy-light);
+      color: #D4A017;
+    }
+    .feature-card:nth-child(3) .feature-icon {
+      background: #F0ECF8;
+      color: #8B7EC8;
+    }
+    .feature-card:nth-child(4) .feature-icon {
+      background: var(--color-primary-lighter);
+      color: var(--color-primary);
+    }
+
+    .feature-card h3 {
+      font-size: var(--font-size-2xl);
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+
+    .feature-card p {
+      font-size: var(--font-size-base);
+      color: var(--color-text-muted);
+    }
+
+    .feature-arrow {
+      margin-top: var(--space-lg);
+      color: var(--color-text-muted);
+      transition: transform var(--transition-fast);
+    }
+
+    .feature-card:hover .feature-arrow {
+      transform: translateX(4px);
+      color: var(--color-primary);
+    }
+
+    .footer-info {
+      text-align: center;
+      padding: var(--space-2xl);
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+    }
+
+    @media (max-width: 600px) {
+      .feature-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+      }
+      .hero h1 { font-size: var(--font-size-3xl); }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="hero">
+      <div class="hero-icon animate-scale-in">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <h1>代間共學互動平台</h1>
+      <p>讓祖孫一起學習、一起歡笑</p>
+    </div>
+
+    <div class="feature-grid stagger">
+      <div class="feature-card animate-fade-in" onclick="location.href='checkin-tree.html'">
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 14c.3-.5.7-1.4.7-2.5 0-2.5-2.2-4.5-5-4.5s-5 2-5 4.5c0 1.1.4 2 .7 2.5"/>
+            <path d="M12 14v8"/>
+            <path d="M8 22h8"/>
+            <path d="M12 7V2"/>
+            <path d="M7 11c-2.5.5-4 2-4 3.5 0 1 .5 1.8 1 2.2"/>
+            <path d="M17 11c2.5.5 4 2 4 3.5 0 1-.5 1.8-1 2.2"/>
+          </svg>
+        </div>
+        <h3>簽到樹</h3>
+        <p>點擊大樹完成簽到</p>
+        <div class="feature-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </div>
+
+      <div class="feature-card animate-fade-in" onclick="location.href='mood.html'">
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>
+          </svg>
+        </div>
+        <h3>心情溫度計</h3>
+        <p>今天心情如何呢</p>
+        <div class="feature-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </div>
+
+      <div class="feature-card animate-fade-in" onclick="location.href='courses.html'">
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+            <path d="M8 7h6"/>
+            <path d="M8 11h8"/>
+          </svg>
+        </div>
+        <h3>課程內容</h3>
+        <p>每週精彩活動</p>
+        <div class="feature-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </div>
+
+      <div class="feature-card animate-fade-in" onclick="location.href='login.html'">
+        <div class="feature-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <h3>人員登入</h3>
+        <p>管理員與教師入口</p>
+        <div class="feature-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-info">
+      代間共學互動平台 &copy; 2026
+    </div>
+  </div>
+</body>
+</html>

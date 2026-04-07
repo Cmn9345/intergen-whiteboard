@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>課程詳情 - 代間共學互動平台</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .detail-header {
+      padding: var(--space-xl);
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+
+    .detail-hero {
+      padding: 0 var(--space-xl) var(--space-xl);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .detail-hero-card {
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .detail-hero-card h1 {
+      font-size: var(--font-size-4xl);
+      font-weight: 900;
+      color: white;
+      margin-bottom: var(--space-xs);
+    }
+
+    .detail-hero-card p {
+      font-size: var(--font-size-lg);
+      color: rgba(255,255,255,0.8);
+    }
+
+    .detail-week-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: rgba(255,255,255,0.2);
+      color: white;
+      font-weight: 700;
+      font-size: var(--font-size-sm);
+      margin-bottom: var(--space-md);
+      backdrop-filter: blur(4px);
+    }
+
+    .activities {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 var(--space-xl) var(--space-2xl);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .activity-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .activity-header {
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+
+    .activity-header:hover {
+      background: var(--color-surface);
+    }
+
+    .activity-indicator {
+      width: 4px;
+      height: 32px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .activity-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .activity-title {
+      flex: 1;
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+    }
+
+    .activity-duration {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .activity-chevron {
+      color: var(--color-text-muted);
+      transition: transform var(--transition-fast);
+    }
+
+    .activity-card.open .activity-chevron {
+      transform: rotate(180deg);
+    }
+
+    .activity-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height var(--transition-slow);
+    }
+
+    .activity-card.open .activity-body {
+      max-height: 600px;
+    }
+
+    .activity-content {
+      padding: 0 var(--space-lg) var(--space-lg);
+      padding-left: calc(var(--space-lg) + 4px + var(--space-md) + 40px + var(--space-md));
+    }
+
+    .activity-content ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .activity-content li {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      font-size: var(--font-size-base);
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+    }
+
+    .activity-content li::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--color-border);
+      flex-shrink: 0;
+      margin-top: 9px;
+    }
+
+    .activity-link {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      margin-top: var(--space-md);
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: var(--font-size-base);
+      transition: all var(--transition-fast);
+    }
+
+    .activity-link:hover {
+      transform: translateX(4px);
+    }
+
+    /* Color themes */
+    .theme-green .activity-indicator { background: #4CAF50; }
+    .theme-green .activity-icon { background: #E8F5E8; color: #2E7D32; }
+    .theme-green .activity-link { background: #E8F5E8; color: #2E7D32; }
+
+    .theme-purple .activity-indicator { background: #8B7EC8; }
+    .theme-purple .activity-icon { background: #F0ECF8; color: #6A5BAD; }
+    .theme-purple .activity-link { background: #F0ECF8; color: #6A5BAD; }
+
+    .theme-orange .activity-indicator { background: #FF9800; }
+    .theme-orange .activity-icon { background: #FFF3E0; color: #E65100; }
+    .theme-orange .activity-link { background: #FFF3E0; color: #E65100; }
+
+    .theme-red .activity-indicator { background: #EF5350; }
+    .theme-red .activity-icon { background: #FFE4E4; color: #C62828; }
+    .theme-red .activity-link { background: #FFE4E4; color: #C62828; }
+
+    .theme-blue .activity-indicator { background: #42A5F5; }
+    .theme-blue .activity-icon { background: #E3F2FD; color: #1565C0; }
+    .theme-blue .activity-link { background: #E3F2FD; color: #1565C0; }
+
+    .theme-teal .activity-indicator { background: var(--color-secondary); }
+    .theme-teal .activity-icon { background: var(--color-secondary-lighter); color: var(--color-secondary-dark); }
+    .theme-teal .activity-link { background: var(--color-secondary-lighter); color: var(--color-secondary-dark); }
+
+    /* Hero background colors */
+    .hero-green { background: linear-gradient(135deg, #4CAF50, #81C784); }
+    .hero-purple { background: linear-gradient(135deg, #7E57C2, #B39DDB); }
+    .hero-orange { background: linear-gradient(135deg, #FF9800, #FFB74D); }
+    .hero-red { background: linear-gradient(135deg, #EF5350, #EF9A9A); }
+    .hero-teal { background: linear-gradient(135deg, var(--color-secondary), var(--color-secondary-light)); }
+
+    .detail-back {
+      text-align: center;
+      padding: 0 0 var(--space-2xl);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="detail-header">
+      <a href="courses.html" class="back-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        所有課程
+      </a>
+    </div>
+
+    <div class="detail-hero">
+      <div class="detail-hero-card hero-green" id="hero-card">
+        <div class="detail-week-badge" id="week-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          第 0 週
+        </div>
+        <h1 id="course-title">課程名稱</h1>
+        <p id="course-desc">課程說明</p>
+      </div>
+    </div>
+
+    <div class="activities" id="activities"></div>
+
+    <div class="detail-back">
+      <a href="courses.html" class="back-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        回到課程列表
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const courseData = {
+      0: {
+        name: '課前預習', desc: '認識彼此、準備迎接精彩課程', hero: 'hero-green',
+        activities: [
+          { title: '找夥伴', theme: 'theme-green', duration: '15 分鐘', items: ['認識同組夥伴', '互相自我介紹', '找出共同興趣'], link: 'find-partner' },
+          { title: '家庭小測驗', theme: 'theme-purple', duration: '10 分鐘', items: ['回答家庭趣味問題', '了解彼此的家庭故事'], link: 'family-quiz' },
+          { title: '比手畫腳', theme: 'theme-orange', duration: '15 分鐘', items: ['用肢體語言表達詞語', '觀察力與想像力訓練'], link: 'charades' },
+        ]
+      },
+      1: {
+        name: '初次見面', desc: '自我介紹與團隊建立', hero: 'hero-purple',
+        activities: [
+          { title: '破冰遊戲', theme: 'theme-purple', duration: '20 分鐘', items: ['互動小遊戲', '打破陌生感', '建立信任基礎'], link: 'ice-breaker' },
+          { title: '一起動一動', theme: 'theme-green', duration: '15 分鐘', items: ['簡單肢體活動', '團隊合作練習'], link: 'together' },
+          { title: '故事書時間', theme: 'theme-orange', duration: '15 分鐘', items: ['共讀繪本故事', '分享心得感想'], link: 'storybook' },
+        ]
+      },
+      2: {
+        name: '情緒認識', desc: '認識情緒、情緒輪盤互動', hero: 'hero-red',
+        activities: [
+          { title: '情緒輪盤', theme: 'theme-red', duration: '20 分鐘', items: ['認識各種情緒', '情緒轉盤遊戲', '分享情緒經驗'], link: 'emotion-wheel' },
+          { title: '情緒表情', theme: 'theme-purple', duration: '15 分鐘', items: ['用表情表達情緒', '猜猜對方的心情'], link: 'emotion-faces' },
+          { title: '找夥伴', theme: 'theme-green', duration: '10 分鐘', items: ['找出有相同感受的夥伴', '互相安慰與鼓勵'], link: 'find-partner' },
+        ]
+      },
+    };
+
+    // Default fallback for weeks not defined
+    for (let w = 3; w <= 8; w++) {
+      if (!courseData[w]) {
+        courseData[w] = {
+          name: `第 ${w} 週課程`, desc: '精彩活動即將推出', hero: 'hero-teal',
+          activities: [
+            { title: '活動內容', theme: 'theme-teal', duration: '待定', items: ['課程內容準備中'], link: null },
+          ]
+        };
+      }
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const weekId = parseInt(params.get('week')) || 0;
+    const course = courseData[weekId] || courseData[0];
+
+    // Render hero
+    document.getElementById('hero-card').className = `detail-hero-card ${course.hero}`;
+    document.getElementById('week-badge').innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      第 ${weekId} 週`;
+    document.getElementById('course-title').textContent = course.name;
+    document.getElementById('course-desc').textContent = course.desc;
+    document.title = `${course.name} - 代間共學互動平台`;
+
+    // Render activities
+    const actIcon = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
+    const chevron = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+    const arrow = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+
+    document.getElementById('activities').innerHTML = course.activities.map((a, i) => `
+      <div class="activity-card ${a.theme} ${i === 0 ? 'open' : ''}" onclick="toggleActivity(this)">
+        <div class="activity-header">
+          <div class="activity-indicator"></div>
+          <div class="activity-icon">${actIcon}</div>
+          <div class="activity-title">${a.title}</div>
+          <div class="activity-duration">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${a.duration}
+          </div>
+          <div class="activity-chevron">${chevron}</div>
+        </div>
+        <div class="activity-body">
+          <div class="activity-content">
+            <ul>${a.items.map(item => `<li>${item}</li>`).join('')}</ul>
+            ${a.link ? `<a class="activity-link" href="#">前往活動 ${arrow}</a>` : ''}
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    function toggleActivity(card) {
+      card.classList.toggle('open');
+    }
+  </script>
+</body>
+</html>

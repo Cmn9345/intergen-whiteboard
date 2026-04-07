@@ -1,0 +1,380 @@
+{
+  "collections": [
+    {
+      "name": "users",
+      "type": "auth",
+      "system": false,
+      "schema": [
+        {
+          "name": "displayName",
+          "type": "text",
+          "required": true,
+          "options": {
+            "min": 1,
+            "max": 255
+          }
+        },
+        {
+          "name": "role",
+          "type": "select",
+          "required": true,
+          "options": {
+            "maxSelect": 1,
+            "values": ["ADMIN", "TEACHER", "STUDENT", "TESTER"]
+          }
+        },
+        {
+          "name": "isTester",
+          "type": "bool",
+          "required": false
+        },
+        {
+          "name": "group",
+          "type": "number",
+          "required": false,
+          "options": {
+            "min": 1,
+            "max": 100
+          }
+        },
+        {
+          "name": "photo",
+          "type": "file",
+          "required": false,
+          "options": {
+            "maxSelect": 1,
+            "maxSize": 5242880,
+            "mimeTypes": ["image/jpeg", "image/png", "image/gif", "image/webp", "image/svg+xml"]
+          }
+        },
+        {
+          "name": "groupImageUrl",
+          "type": "url",
+          "required": false
+        }
+      ],
+      "listRule": "",
+      "viewRule": "",
+      "createRule": "",
+      "updateRule": "@request.auth.id = id || @request.auth.role = 'ADMIN'",
+      "deleteRule": "@request.auth.role = 'ADMIN'"
+    },
+    {
+      "name": "courses",
+      "type": "base",
+      "system": false,
+      "schema": [
+        {
+          "name": "title",
+          "type": "text",
+          "required": true,
+          "options": {
+            "min": 1,
+            "max": 255
+          }
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "startsAt",
+          "type": "date",
+          "required": false
+        },
+        {
+          "name": "endsAt",
+          "type": "date",
+          "required": false
+        }
+      ],
+      "listRule": "@request.auth.id != ''",
+      "viewRule": "@request.auth.id != ''",
+      "createRule": "@request.auth.role = 'ADMIN' || @request.auth.role = 'TEACHER'",
+      "updateRule": "@request.auth.role = 'ADMIN' || @request.auth.role = 'TEACHER'",
+      "deleteRule": "@request.auth.role = 'ADMIN'"
+    },
+    {
+      "name": "enrollments",
+      "type": "base",
+      "system": false,
+      "schema": [
+        {
+          "name": "userId",
+          "type": "relation",
+          "required": true,
+          "options": {
+            "collectionId": "_pb_users_auth_",
+            "cascadeDelete": true,
+            "maxSelect": 1,
+            "displayFields": ["email", "displayName"]
+          }
+        },
+        {
+          "name": "courseId",
+          "type": "relation",
+          "required": true,
+          "options": {
+            "collectionId": "courses",
+            "cascadeDelete": true,
+            "maxSelect": 1,
+            "displayFields": ["title"]
+          }
+        }
+      ],
+      "indexes": ["CREATE UNIQUE INDEX idx_enrollments ON enrollments (userId, courseId)"],
+      "listRule": "@request.auth.id != ''",
+      "viewRule": "@request.auth.id != ''",
+      "createRule": "@request.auth.role = 'ADMIN' || @request.auth.role = 'TEACHER'",
+      "updateRule": "@request.auth.role = 'ADMIN' || @request.auth.role = 'TEACHER'",
+      "deleteRule": "@request.auth.role = 'ADMIN' || @request.auth.role = 'TEACHER'"
+    },
+    {
+      "name": "textPosts",
+      "type": "base",
+      "system": false,
+      "schema": [
+        {
+          "name": "content",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "authorId",
+          "type": "relation",
+          "required": true,
+          "options": {
+            "collectionId": "_pb_users_auth_",
+            "cascadeDelete": true,
+            "maxSelect": 1,
+            "displayFields": ["email", "displayName"]
+          }
+        },
+        {
+          "name": "courseId",
+          "type": "relation",
+          "required": false,
+          "options": {
+            "collectionId": "courses",
+            "cascadeDelete": false,
+            "maxSelect": 1,
+            "displayFields": ["title"]
+          }
+        }
+      ],
+      "listRule": "@request.auth.id != ''",
+      "viewRule": "@request.auth.id != ''",
+      "createRule": "@request.auth.id != ''",
+      "updateRule": "@request.auth.id = authorId",
+      "deleteRule": "@request.auth.id = authorId || @request.auth.role = 'ADMIN'"
+    },
+    {
+      "name": "voicePosts",
+      "type": "base",
+      "system": false,
+      "schema": [
+        {
+          "name": "title",
+          "type": "text",
+          "required": true,
+          "options": {
+            "min": 1,
+            "max": 255
+          }
+        },
+        {
+          "name": "audioFile",
+          "type": "file",
+          "required": true,
+          "options": {
+            "maxSelect": 1,
+            "maxSize": 52428800,
+            "mimeTypes": ["audio/mpeg", "audio/wav", "audio/ogg", "audio/webm"]
+          }
+        },
+        {
+          "name": "authorId",
+          "type": "relation",
+          "required": true,
+          "options": {
+            "collectionId": "_pb_users_auth_",
+            "cascadeDelete": true,
+            "maxSelect": 1,
+            "displayFields": ["email", "displayName"]
+          }
+        },
+        {
+          "name": "courseId",
+          "type": "relation",
+          "required": false,
+          "options": {
+            "collectionId": "courses",
+            "cascadeDelete": false,
+            "maxSelect": 1,
+            "displayFields": ["title"]
+          }
+        }
+      ],
+      "listRule": "@request.auth.id != ''",
+      "viewRule": "@request.auth.id != ''",
+      "createRule": "@request.auth.id != ''",
+      "updateRule": "@request.auth.id = authorId",
+      "deleteRule": "@request.auth.id = authorId || @request.auth.role = 'ADMIN'"
+    },
+    {
+      "name": "moods",
+      "type": "base",
+      "system": false,
+      "schema": [
+        {
+          "name": "value",
+          "type": "number",
+          "required": true,
+          "options": {
+            "min": 1,
+            "max": 10
+          }
+        },
+        {
+          "name": "note",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "recordedAt",
+          "type": "date",
+          "required": true
+        },
+        {
+          "name": "userId",
+          "type": "relation",
+          "required": true,
+          "options": {
+            "collectionId": "_pb_users_auth_",
+            "cascadeDelete": true,
+            "maxSelect": 1,
+            "displayFields": ["email", "displayName"]
+          }
+        },
+        {
+          "name": "courseId",
+          "type": "relation",
+          "required": false,
+          "options": {
+            "collectionId": "courses",
+            "cascadeDelete": false,
+            "maxSelect": 1,
+            "displayFields": ["title"]
+          }
+        },
+        {
+          "name": "sessionId",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "deviceInfo",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "location",
+          "type": "text",
+          "required": false
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_moods_user ON moods (userId, recordedAt)",
+        "CREATE INDEX idx_moods_course ON moods (courseId, recordedAt)"
+      ],
+      "listRule": "@request.auth.id != ''",
+      "viewRule": "@request.auth.id != ''",
+      "createRule": "@request.auth.id != ''",
+      "updateRule": "@request.auth.id = userId",
+      "deleteRule": "@request.auth.id = userId || @request.auth.role = 'ADMIN'"
+    },
+    {
+      "name": "checkins",
+      "type": "base",
+      "system": false,
+      "schema": [
+        {
+          "name": "date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "name": "userId",
+          "type": "relation",
+          "required": true,
+          "options": {
+            "collectionId": "_pb_users_auth_",
+            "cascadeDelete": true,
+            "maxSelect": 1,
+            "displayFields": ["email", "displayName"]
+          }
+        },
+        {
+          "name": "courseId",
+          "type": "relation",
+          "required": false,
+          "options": {
+            "collectionId": "courses",
+            "cascadeDelete": false,
+            "maxSelect": 1,
+            "displayFields": ["title"]
+          }
+        },
+        {
+          "name": "sessionId",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "deviceInfo",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "location",
+          "type": "text",
+          "required": false
+        },
+        {
+          "name": "checkinType",
+          "type": "select",
+          "required": true,
+          "options": {
+            "maxSelect": 1,
+            "values": ["MANUAL", "AUTO", "QR_CODE"]
+          }
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "options": {
+            "maxSelect": 1,
+            "values": ["PRESENT", "LATE", "ABSENT"]
+          }
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "required": false
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX idx_checkins_user_date ON checkins (userId, date)",
+        "CREATE INDEX idx_checkins_course ON checkins (courseId, date)",
+        "CREATE INDEX idx_checkins_date ON checkins (date)"
+      ],
+      "listRule": "@request.auth.id != ''",
+      "viewRule": "@request.auth.id != ''",
+      "createRule": "@request.auth.id != ''",
+      "updateRule": "@request.auth.id = userId || @request.auth.role = 'ADMIN' || @request.auth.role = 'TEACHER'",
+      "deleteRule": "@request.auth.role = 'ADMIN'"
+    }
+  ]
+}

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理儀表板 - 代間共學互動平台</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .dash-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dash-header {
+      padding: var(--space-xl) var(--space-xl) 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .dash-welcome {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+
+    .dash-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-2xl);
+      font-weight: 800;
+    }
+
+    .dash-greeting {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+    }
+
+    .dash-name {
+      font-size: var(--font-size-2xl);
+      font-weight: 700;
+    }
+
+    .dash-actions {
+      display: flex;
+      gap: var(--space-sm);
+    }
+
+    .dash-content {
+      flex: 1;
+      padding: var(--space-xl);
+      max-width: 960px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .dash-section-title {
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .dash-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+
+    .dash-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-lg);
+    }
+
+    .dash-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .dash-card:active { transform: translateY(0); }
+
+    .dash-card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dash-card-info { flex: 1; }
+
+    .dash-card-title {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+
+    .dash-card-desc {
+      font-size: var(--font-size-base);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-md);
+    }
+
+    .dash-card-arrow {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      transition: all var(--transition-fast);
+    }
+
+    .dash-card:hover .dash-card-arrow {
+      color: var(--color-primary);
+      transform: translateX(4px);
+    }
+
+    /* Quick stats */
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+
+    .stat-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md) var(--space-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-xs);
+    }
+
+    .stat-value {
+      font-size: var(--font-size-3xl);
+      font-weight: 800;
+    }
+
+    .stat-sub {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+
+    /* Not logged in */
+    .not-logged-in {
+      text-align: center;
+      padding: var(--space-3xl);
+    }
+
+    .not-logged-in .icon-box {
+      margin: 0 auto var(--space-lg);
+    }
+
+    @media (max-width: 768px) {
+      .dash-grid { grid-template-columns: 1fr; }
+      .quick-stats { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="dash-page">
+    <!-- Logged in view -->
+    <div id="logged-in" style="display:none">
+      <div class="dash-header">
+        <div class="dash-welcome">
+          <div class="dash-avatar" id="user-avatar"></div>
+          <div>
+            <div class="dash-greeting">歡迎回來</div>
+            <div class="dash-name" id="user-name"></div>
+          </div>
+        </div>
+        <div class="dash-actions">
+          <a href="index.html" class="btn btn-ghost">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            首頁
+          </a>
+          <button class="btn btn-outline" onclick="logout()" style="color:var(--color-danger);border-color:var(--color-danger)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            登出
+          </button>
+        </div>
+      </div>
+
+      <div class="dash-content">
+        <!-- Quick Stats -->
+        <div class="dash-section-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          快速統計
+        </div>
+        <div class="quick-stats" id="quick-stats">
+          <div class="stat-card">
+            <div class="stat-label">總學員數</div>
+            <div class="stat-value" id="stat-students">--</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">本週簽到</div>
+            <div class="stat-value" id="stat-checkins">--</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">心情投票</div>
+            <div class="stat-value" id="stat-moods">--</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">目前週次</div>
+            <div class="stat-value" id="stat-week">--</div>
+          </div>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="dash-section-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          管理功能
+        </div>
+        <div class="dash-grid">
+          <div class="dash-card" onclick="location.href='mood-stats.html'">
+            <div class="dash-card-icon icon-box-happy">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>
+              </svg>
+            </div>
+            <div class="dash-card-info">
+              <div class="dash-card-title">心情紀錄</div>
+              <div class="dash-card-desc">查看與管理所有心情投票紀錄</div>
+              <div class="dash-card-arrow">
+                查看詳情
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-card" onclick="location.href='checkin-tree.html'">
+            <div class="dash-card-icon icon-box-secondary">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <polyline points="16 11 18 13 22 9"/>
+              </svg>
+            </div>
+            <div class="dash-card-info">
+              <div class="dash-card-title">簽到紀錄</div>
+              <div class="dash-card-desc">查看各週簽到狀況與出席率</div>
+              <div class="dash-card-arrow">
+                查看詳情
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-card" onclick="location.href='courses.html'">
+            <div class="dash-card-icon" style="background:#F0ECF8;color:#8B7EC8">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+              </svg>
+            </div>
+            <div class="dash-card-info">
+              <div class="dash-card-title">課程管理</div>
+              <div class="dash-card-desc">查看與管理所有課程內容</div>
+              <div class="dash-card-arrow">
+                查看詳情
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-card" onclick="location.href='index.html'">
+            <div class="dash-card-icon icon-box-primary">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+            </div>
+            <div class="dash-card-info">
+              <div class="dash-card-title">回到前台</div>
+              <div class="dash-card-desc">回到互動平台首頁</div>
+              <div class="dash-card-arrow">
+                前往
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Not logged in -->
+    <div id="not-logged-in" class="not-logged-in">
+      <div class="icon-box icon-box-lg icon-box-primary" style="margin:0 auto var(--space-lg)">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="18" height="11" x="3" y="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <h2 style="font-size:var(--font-size-2xl);margin-bottom:var(--space-sm)">尚未登入</h2>
+      <p style="color:var(--color-text-muted);margin-bottom:var(--space-lg)">請先登入以使用管理功能</p>
+      <a href="login.html" class="btn btn-primary btn-lg">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        前往登入
+      </a>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+
+    if (user) {
+      document.getElementById('logged-in').style.display = '';
+      document.getElementById('not-logged-in').style.display = 'none';
+      const name = user.Name || user.name || '使用者';
+      document.getElementById('user-avatar').textContent = name[0];
+      document.getElementById('user-name').textContent = name;
+      loadStats();
+    } else {
+      document.getElementById('logged-in').style.display = 'none';
+      document.getElementById('not-logged-in').style.display = '';
+    }
+
+    async function loadStats() {
+      const students = await api.getStudents();
+      document.getElementById('stat-students').textContent = students ? students.length : '--';
+
+      const checkins = await api.getCheckins('1');
+      document.getElementById('stat-checkins').textContent = checkins.length;
+
+      const moods = await api.getMoods('1');
+      document.getElementById('stat-moods').textContent = moods.length;
+
+      document.getElementById('stat-week').textContent = '1';
+    }
+
+    function logout() {
+      localStorage.removeItem('currentUser');
+      location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

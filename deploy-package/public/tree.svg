@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Blank tree">
+  <rect width="1600" height="900" fill="#efefef"/>
+  <g fill="#5b3a29" stroke="#5b3a29" stroke-linecap="round">
+    <!-- trunk -->
+    <path d="M800 880 C 760 620, 780 520, 800 460 C 820 520, 840 620, 800 880 Z"/>
+    <!-- main branches -->
+    <path d="M800 480 Q 620 420 480 560" stroke-width="16" fill="none"/>
+    <path d="M800 500 Q 980 420 1140 560" stroke-width="16" fill="none"/>
+    <path d="M800 460 Q 700 360 560 340" stroke-width="12" fill="none"/>
+    <path d="M800 460 Q 900 360 1040 330" stroke-width="12" fill="none"/>
+    <path d="M790 520 Q 640 520 520 640" stroke-width="10" fill="none"/>
+    <path d="M810 520 Q 960 500 1080 640" stroke-width="10" fill="none"/>
+  </g>
+  <!-- light highlights -->
+  <g stroke="rgba(255,255,255,0.7)" stroke-linecap="round" fill="none">
+    <path d="M700 400 Q 660 380 560 360" stroke-width="6"/>
+    <path d="M900 400 Q 940 370 1040 350" stroke-width="6"/>
+    <path d="M740 520 Q 680 520 600 600" stroke-width="5"/>
+    <path d="M860 520 Q 920 510 980 600" stroke-width="5"/>
+  </g>
+</svg>
+
+
+

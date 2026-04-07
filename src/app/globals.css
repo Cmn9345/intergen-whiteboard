@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+/* ============================================
+   代間共學互動平台 - Design System
+   ============================================ */
+
+:root {
+  /* Primary - Warm Coral */
+  --primary: #E8734A;
+  --primary-light: #F4A27A;
+  --primary-lighter: #FFF0E8;
+  --primary-dark: #C85A32;
+
+  /* Secondary - Soft Teal */
+  --secondary: #3DABB5;
+  --secondary-light: #7FD0D6;
+  --secondary-lighter: #E6F7F8;
+  --secondary-dark: #2A8A93;
+
+  /* Neutral */
+  --bg: #FDF8F4;
+  --bg-card: #FFFFFF;
+  --surface: #F7F0EA;
+  --border: #E8DDD4;
+  --border-light: #F0E8E0;
+
+  /* Text */
+  --text-primary: #2D2520;
+  --text-secondary: #6B5E54;
+  --text-muted: #9B8E84;
+  --text-inverse: #FFFFFF;
+
+  /* Mood */
+  --happy: #F5C842;
+  --happy-light: #FFF5D4;
+  --sad: #5B9BD5;
+  --sad-light: #E0F0FF;
+  --angry: #E06B6B;
+  --angry-light: #FFE4E4;
+
+  /* Status */
+  --success: #5CB85C;
+  --success-light: #E8F5E8;
+  --warning: #F0AD4E;
+  --danger: #D9534F;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(45,37,32,0.06);
+  --shadow-md: 0 4px 12px rgba(45,37,32,0.08);
+  --shadow-lg: 0 8px 24px rgba(45,37,32,0.10);
+  --shadow-xl: 0 16px 40px rgba(45,37,32,0.12);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Animations */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes celebrate {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes spot-pulse {
+  0%, 100% { border-color: rgba(255,255,255,0.35); transform: scale(1); }
+  50% { border-color: rgba(255,255,255,0.7); transform: scale(1.08); }
+}
+
+@keyframes stamp-pop {
+  0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}

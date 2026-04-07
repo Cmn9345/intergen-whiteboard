@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(npm run dev:*)",
+      "Bash(findstr:*)",
+      "Bash(npx prisma studio:*)",
+      "Bash(mkdir:*)",
+      "Bash(powershell:*)",
+      "Bash(./pocketbase.exe serve:*)",
+      "Bash(curl:*)",
+      "Bash(xcopy \"C:\\Users\\lianz\\Downloads\\intergen-whiteboard\" \"C:\\Users\\lianz\\Downloads\\代間計劃\\白板\" /E /I /H /Y)",
+      "Bash(start http://localhost:3001/checkin-tree)",
+      "Bash(start http://localhost:3001/mood)",
+      "WebSearch",
+      "Bash(python3 -c \" import json, sys d = json.load\\(sys.stdin\\) print\\(f\\\\\"Stars: {d.get\\('stargazers_count','?'\\)}, Pushed: {d.get\\('pushed_at','?'\\)}, Created: {d.get\\('created_at','?'\\)}, Forks: {d.get\\('forks_count','?'\\)}\\\\\"\\) print\\(f\\\\\"Desc: {d.get\\('description','?'\\)}\\\\\"\\) \")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

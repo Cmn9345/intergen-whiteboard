@@ -1,0 +1,44 @@
+<svg viewBox="0 0 1600 900" xmlns="http://www.w3.org/2000/svg">
+  <!-- 黑色背景 -->
+  <rect width="1600" height="900" fill="#000000"/>
+  
+  <!-- 樹木主體 - 深紅棕色 -->
+  <g fill="#8B4513" stroke="#654321" stroke-width="8">
+    <!-- 樹幹 -->
+    <path d="M800 880 C 780 750, 790 650, 800 580 C 810 650, 820 750, 800 880 Z"/>
+    
+    <!-- 主要枝條 -->
+    <path d="M800 580 Q 600 520, 450 650" stroke-width="20" fill="none" stroke-linecap="round"/>
+    <path d="M800 580 Q 1000 520, 1150 650" stroke-width="20" fill="none" stroke-linecap="round"/>
+    <path d="M800 580 Q 700 480, 550 450" stroke-width="16" fill="none" stroke-linecap="round"/>
+    <path d="M800 580 Q 900 480, 1050 450" stroke-width="16" fill="none" stroke-linecap="round"/>
+    <path d="M790 600 Q 650 600, 520 720" stroke-width="12" fill="none" stroke-linecap="round"/>
+    <path d="M810 600 Q 950 600, 1080 720" stroke-width="12" fill="none" stroke-linecap="round"/>
+    
+    <!-- 細分支條 -->
+    <path d="M750 500 Q 680 480, 600 520" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <path d="M850 500 Q 920 480, 1000 520" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <path d="M800 580 Q 750 450, 700 400" stroke-width="14" fill="none" stroke-linecap="round"/>
+    <path d="M800 580 Q 850 450, 900 400" stroke-width="14" fill="none" stroke-linecap="round"/>
+    <path d="M700 400 Q 650 380, 600 360" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M900 400 Q 950 380, 1000 360" stroke-width="8" fill="none" stroke-linecap="round"/>
+  </g>
+  
+  <!-- 綠色光暈效果 -->
+  <g opacity="0.3" stroke="#00FF00" fill="none" stroke-linecap="round">
+    <path d="M800 580 Q 600 520, 450 650" stroke-width="24"/>
+    <path d="M800 580 Q 1000 520, 1150 650" stroke-width="24"/>
+    <path d="M800 580 Q 700 480, 550 450" stroke-width="20"/>
+    <path d="M800 580 Q 900 480, 1050 450" stroke-width="20"/>
+  </g>
+  
+  <!-- 簽到位置標記點 (隱藏，用於計算位置) -->
+  <g opacity="0">
+    <path d="M800 580 Q 600 520, 450 650" data-branch />
+    <path d="M800 580 Q 1000 520, 1150 650" data-branch />
+    <path d="M800 580 Q 700 480, 550 450" data-branch />
+    <path d="M800 580 Q 900 480, 1050 450" data-branch />
+    <path d="M790 600 Q 650 600, 520 720" data-branch />
+    <path d="M810 600 Q 950 600, 1080 720" data-branch />
+  </g>
+</svg>
