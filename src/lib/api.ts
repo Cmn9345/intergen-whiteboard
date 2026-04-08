@@ -1,14 +1,17 @@
 /**
- * API helper - connects to Express API on Render (proxies to PocketBase)
+ * API helper — connects to local PocketBase
  */
+import pb from './pocketbase';
 
-const RENDER_URL = 'https://intergenapp.onrender.com';
-const IS_SERVER = typeof window === 'undefined';
-const API_BASE = IS_SERVER ? RENDER_URL : (
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? '' : RENDER_URL
-);
-const PB_PROXY = `${RENDER_URL}/api/pb`;
+// ---- Types ----
+
+export interface Member {
+  group: number;
+  name: string;
+  color: string;
+  imageUrl?: string;
+  groupImageUrl?: string;
+}
 
 export interface Student {
   id: string;
@@ -39,26 +42,48 @@ export interface MoodRecord {
   created: string;
 }
 
-// ---- Students ----
+// ---- Members (Google Sheets) ----
 
-export async function getStudents(): Promise<Student[] | null> {
+export async function getMembers(): Promise<Member[]> {
   try {
-    const res = await fetch(`${RENDER_URL}/api/students`);
+    const res = await fetch('/api/members');
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch (err) {
+    console.error('[api] getMembers failed:', err);
+    return [];
+  }
+}
+
+export function groupMembers(members: Member[]): Record<number, Member[]> {
+  const groups: Record<number, Member[]> = {};
+  for (const m of members) {
+    const g = m.group || 1;
+    if (!groups[g]) groups[g] = [];
+    groups[g].push(m);
+  }
+  return groups;
+}
+
+// ---- Students (PocketBase) ----
+
+export async function getStudents(): Promise<Student[]> {
+  try {
+    const result = await pb.collection('student').getFullList<Student>();
+    return result;
+  } catch (err) {
     console.error('[api] getStudents failed:', err);
-    return null;
+    return [];
   }
 }
 
 export function groupStudents(students: Student[]): Record<string, Student[]> {
   const groups: Record<string, Student[]> = {};
-  students.forEach(s => {
+  for (const s of students) {
     const g = s.group || '1';
     if (!groups[g]) groups[g] = [];
     groups[g].push(s);
-  });
+  }
   return groups;
 }
 
@@ -66,75 +91,60 @@ export function getStudentName(s: Student): string {
   return s.Name || s.name || '?';
 }
 
-// ---- PocketBase Generic CRUD ----
+// ---- Checkins (PocketBase: signintree) ----
 
-async function getRecords<T = Record<string, unknown>>(collection: string, params: Record<string, string> = {}): Promise<T[]> {
+export async function getCheckins(weekend: string): Promise<CheckinRecord[]> {
   try {
-    const query = new URLSearchParams(params).toString();
-    const url = `${PB_PROXY}/${collection}/records${query ? '?' + query : ''}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    return data.items || data || [];
+    return await pb.collection('signintree').getFullList<CheckinRecord>({
+      sort: '-created',
+      ...(weekend ? { filter: `weekend = "${weekend}"` } : {}),
+    });
   } catch (err) {
-    console.error(`[api] getRecords(${collection}) failed:`, err);
+    console.error('[api] getCheckins failed:', err);
     return [];
   }
 }
 
-async function createRecord<T = Record<string, unknown>>(collection: string, body: Record<string, unknown>): Promise<T> {
-  const res = await fetch(`${PB_PROXY}/${collection}/records`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const errData = await res.json().catch(() => ({}));
-    throw new Error(errData.error || `HTTP ${res.status}`);
-  }
-  return await res.json();
-}
-
-// ---- Checkin ----
-
-export async function getCheckins(weekend: string): Promise<CheckinRecord[]> {
-  return getRecords<CheckinRecord>('signintree', {
-    sort: '-created',
-    ...(weekend ? { filter: `weekend = "${weekend}"` } : {}),
-  });
-}
-
 export async function checkin(name: string, group: string, weekend: string): Promise<CheckinRecord> {
-  const existing = await getRecords<CheckinRecord>('signintree', {
+  // Check duplicate
+  const existing = await pb.collection('signintree').getFullList<CheckinRecord>({
     filter: `Name = "${name}" && weekend = "${weekend}"`,
   });
   if (existing.length > 0) throw new Error('DUPLICATE');
-  return createRecord<CheckinRecord>('signintree', {
-    Name: name, group, weekend, checkinstatus: 'Yes',
+
+  return await pb.collection('signintree').create<CheckinRecord>({
+    Name: name,
+    group,
+    weekend,
+    checkinstatus: 'Yes',
   });
 }
 
-// ---- Mood ----
+// ---- Moods (PocketBase: emotion_temperature) ----
 
 export async function getMoods(weekend: string): Promise<MoodRecord[]> {
-  return getRecords<MoodRecord>('emotion_temperature', {
-    sort: '-created',
-    ...(weekend ? { filter: `weekend = "${weekend}"` } : {}),
-  });
+  try {
+    return await pb.collection('emotion_temperature').getFullList<MoodRecord>({
+      sort: '-created',
+      ...(weekend ? { filter: `weekend = "${weekend}"` } : {}),
+    });
+  } catch (err) {
+    console.error('[api] getMoods failed:', err);
+    return [];
+  }
 }
 
 export async function voteMood(name: string, group: string, weekend: string, emotional: string): Promise<MoodRecord> {
-  const existing = await getRecords<MoodRecord>('emotion_temperature', {
+  // Check duplicate
+  const existing = await pb.collection('emotion_temperature').getFullList<MoodRecord>({
     filter: `Name = "${name}" && weekend = "${weekend}"`,
   });
   if (existing.length > 0) throw new Error('DUPLICATE');
-  return createRecord<MoodRecord>('emotion_temperature', {
-    Name: name, group, weekend, emotional,
+
+  return await pb.collection('emotion_temperature').create<MoodRecord>({
+    Name: name,
+    group,
+    weekend,
+    emotional,
   });
-}
-
-// ---- File URL ----
-
-export function fileUrl(collectionId: string, recordId: string, filename: string): string {
-  return `${RENDER_URL}/api/files/${collectionId}/${recordId}/${filename}`;
 }

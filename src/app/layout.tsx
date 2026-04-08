@@ -1,14 +1,7 @@
 import type { Metadata } from "next";
-import { Noto_Sans_TC } from "next/font/google";
 import "./globals.css";
 import React from "react";
 import { AuthProvider } from "./contexts/AuthContext";
-
-const notoSansTC = Noto_Sans_TC({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "900"],
-  variable: "--font-noto",
-});
 
 export const metadata: Metadata = {
   title: "代間共學互動平台",
@@ -22,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-TW">
-      <body className={`${notoSansTC.className} antialiased`}>
+      <body className="antialiased">
         <AuthProvider>
           {children}
         </AuthProvider>
