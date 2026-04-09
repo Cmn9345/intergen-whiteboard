@@ -1,145 +1,97 @@
 "use client";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { getWeekTitle } from "@/lib/weeks";
 
-// 合奏歌曲列表
-const ensembleSongs = [
-  {
-    id: "hippo",
-    name: "河馬歌",
-    url: "https://youtu.be/1OjkOZ7HhFc?si=xXvTlycalF1aS5OK",
-    videoId: "1OjkOZ7HhFc"
-  },
-  {
-    id: "aram",
-    name: "A Ram Sam Sam",
-    url: "https://youtu.be/t59wPLPdzcM?feature=shared",
-    videoId: "t59wPLPdzcM"
-  },
-  {
-    id: "embrace",
-    name: "擁抱世界擁抱你",
-    url: "https://youtu.be/rBvJ3CFnnQU?si=pqN4d3qRlVEjzKnz",
-    videoId: "rBvJ3CFnnQU"
-  },
-  {
-    id: "environment",
-    name: "人人做環保",
-    url: "https://youtu.be/-Cmj65rNdok?si=rYBF9UnuHjaA9IGf",
-    videoId: "-Cmj65rNdok"
-  },
-  {
-    id: "mud",
-    name: "捏泥巴",
-    url: "https://youtu.be/qn_0T9gerCA?si=dkcJyXYjmxImhxdg",
-    videoId: "qn_0T9gerCA"
-  },
-  {
-    id: "copper",
-    name: "丟丟銅仔",
-    url: "https://youtu.be/baRAM0RVhn8?si=FixdUEn7tj5gQgjC",
-    videoId: "baRAM0RVhn8"
-  }
+import { useState } from "react";
+import Link from "next/link";
+import FloatingNav from "@/app/courses/_components/FloatingNav";
+
+const songs = [
+  { name: "河馬歌", emoji: "🦛", videoId: "1OjkOZ7HhFc", desc: "可愛的河馬歌" },
+  { name: "A Ram Sam Sam", emoji: "🎵", videoId: "t59wPLPdzcM", desc: "經典律動歌曲" },
+  { name: "擁抱世界擁抱你", emoji: "🤗", videoId: "rBvJ3CFnnQU", desc: "溫暖的擁抱歌" },
+  { name: "人人做環保", emoji: "♻️", videoId: "-Cmj65rNdok", desc: "環保小尖兵" },
+  { name: "捏泥巴", emoji: "🏺", videoId: "qn_0T9gerCA", desc: "手作泥巴歌" },
+  { name: "丟丟銅仔", emoji: "🎼", videoId: "baRAM0RVhn8", desc: "台灣民謠經典" },
+];
+
+const cardBgs = [
+  "var(--color-postit-yellow)", "var(--color-postit-pink)", "var(--color-postit-blue)",
+  "var(--color-postit-green)", "#F3E5F5", "#FFF3E0",
 ];
 
 export default function EnsemblePage() {
-  const router = useRouter();
-  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
-  const [selectedSongName, setSelectedSongName] = useState<string>("");
+  const [showVideo, setShowVideo] = useState(false);
+  const [videoTitle, setVideoTitle] = useState("");
+  const [videoSrc, setVideoSrc] = useState("");
 
-  const handlePlayVideo = (videoId: string, songName: string) => {
-    setSelectedVideoId(videoId);
-    setSelectedSongName(songName);
+  const playSong = (index: number) => {
+    const s = songs[index];
+    setVideoTitle(`🎵 ${s.name}`);
+    setVideoSrc(`https://www.youtube.com/embed/${s.videoId}?autoplay=1&feature=oembed`);
+    setShowVideo(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleCloseVideo = () => {
-    setSelectedVideoId(null);
-    setSelectedSongName("");
+  const closeVideo = () => {
+    setVideoSrc("");
+    setShowVideo(false);
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-orange-50 to-red-100 flex flex-col relative">
-      {/* 返回按鈕 */}
-      <div className="fixed top-4 left-4 z-50">
-        <button
-          onClick={() => router.push('/courses/4')}
-          className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors border border-gray-200"
-          title={`返回${getWeekTitle('4')}課程`}
-        >
-          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          <span className="text-sm font-medium text-gray-700">返回{getWeekTitle('4')}</span>
-        </button>
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ flex: 1, overflow: "auto", maxWidth: 1000, margin: "0 auto", padding: "var(--space-lg)", width: "100%" }}>
+      <div style={{ marginBottom: "var(--space-lg)" }}>
+        <Link href="/courses/4" className="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7" /><path d="M19 12H5" /></svg>
+          回到第 5 週
+        </Link>
       </div>
 
-      {selectedVideoId ? (
-        // 播放影片模式
-        <div className="w-full h-screen bg-black relative">
-          <iframe
-            width="100%"
-            height="100%"
-            src={`https://www.youtube.com/embed/${selectedVideoId}?autoplay=1&rel=0&modestbranding=1&controls=1&showinfo=0&fs=1&cc_load_policy=1&iv_load_policy=3`}
-            title={selectedSongName}
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            className="w-full h-full"
-          ></iframe>
-          
-          {/* 關閉按鈕 */}
-          <button
-            onClick={handleCloseVideo}
-            className="fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors border border-gray-200"
-            title="返回歌曲列表"
-          >
-            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-            <span className="text-sm font-medium text-gray-700">返回列表</span>
-          </button>
+      <div style={{ textAlign: "center", marginBottom: "var(--space-xl)" }}>
+        <h1 style={{ fontSize: "var(--font-size-4xl)", fontFamily: "var(--font-heading)" }}>🎶 合唱合奏</h1>
+        <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--font-size-xl)", marginTop: "var(--space-xs)" }}>選一首歌，大家一起唱！</p>
+      </div>
 
-          {/* 標題顯示在頂部中央（不擋播放器控制欄） */}
-          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-40 bg-black bg-opacity-70 text-white px-6 py-2 rounded-lg pointer-events-none">
-            <h2 className="text-lg font-semibold">{selectedSongName}</h2>
+      {showVideo && (
+        <div style={{ marginBottom: "var(--space-xl)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-md)" }}>
+            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-2xl)" }}>{videoTitle}</h2>
+            <button className="btn btn-outline" onClick={closeVideo}>X 關閉</button>
           </div>
-        </div>
-      ) : (
-        // 歌曲列表模式
-        <div className="flex-1 flex flex-col items-center justify-center p-8 pt-24">
-          <div className="w-full max-w-4xl">
-            <h1 className="text-5xl font-bold text-orange-800 mb-4 text-center">🎵 合奏</h1>
-            <p className="text-xl text-gray-700 mb-8 text-center">
-              選擇一首歌曲，一起合奏吧！
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {ensembleSongs.map((song) => (
-                <button
-                  key={song.id}
-                  onClick={() => handlePlayVideo(song.videoId, song.name)}
-                  className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 border-2 border-orange-200 hover:border-orange-400 text-left group"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-2xl font-bold text-orange-600 group-hover:text-orange-700">
-                      {song.name}
-                    </h3>
-                    <svg className="w-6 h-6 text-gray-400 group-hover:text-orange-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="text-gray-600 text-sm">
-                    點擊播放
-                  </div>
-                </button>
-              ))}
-            </div>
+          <div style={{ position: "relative", width: "100%", paddingBottom: "56.25%", borderRadius: "var(--wobble-1)", border: "var(--border-width) solid var(--color-border)", overflow: "hidden", boxShadow: "var(--shadow-sketch)", background: "#000" }}>
+            <iframe
+              src={videoSrc}
+              style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: "none" }}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+              title="合唱合奏"
+            />
           </div>
         </div>
       )}
-    </main>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "var(--space-lg)" }}>
+        {songs.map((s, i) => (
+          <div key={i} onClick={() => playSong(i)} style={{
+            background: cardBgs[i], border: "var(--border-width) solid var(--color-border)",
+            borderRadius: i % 3 === 0 ? "var(--wobble-1)" : i % 3 === 1 ? "var(--wobble-2)" : "var(--wobble-3)",
+            padding: "var(--space-xl)", display: "flex", alignItems: "center", gap: "var(--space-lg)",
+            cursor: "pointer", transition: "all 0.2s ease", boxShadow: "var(--shadow-sketch)",
+          }}>
+            <span style={{ fontSize: 48, flexShrink: 0 }}>{s.emoji}</span>
+            <div style={{ flex: 1 }}>
+              <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-2xl)", fontWeight: 700 }}>{s.name}</h3>
+              <p style={{ color: "var(--color-text-muted)", fontSize: "var(--font-size-base)" }}>{s.desc}</p>
+            </div>
+            <div style={{ color: "var(--color-text-muted)", flexShrink: 0 }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      </div>
+      <FloatingNav prev={{ href: "/courses/4/talent-show", label: "才藝表演" }} next={{ href: "/courses/4", label: "回課程" }} />
+    </div>
   );
 }
-

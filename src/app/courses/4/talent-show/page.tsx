@@ -1,247 +1,114 @@
 "use client";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { getWeekTitle } from "@/lib/weeks";
 
-// 才藝類型數據
-const talentCategories = [
-  {
-    id: "singing",
-    name: "唱歌",
-    icon: "🎤",
-    description: "展示美妙的歌聲",
-    examples: ["兒歌", "老歌", "流行歌曲", "民謠"]
-  },
-  {
-    id: "dancing",
-    name: "跳舞",
-    icon: "💃",
-    description: "展現優美的舞姿",
-    examples: ["民族舞", "現代舞", "廣場舞", "兒童舞"]
-  },
-  {
-    id: "storytelling",
-    name: "說故事",
-    icon: "📚",
-    description: "分享精彩的故事",
-    examples: ["童話故事", "民間故事", "生活趣事", "歷史故事"]
-  },
-  {
-    id: "art",
-    name: "繪畫/手工",
-    icon: "🎨",
-    description: "展現藝術天分",
-    examples: ["畫畫", "摺紙", "剪紙", "書法"]
-  },
-  {
-    id: "sports",
-    name: "運動技能",
-    icon: "⚽",
-    description: "展示運動才能",
-    examples: ["太極拳", "體操", "球類運動", "武術"]
-  },
-  {
-    id: "music",
-    name: "樂器演奏",
-    icon: "🎵",
-    description: "演奏樂器",
-    examples: ["鋼琴", "吉他", "口琴", "打擊樂器"]
-  }
+import { useState } from "react";
+import Link from "next/link";
+import FloatingNav from "@/app/courses/_components/FloatingNav";
+
+const categories = [
+  { name: "唱歌", emoji: "🎤", examples: "兒歌、老歌、流行歌、民謠" },
+  { name: "跳舞", emoji: "💃", examples: "民族舞、現代舞、廣場舞、兒童舞" },
+  { name: "說故事", emoji: "📖", examples: "童話、民間故事、生活故事、歷史故事" },
+  { name: "繪畫手工", emoji: "🎨", examples: "畫畫、摺紙、剪紙、書法" },
+  { name: "運動技能", emoji: "🏃", examples: "太極拳、體操、球類、武術" },
+  { name: "樂器演奏", emoji: "🎹", examples: "鋼琴、吉他、口琴、打擊樂" },
+];
+
+const cardBgs = [
+  "var(--color-postit-pink)", "var(--color-postit-blue)", "var(--color-postit-yellow)",
+  "var(--color-postit-green)", "#F3E5F5", "#FFF3E0",
 ];
 
 export default function TalentShowPage() {
-  const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [currentPerformer, setCurrentPerformer] = useState<'child' | 'elder' | null>(null);
-  const [showTime, setShowTime] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<typeof categories[0] | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [showPerformerSelect, setShowPerformerSelect] = useState(false);
+  const [showStage, setShowStage] = useState(false);
+  const [performer, setPerformer] = useState("");
 
-  const handleCategoryClick = (categoryId: string) => {
-    setSelectedCategory(categoryId);
+  const selectCategory = (index: number) => {
+    setSelectedCategory(categories[index]);
+    setSelectedIndex(index);
+    setShowPerformerSelect(true);
+    setShowStage(false);
   };
 
-  const handleStartPerformance = (performer: 'child' | 'elder') => {
-    setCurrentPerformer(performer);
-    setShowTime(true);
+  const startShow = (who: "child" | "elder") => {
+    setPerformer(who === "child" ? "👧 小朋友正在表演..." : "👴 長輩正在表演...");
+    setShowStage(true);
   };
 
-  const handleEndPerformance = () => {
-    setCurrentPerformer(null);
-    setShowTime(false);
+  const endShow = () => {
+    setShowStage(false);
+    setShowPerformerSelect(false);
+    setSelectedCategory(null);
+    setSelectedIndex(null);
   };
-
-  const selectedTalent = talentCategories.find(t => t.id === selectedCategory);
 
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
-      {/* 返回按鈕 */}
-      <div className="fixed top-4 left-4 z-50">
-        <button
-          onClick={() => router.push('/courses/4')}
-          className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors border border-gray-200"
-          title={`返回${getWeekTitle('4')}課程`}
-        >
-          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          <span className="text-sm font-medium text-gray-700">返回{getWeekTitle('4')}</span>
-        </button>
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ flex: 1, overflow: "auto", maxWidth: 900, margin: "0 auto", padding: "var(--space-lg)", width: "100%" }}>
+      <div style={{ marginBottom: "var(--space-lg)" }}>
+        <Link href="/courses/4" className="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7" /><path d="M19 12H5" /></svg>
+          回到第 5 週
+        </Link>
       </div>
 
-      <div className="w-full max-w-6xl mx-auto pt-16">
-        <div className="bg-white rounded-2xl shadow p-8">
-          <h1 className="text-3xl font-bold text-center mb-8 text-red-600">
-            我們的拿手好戲
-          </h1>
+      <div style={{ textAlign: "center", marginBottom: "var(--space-xl)" }}>
+        <h1 style={{ fontSize: "var(--font-size-4xl)", fontFamily: "var(--font-heading)" }}>🎤 才藝表演</h1>
+        <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--font-size-xl)", marginTop: "var(--space-xs)" }}>選一個才藝類別，大家一起表演吧！</p>
+      </div>
 
-          <div className="text-center mb-8">
-            <p className="text-lg text-gray-700 mb-4">
-              讓我們一起展示各自的才藝，互相學習和欣賞！
-            </p>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-2xl mx-auto">
-              <h3 className="text-lg font-bold text-red-800 mb-2">🎭 表演規則</h3>
-              <ul className="text-red-700 text-sm space-y-1">
-                <li>• 選擇一種才藝類型進行表演</li>
-                <li>• 孩子和長者輪流展示</li>
-                <li>• 表演時間約2-3分鐘</li>
-                <li>• 互相鼓勵和讚美</li>
-              </ul>
-            </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--space-lg)", marginBottom: "var(--space-xl)" }}>
+        {categories.map((c, i) => (
+          <div key={i} onClick={() => selectCategory(i)} style={{
+            background: selectedIndex === i ? "var(--color-primary-lighter)" : cardBgs[i],
+            border: `var(--border-width) solid ${selectedIndex === i ? "var(--color-primary)" : "var(--color-border)"}`,
+            borderRadius: i % 3 === 0 ? "var(--wobble-1)" : i % 3 === 1 ? "var(--wobble-2)" : "var(--wobble-3)",
+            padding: "var(--space-xl)", textAlign: "center", cursor: "pointer",
+            transition: "all 0.2s ease", boxShadow: "var(--shadow-sketch)",
+          }}>
+            <span style={{ fontSize: 56, display: "block", marginBottom: "var(--space-sm)" }}>{c.emoji}</span>
+            <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-2xl)", fontWeight: 700, marginBottom: "var(--space-xs)", display: "block" }}>{c.name}</span>
+            <span style={{ fontSize: "var(--font-size-base)", color: "var(--color-text-muted)" }}>{c.examples}</span>
           </div>
+        ))}
+      </div>
 
-          {/* 才藝類型選擇 */}
-          {!selectedCategory && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">選擇才藝類型</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {talentCategories.map((talent) => (
-                  <button
-                    key={talent.id}
-                    onClick={() => handleCategoryClick(talent.id)}
-                    className="p-6 rounded-lg border-2 border-gray-200 hover:border-red-400 hover:shadow-lg transition-all duration-200 text-center group"
-                  >
-                    <div className="text-4xl mb-3">{talent.icon}</div>
-                    <h3 className="font-semibold text-lg text-gray-800 mb-2">{talent.name}</h3>
-                    <p className="text-gray-600 text-sm mb-3">{talent.description}</p>
-                    <div className="text-xs text-gray-500">
-                      {talent.examples.slice(0, 2).join('、')}...
-                    </div>
-                  </button>
-                ))}
-              </div>
+      {showPerformerSelect && !showStage && (
+        <div style={{ textAlign: "center", marginBottom: "var(--space-xl)", animation: "fadeInUp 0.4s ease both" }}>
+          <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-2xl)", marginBottom: "var(--space-lg)" }}>誰先表演？</h2>
+          <div style={{ display: "flex", justifyContent: "center", gap: "var(--space-xl)" }}>
+            <div onClick={() => startShow("child")} style={{ background: "var(--color-bg-card)", border: "var(--border-width) solid var(--color-border)", borderRadius: "var(--wobble-2)", padding: "var(--space-xl) var(--space-2xl)", textAlign: "center", cursor: "pointer", transition: "all 0.2s ease", boxShadow: "var(--shadow-sketch)" }}>
+              <span style={{ fontSize: 56, display: "block", marginBottom: "var(--space-sm)" }}>👧</span>
+              <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-xl)", fontWeight: 700 }}>小朋友先</span>
             </div>
-          )}
-
-          {/* 選中才藝的詳細頁面 */}
-          {selectedCategory && !currentPerformer && (
-            <div className="space-y-6">
-              <div className="text-center">
-                <div className="text-6xl mb-4">{selectedTalent?.icon}</div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">{selectedTalent?.name}</h2>
-                <p className="text-gray-600 mb-6">{selectedTalent?.description}</p>
-              </div>
-
-              <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                <h3 className="text-lg font-bold text-gray-800 mb-3">💡 表演建議</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  {selectedTalent?.examples.map((example, index) => (
-                    <div key={index} className="bg-white p-3 rounded-lg border border-gray-200">
-                      <span className="text-sm text-gray-700">{example}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="text-center space-y-4">
-                <h3 className="text-xl font-bold text-gray-800">誰先開始表演？</h3>
-                <div className="flex justify-center gap-6">
-                  <button
-                    onClick={() => handleStartPerformance('child')}
-                    className="px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold text-lg transition-colors"
-                  >
-                    👶 孩子先表演
-                  </button>
-                  <button
-                    onClick={() => handleStartPerformance('elder')}
-                    className="px-8 py-4 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold text-lg transition-colors"
-                  >
-                    👴 長者先表演
-                  </button>
-                </div>
-              </div>
-
-              <div className="text-center">
-                <button
-                  onClick={() => setSelectedCategory(null)}
-                  className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition-colors"
-                >
-                  重新選擇才藝類型
-                </button>
-              </div>
+            <div onClick={() => startShow("elder")} style={{ background: "var(--color-bg-card)", border: "var(--border-width) solid var(--color-border)", borderRadius: "var(--wobble-2)", padding: "var(--space-xl) var(--space-2xl)", textAlign: "center", cursor: "pointer", transition: "all 0.2s ease", boxShadow: "var(--shadow-sketch)" }}>
+              <span style={{ fontSize: 56, display: "block", marginBottom: "var(--space-sm)" }}>👴</span>
+              <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-xl)", fontWeight: 700 }}>長輩先</span>
             </div>
-          )}
-
-          {/* 表演時間 */}
-          {showTime && currentPerformer && (
-            <div className="text-center space-y-6">
-              <div className="bg-gradient-to-r from-yellow-400 to-orange-500 p-8 rounded-lg text-white">
-                <div className="text-6xl mb-4">
-                  {currentPerformer === 'child' ? '👶' : '👴'}
-                </div>
-                <h2 className="text-3xl font-bold mb-2">
-                  {currentPerformer === 'child' ? '孩子' : '長者'}的表演時間！
-                </h2>
-                <p className="text-xl mb-4">才藝類型：{selectedTalent?.name}</p>
-                <div className="text-2xl font-bold mb-6">🎭 請開始表演 🎭</div>
-                
-                <div className="bg-white bg-opacity-20 rounded-lg p-4 mb-6">
-                  <h3 className="text-lg font-bold mb-2">表演提示</h3>
-                  <p className="text-sm">
-                    {currentPerformer === 'child' 
-                      ? '小朋友，請展示你的拿手好戲！不用緊張，大家都會為你加油！' 
-                      : '長者，請分享您的才藝！您的經驗和技能是寶貴的財富！'
-                    }
-                  </p>
-                </div>
-
-                <button
-                  onClick={handleEndPerformance}
-                  className="px-8 py-3 bg-white text-orange-600 rounded-lg font-bold text-lg hover:bg-gray-100 transition-colors"
-                >
-                  表演結束
-                </button>
-              </div>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="text-lg font-bold text-blue-800 mb-2">👏 觀眾互動</h3>
-                <p className="text-blue-700">
-                  請其他參與者為表演者鼓掌和讚美！可以說「太棒了！」、「好厲害！」等鼓勵的話語。
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* 底部按鈕 */}
-          <div className="flex justify-center mt-8 gap-4">
-            <button
-              onClick={() => router.push('/courses/4')}
-              className="px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold"
-            >
-              返回{getWeekTitle('4')}
-            </button>
-            <button
-              onClick={() => router.push('/courses/4/ensemble')}
-              className="px-6 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold"
-            >
-              下一個活動：合奏
-            </button>
           </div>
         </div>
+      )}
+
+      {showStage && selectedCategory && (
+        <div style={{ background: "linear-gradient(135deg, #667eea, #764ba2)", border: "var(--border-width) solid var(--color-border)", borderRadius: "var(--wobble-1)", padding: "var(--space-2xl)", textAlign: "center", color: "white", boxShadow: "var(--shadow-sketch)", marginBottom: "var(--space-xl)", animation: "celebrate 0.5s ease both" }}>
+          <span style={{ fontSize: 100, display: "block", marginBottom: "var(--space-md)" }}>{selectedCategory.emoji}</span>
+          <h2 style={{ fontSize: "var(--font-size-3xl)", fontFamily: "var(--font-heading)", marginBottom: "var(--space-xs)" }}>{selectedCategory.name}表演</h2>
+          <p style={{ fontSize: "var(--font-size-xl)", opacity: 0.85, marginBottom: "var(--space-lg)" }}>{performer}</p>
+          <button className="btn btn-outline" style={{ color: "white", borderColor: "rgba(255,255,255,0.5)" }} onClick={endShow}>👏 結束表演</button>
+          <div style={{ background: "rgba(255,255,255,0.2)", borderRadius: "var(--wobble-3)", padding: "var(--space-md)", marginTop: "var(--space-lg)", fontSize: "var(--font-size-lg)" }}>
+            💡 觀眾們，請給表演者掌聲鼓勵！每人 2-3 分鐘表演時間
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes celebrate { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+      `}</style>
       </div>
-    </main>
+      <FloatingNav prev={{ href: "/courses/4", label: "課程" }} next={{ href: "/courses/4/ensemble", label: "合唱合奏" }} />
+    </div>
   );
 }
-
-
-
-
-

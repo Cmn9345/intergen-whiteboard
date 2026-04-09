@@ -1,13 +1,6 @@
 "use client";
 import React from "react";
-
-type Member = {
-  group: number;
-  name: string;
-  color: string;
-  imageUrl?: string;
-  groupImageUrl?: string;
-};
+import { getStudents, getStudentName, type Student } from "@/lib/api";
 
 type Stamp = { 
   xRatio?: number; 
@@ -21,7 +14,7 @@ type Stamp = {
 };
 
 export default function SimpleCheckinTreePage() {
-  const [members, setMembers] = React.useState<Member[]>([]);
+  const [members, setMembers] = React.useState<Student[]>([]);
   const [stamps, setStamps] = React.useState<Stamp[]>([]);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [selectedName, setSelectedName] = React.useState<string>("");
@@ -36,23 +29,18 @@ export default function SimpleCheckinTreePage() {
     return () => clearInterval(t);
   }, []);
 
-  // 載入 Google Sheets 組員名單
+  // 載入 PocketBase 學生名單
   React.useEffect(() => {
-    const loadMembersFromSheets = async () => {
+    const loadStudents = async () => {
       setLoading(true);
       try {
-        const response = await fetch('/api/members');
-        if (response.ok) {
-          const data = await response.json();
-          setMembers(data);
-          if (data.length > 0) {
-            setSelectedName(data[0].name);
-          }
-        } else {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await getStudents();
+        setMembers(data);
+        if (data.length > 0) {
+          setSelectedName(getStudentName(data[0]));
         }
       } catch (error) {
-        console.error('Failed to load members from Google Sheets:', error);
+        console.error('Failed to load students:', error);
         setMembers([]);
         setSelectedName("");
       } finally {
@@ -60,7 +48,7 @@ export default function SimpleCheckinTreePage() {
       }
     };
 
-    loadMembersFromSheets();
+    loadStudents();
   }, []);
 
   // 點擊樹木進行簽到
@@ -81,33 +69,34 @@ export default function SimpleCheckinTreePage() {
       return;
     }
     
-    const member = members.find((m) => m.name === selectedName);
+    const member = members.find((m) => getStudentName(m) === selectedName);
     if (!member) {
       alert('找不到選中的成員');
       return;
     }
-    
+
+    const memberName = getStudentName(member);
+
     // 檢查是否已經簽到過
-    const hasAlreadySignedIn = stamps.some(stamp => stamp.name === member.name);
+    const hasAlreadySignedIn = stamps.some(stamp => stamp.name === memberName);
     if (hasAlreadySignedIn) {
       alert('該成員已經簽到過了！');
       return;
     }
-    
+
     try {
       const ts = formatZhTimestamp(new Date());
-      
+
       // 更新本地狀態
-      setStamps((prev) => [...prev, { 
-        color: member.color, 
-        name: member.name, 
-        timestamp: ts, 
-        imageUrl: member.imageUrl 
+      setStamps((prev) => [...prev, {
+        color: '#2D5DA1',
+        name: memberName,
+        timestamp: ts,
       }]);
       setShowPicker(false);
 
       // 顯示成功訊息
-      setSuccessMemberName(member.name);
+      setSuccessMemberName(memberName);
       setShowSuccessMessage(true);
       
       // 1秒後自動隱藏
@@ -121,7 +110,7 @@ export default function SimpleCheckinTreePage() {
   };
 
   const signedNames = React.useMemo(() => new Set((stamps || []).map((s) => s.name).filter(Boolean) as string[]), [stamps]);
-  const GROUP_IDS = React.useMemo(() => Array.from(new Set(members.map((m) => m.group))).sort((a,b)=>a-b), [members]);
+  const GROUP_IDS = React.useMemo(() => Array.from(new Set(members.map((m) => m.group))).sort(), [members]);
 
   return (
     <main className="min-h-screen bg-gray-100">
@@ -171,9 +160,7 @@ export default function SimpleCheckinTreePage() {
             </div>
 
             {/* 簽到圖標顯示 */}
-            {stamps.map((stamp, index) => {
-              const member = members.find(m => m.name === stamp.name);
-              return (
+            {stamps.map((stamp, index) => (
                 <div
                   key={index}
                   className="absolute transform -translate-x-1/2 -translate-y-1/2"
@@ -183,19 +170,8 @@ export default function SimpleCheckinTreePage() {
                   }}
                 >
                   <div className="flex flex-col items-center">
-                    {member?.imageUrl ? (
-                      <img 
-                        src={member.imageUrl} 
-                        alt={stamp.name}
-                        className="w-8 h-8 rounded-full border-2 border-white shadow-lg"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                        }}
-                      />
-                    ) : null}
-                    <div 
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-lg ${member?.imageUrl ? 'hidden' : ''}`} 
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-lg"
                       style={{ backgroundColor: stamp.color }}
                     >
                       {stamp.name?.charAt(0)}
@@ -205,8 +181,7 @@ export default function SimpleCheckinTreePage() {
                     </div>
                   </div>
                 </div>
-              );
-            })}
+            ))}
           </div>
         </div>
       </div>
@@ -217,46 +192,37 @@ export default function SimpleCheckinTreePage() {
           <div className="w-[600px] h-[600px] rounded-2xl border border-gray-200 bg-white p-6 shadow-lg overflow-y-auto">
             <div className="text-lg font-semibold text-gray-800 mb-4">選擇簽到成員</div>
             <div className="space-y-3">
-              {members.map((m) => (
-                <label key={m.name} className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
+              {members.map((m) => {
+                const mName = getStudentName(m);
+                return (
+                <label key={m.id} className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
                   <input
                     type="radio"
                     name="picker-member"
-                    value={m.name}
-                    checked={selectedName === m.name}
-                    onChange={() => setSelectedName(m.name)}
+                    value={mName}
+                    checked={selectedName === mName}
+                    onChange={() => setSelectedName(mName)}
                     className="text-blue-600"
                   />
                   <div className="flex items-center gap-3 flex-1">
-                    {m.imageUrl ? (
-                      <img 
-                        src={m.imageUrl} 
-                        alt={m.name}
-                        className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                        }}
-                      />
-                    ) : null}
-                    <div 
-                      className={`h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg ${m.imageUrl ? 'hidden' : ''}`} 
-                      style={{ backgroundColor: m.color }} 
+                    <div
+                      className="h-12 w-12 rounded-full flex items-center justify-center text-white font-bold text-lg bg-blue-500"
                     >
-                      {m.name.charAt(0)}
+                      {mName.charAt(0)}
                     </div>
                     <div className="flex-1">
                       <div className="font-medium text-lg text-gray-900 flex items-center justify-between">
-                        <span>{m.name}</span>
-                        <span className="text-2xl">{m.group === 1 ? '1️⃣' : m.group === 2 ? '2️⃣' : m.group === 3 ? '3️⃣' : m.group === 4 ? '4️⃣' : m.group === 5 ? '5️⃣' : m.group === 6 ? '6️⃣' : m.group === 7 ? '7️⃣' : m.group === 8 ? '8️⃣' : m.group === 9 ? '9️⃣' : '🔟'}</span>
+                        <span>{mName}</span>
+                        <span className="text-sm text-gray-500">第 {m.group} 組</span>
                       </div>
                     </div>
-                    {signedNames.has(m.name) && (
+                    {signedNames.has(mName) && (
                       <div className="text-green-600 text-lg">✓</div>
                     )}
                   </div>
                 </label>
-              ))}
+                );
+              })}
             </div>
             
             <div className="mt-6 flex justify-end gap-3">

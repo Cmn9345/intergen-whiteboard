@@ -4,8 +4,8 @@ import FloatingNav from "@/app/courses/_components/FloatingNav";
 export default function Page() {
   return (
     <>
-      <StorybookPage weekNum={7} backLink="/courses/6" />
-      <FloatingNav prev={{ href: "/courses/6/guess-feet", label: "猜動物腳" }} next={{ href: "/courses/6", label: "回課程" }} />
+      <StorybookPage weekNum={3} backLink="/courses/2" />
+      <FloatingNav prev={{ href: "/courses/2", label: "課程" }} next={{ href: "/courses/2/toolkit", label: "職業工具箱" }} />
     </>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { getMoods, deleteMood, deleteAllMoods, type MoodRecord } from '@/lib/api';
+import { getCheckins, getStudents, deleteCheckin, deleteAllCheckins, type CheckinRecord, type Student } from '@/lib/api';
 
 /* ---- CSS variable tokens (whiteboard theme) ---- */
 const V = {
@@ -13,14 +13,15 @@ const V = {
   textPrimary: 'var(--color-text-primary, #2D2D2D)',
   textSecondary: 'var(--color-text-secondary, #5A5347)',
   textMuted: 'var(--color-text-muted, #8A7E72)',
+  textInverse: 'var(--color-text-inverse, #FDFBF7)',
   primary: 'var(--color-primary, #E8874A)',
   postitBlue: 'var(--color-postit-blue, #D8ECFF)',
+  postitGreen: 'var(--color-postit-green, #D8F5D8)',
   postitYellow: 'var(--color-postit-yellow, #FFF9C4)',
-  happyLight: 'var(--color-happy-light, #FFF9D4)',
-  sadLight: 'var(--color-sad-light, #E0F0FF)',
-  angryLight: 'var(--color-angry-light, #FFE4E4)',
-  sad: 'var(--color-sad, #5B9BD5)',
-  angry: 'var(--color-angry, #E06B6B)',
+  successLight: 'var(--color-success-light, #E2F5E2)',
+  success: 'var(--color-success, #3A8F4B)',
+  secondaryLighter: 'var(--color-secondary-lighter, #E8F0FA)',
+  secondary: 'var(--color-secondary, #2D5DA1)',
   markerBlack: 'var(--color-marker-black, #2D2D2D)',
   shadowSketch: 'var(--shadow-sketch, 4px 4px 0 #2D2D2D)',
   shadowSketchSm: 'var(--shadow-sketch-sm, 3px 3px 0 #2D2D2D)',
@@ -44,27 +45,24 @@ const V = {
   transitionFast: 'var(--transition-fast, 150ms ease)',
 } as const;
 
-function classifyMood(emotional: string): 'happy' | 'sad' | 'angry' {
-  if (!emotional) return 'sad';
-  const e = emotional.toLowerCase();
-  if (e.includes('happy') || e.includes('sun') || e.includes('開心')) return 'happy';
-  if (e.includes('angry') || e.includes('storm') || e.includes('rain') || e.includes('生氣')) return 'angry';
-  return 'sad';
-}
-
-export default function MoodRecordsPage() {
+export default function SignintreeRecordsPage() {
   const [currentWeek, setCurrentWeek] = useState(1);
-  const [moods, setMoods] = useState<MoodRecord[]>([]);
+  const [checkins, setCheckins] = useState<CheckinRecord[]>([]);
+  const [totalStudents, setTotalStudents] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const loadData = useCallback(async (week: number) => {
     setLoading(true);
     try {
-      const data = await getMoods(String(week));
-      setMoods(data);
+      const [checkinData, studentData] = await Promise.all([
+        getCheckins(String(week)),
+        getStudents(),
+      ]);
+      setCheckins(checkinData);
+      setTotalStudents(studentData.length);
     } catch (e) {
-      console.error('Failed to load moods:', e);
-      setMoods([]);
+      console.error('Failed to load checkins:', e);
+      setCheckins([]);
     } finally {
       setLoading(false);
     }
@@ -74,9 +72,9 @@ export default function MoodRecordsPage() {
 
   const switchWeek = (w: number) => setCurrentWeek(w);
 
-  const happy = moods.filter(m => classifyMood(m.emotional) === 'happy');
-  const sad = moods.filter(m => classifyMood(m.emotional) === 'sad');
-  const angry = moods.filter(m => classifyMood(m.emotional) === 'angry');
+  const checkinRate = totalStudents > 0
+    ? Math.round((checkins.length / totalStudents) * 100)
+    : 0;
 
   const wobbles = [V.wobble1, V.wobble2, V.wobble3, V.wobble4];
 
@@ -129,29 +127,17 @@ export default function MoodRecordsPage() {
     boxShadow: active ? V.shadowSketchSm : 'none',
   });
 
-  const summaryGridStyle: React.CSSProperties = {
-    display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: V.spMd, marginBottom: V.spXl,
-  };
-
   const summaryData = [
-    { label: '總投票數', value: moods.length, bg: V.postitBlue, iconColor: V.textSecondary },
-    { label: '開心', value: happy.length, bg: V.happyLight, iconColor: '#B8860B' },
-    { label: '難過', value: sad.length, bg: V.sadLight, iconColor: V.sad },
-    { label: '生氣', value: angry.length, bg: V.angryLight, iconColor: V.angry },
-  ];
-
-  const summaryIcons = [
-    <svg key="total" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
-    <svg key="happy" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>,
-    <svg key="sad" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>,
-    <svg key="angry" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><path d="M7.5 8 10 9"/><path d="M16.5 8 14 9"/></svg>,
-  ];
-
-  const detailSections = [
-    { key: 'happy', label: '開心', items: happy, bg: V.happyLight, icon: summaryIcons[1] },
-    { key: 'sad', label: '難過', items: sad, bg: V.sadLight, icon: summaryIcons[2] },
-    { key: 'angry', label: '生氣', items: angry, bg: V.angryLight, icon: summaryIcons[3] },
+    {
+      label: '總簽到數', value: checkins.length, bg: V.postitBlue,
+      iconColor: V.textSecondary,
+      icon: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>,
+    },
+    {
+      label: '簽到率', value: `${checkinRate}%`, bg: V.postitGreen,
+      iconColor: V.success,
+      icon: <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
+    },
   ];
 
   return (
@@ -167,7 +153,7 @@ export default function MoodRecordsPage() {
             fontSize: V.fs3xl, fontWeight: 700, fontFamily: V.fontHeading,
             transform: 'rotate(-0.8deg)',
           }}>
-            心情統計
+            簽到紀錄
           </h1>
         </div>
         <div style={{ display: 'flex', gap: V.spSm }}>
@@ -176,9 +162,9 @@ export default function MoodRecordsPage() {
             {loading ? '載入中...' : '重新整理'}
           </button>
           <button style={{ ...refreshBtnStyle, color: 'var(--color-angry, #E06B6B)', borderColor: 'var(--color-angry, #E06B6B)' }} onClick={async () => {
-            if (!confirm(`確定要刪除第 ${currentWeek} 週的所有心情紀錄嗎？`)) return;
-            const count = await deleteAllMoods(String(currentWeek));
-            alert(`已刪除 ${count} 筆心情紀錄`);
+            if (!confirm(`確定要刪除第 ${currentWeek} 週的所有簽到紀錄嗎？`)) return;
+            const count = await deleteAllCheckins(String(currentWeek));
+            alert(`已刪除 ${count} 筆簽到紀錄`);
             loadData(currentWeek);
           }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
@@ -199,7 +185,7 @@ export default function MoodRecordsPage() {
         </div>
 
         {/* Summary Cards */}
-        <div style={summaryGridStyle}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: V.spMd, marginBottom: V.spXl }}>
           {summaryData.map((s, i) => (
             <div key={s.label} style={{
               background: s.bg, border: `${V.borderWidth} solid ${V.border}`,
@@ -213,7 +199,7 @@ export default function MoodRecordsPage() {
                 alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                 background: V.bgCard, color: s.iconColor,
               }}>
-                {summaryIcons[i]}
+                {s.icon}
               </div>
               <div>
                 <div style={{ fontSize: V.fs3xl, fontWeight: 700, fontFamily: V.fontHeading, lineHeight: 1 }}>
@@ -227,60 +213,60 @@ export default function MoodRecordsPage() {
           ))}
         </div>
 
-        {/* Detail Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: V.spLg }}>
-          {detailSections.map((sec, i) => (
-            <div key={sec.key} style={{
-              background: V.bgCard, border: `${V.borderWidth} solid ${V.border}`,
-              boxShadow: V.shadowSketch, overflow: 'hidden',
-              borderRadius: wobbles[i],
-            }}>
-              {/* Section header */}
-              <div style={{
-                padding: `${V.spMd} ${V.spLg}`, display: 'flex', alignItems: 'center', gap: V.spSm,
-                fontWeight: 700, fontSize: V.fsXl, fontFamily: V.fontHeading,
-                borderBottom: `${V.borderWidth} solid ${V.border}`, background: sec.bg,
+        {/* Detail List */}
+        <div style={{
+          background: V.bgCard, border: `${V.borderWidth} solid ${V.border}`,
+          boxShadow: V.shadowSketch, overflow: 'hidden', borderRadius: V.wobble1,
+        }}>
+          {/* Section header */}
+          <div style={{
+            padding: `${V.spMd} ${V.spLg}`, display: 'flex', alignItems: 'center', gap: V.spSm,
+            fontWeight: 700, fontSize: V.fsXl, fontFamily: V.fontHeading,
+            borderBottom: `${V.borderWidth} solid ${V.border}`, background: V.successLight,
+          }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/>
+            </svg>
+            已簽到學員
+            <span style={{ marginLeft: 'auto', fontSize: V.fsBase, color: V.textMuted, fontWeight: 500 }}>
+              {checkins.length} / {totalStudents} 人
+            </span>
+          </div>
+          {/* List */}
+          <div style={{ padding: V.spSm, maxHeight: 600, overflowY: 'auto' }}>
+            {checkins.length === 0 ? (
+              <div style={{ padding: V.spXl, textAlign: 'center', color: V.textMuted, fontFamily: V.fontHeading, fontSize: V.fsLg }}>
+                尚無簽到資料
+              </div>
+            ) : checkins.map((c, j) => (
+              <div key={c.id} style={{
+                display: 'flex', alignItems: 'center', gap: V.spMd,
+                padding: `${V.spSm} ${V.spMd}`, borderRadius: V.wobble3,
+                fontSize: V.fsLg, transition: `background ${V.transitionFast}`,
               }}>
-                {sec.icon}
-                {sec.label}
-                <span style={{ marginLeft: 'auto', fontSize: V.fsBase, color: V.textMuted, fontWeight: 500 }}>
-                  {sec.items.length} 人
-                </span>
+                <div style={{
+                  width: 32, height: 32, borderRadius: '50%', border: `2px solid ${V.border}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: V.fsBase, fontWeight: 700, fontFamily: V.fontHeading,
+                  flexShrink: 0, background: V.successLight,
+                }}>
+                  {j + 1}
+                </div>
+                <div style={{ fontWeight: 700, fontFamily: V.fontHeading, flex: 1 }}>
+                  {c.Name || '未知'}
+                </div>
+                <div style={{ fontSize: V.fsBase, color: V.textMuted }}>
+                  第 {c.group || '?'} 組
+                </div>
+                <div style={{ fontSize: V.fsSm, color: V.textMuted }}>
+                  {c.created ? new Date(c.created).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }) : ''}
+                </div>
+                <button onClick={async () => { await deleteCheckin(c.id); loadData(currentWeek); }} style={{ width: 28, height: 28, borderRadius: '50%', border: '1.5px solid var(--color-angry, #E06B6B)', background: 'transparent', color: 'var(--color-angry, #E06B6B)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }} title="刪除">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
               </div>
-              {/* List */}
-              <div style={{ padding: V.spSm, maxHeight: 400, overflowY: 'auto' }}>
-                {sec.items.length === 0 ? (
-                  <div style={{ padding: V.spXl, textAlign: 'center', color: V.textMuted, fontFamily: V.fontHeading, fontSize: V.fsLg }}>
-                    尚無資料
-                  </div>
-                ) : sec.items.map((m, j) => (
-                  <div key={m.id} style={{
-                    display: 'flex', alignItems: 'center', gap: V.spMd,
-                    padding: `${V.spSm} ${V.spMd}`, borderRadius: V.wobble3,
-                    fontSize: V.fsLg, transition: `background ${V.transitionFast}`,
-                  }}>
-                    <div style={{
-                      width: 32, height: 32, borderRadius: '50%', border: `2px solid ${V.border}`,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: V.fsBase, fontWeight: 700, fontFamily: V.fontHeading,
-                      flexShrink: 0, background: sec.bg,
-                    }}>
-                      {j + 1}
-                    </div>
-                    <div style={{ fontWeight: 700, fontFamily: V.fontHeading, flex: 1 }}>
-                      {m.Name || '未知'}
-                    </div>
-                    <div style={{ fontSize: V.fsBase, color: V.textMuted }}>
-                      第 {m.group || '?'} 組
-                    </div>
-                    <button onClick={async () => { await deleteMood(m.id); loadData(currentWeek); }} style={{ width: 28, height: 28, borderRadius: '50%', border: '1.5px solid var(--color-angry, #E06B6B)', background: 'transparent', color: 'var(--color-angry, #E06B6B)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }} title="刪除">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>

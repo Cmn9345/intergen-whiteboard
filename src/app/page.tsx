@@ -14,21 +14,18 @@ const ROTATIONS = ["-1deg", "0.8deg", "0.5deg", "-0.6deg"];
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       {/* Hero */}
-      <div className="text-center" style={{ padding: "var(--space-3xl) var(--space-xl) var(--space-xl)" }}>
+      <div className="text-center" style={{ padding: "var(--space-lg) var(--space-xl) var(--space-sm)", flexShrink: 0 }}>
         {/* Hero icon */}
         <div className="mx-auto" style={{
-          width: 100, height: 100, marginBottom: "var(--space-lg)",
-          background: "var(--color-postit-yellow)", border: "var(--border-width) solid var(--color-border)",
-          borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
-          color: "var(--color-marker-black)", boxShadow: "var(--shadow-sketch)", transform: "rotate(-2deg)",
-          animation: "scale-in 0.3s var(--transition-slow) both",
+          width: 100, height: 100, marginBottom: "var(--space-sm)",
+          borderRadius: "var(--wobble-2)", overflow: "hidden",
+          border: "var(--border-width) solid var(--color-border)",
+          boxShadow: "var(--shadow-sketch)", transform: "rotate(-2deg)",
         }}>
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icon-hero.png" alt="代間共學" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         </div>
 
         {/* Title with marker underline */}
@@ -44,7 +41,7 @@ export default function Home() {
       </div>
 
       {/* Feature grid - 2x2 */}
-      <div className="grid grid-cols-2" style={{ gap: "var(--space-xl)", maxWidth: 800, margin: "var(--space-2xl) auto 0", padding: "0 var(--space-xl)" }}>
+      <div className="grid grid-cols-2" style={{ gap: "var(--space-lg)", maxWidth: 800, margin: "0 auto", padding: "var(--space-md) var(--space-xl)", flex: 1, alignContent: "center" }}>
         {FEATURES.map((f, i) => (
           <Link key={f.href} href={f.href}
             className="group relative flex flex-col items-center text-center transition-all"
@@ -70,7 +67,7 @@ export default function Home() {
 
             {/* Icon */}
             <div className="flex items-center justify-center overflow-hidden" style={{
-              width: 180, height: 180, borderRadius: "var(--wobble-2)",
+              width: 140, height: 140, borderRadius: "var(--wobble-2)",
               border: "var(--border-width) solid var(--color-border)",
               background: "var(--color-bg-card)", boxShadow: "var(--shadow-sketch-sm)",
               marginBottom: "var(--space-sm)", flexShrink: 0,
@@ -93,7 +90,7 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <div className="text-center" style={{ padding: "var(--space-2xl)", color: "var(--color-text-muted)", fontFamily: "var(--font-heading)", fontSize: "var(--font-size-base, 20px)" }}>
+      <div className="text-center" style={{ padding: "var(--space-sm)", color: "var(--color-text-muted)", fontFamily: "var(--font-heading)", fontSize: "var(--font-size-sm, 16px)", flexShrink: 0 }}>
         代間共學互動平台 &copy; 2026
       </div>
     </div>

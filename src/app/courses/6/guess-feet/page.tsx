@@ -1,305 +1,214 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { getWeekTitle } from "@/lib/weeks";
 
-// 動物數據（依照檔名排序）
+import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
+import FloatingNav from "@/app/courses/_components/FloatingNav";
+
 const animals = [
-  { name: "斑馬", image: "/images/animal-feet/斑馬.png", feet: 4 },
-  { name: "長頸鹿", image: "/images/animal-feet/長頸鹿.png", feet: 4 },
-  { name: "兔子", image: "/images/animal-feet/兔子.png", feet: 4 },
-  { name: "雞", image: "/images/animal-feet/雞.png", feet: 2 },
-  { name: "鴨", image: "/images/animal-feet/鴨.png", feet: 2 },
-  { name: "豬", image: "/images/animal-feet/豬.png", feet: 4 },
-  { name: "台灣黑熊", image: "/images/animal-feet/熊.png", feet: 4 }, // 檔案名是熊.png
-  { name: "大象", image: "/images/animal-feet/大象.png", feet: 4 },
-  { name: "貓", image: "/images/animal-feet/貓.png", feet: 4 },
-  { name: "狗", image: "/images/animal-feet/狗.png", feet: 4 },
+  { name: "斑馬", emoji: "🦓", feet: 4 },
+  { name: "長頸鹿", emoji: "🦒", feet: 4 },
+  { name: "兔子", emoji: "🐰", feet: 4 },
+  { name: "雞", emoji: "🐔", feet: 2 },
+  { name: "鴨子", emoji: "🦆", feet: 2 },
+  { name: "豬", emoji: "🐷", feet: 4 },
+  { name: "台灣黑熊", emoji: "🐻", feet: 4 },
+  { name: "大象", emoji: "🐘", feet: 4 },
+  { name: "貓", emoji: "🐱", feet: 4 },
+  { name: "狗", emoji: "🐶", feet: 4 },
 ];
 
-const GAME_TIME = 30; // 30秒倒計時
-
-export default function GuessFeetPage() {
-  const router = useRouter();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(GAME_TIME);
-  const [gameStarted, setGameStarted] = useState(false);
-  const [gameEnded, setGameEnded] = useState(false);
-  const [selectedFeet, setSelectedFeet] = useState<number | null>(null);
-  const [showResult, setShowResult] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
-  const [imageError, setImageError] = useState<{ [key: number]: boolean }>({});
-
-  // 語音朗讀功能
-  const speakText = useCallback((text: string) => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'zh-TW';
-      utterance.rate = 1.0;
-      utterance.pitch = 1.0;
-      utterance.volume = 1.0;
-      speechSynthesis.speak(utterance);
-    }
-  }, []);
-
-  // 開始遊戲
-  const startGame = () => {
-    setGameStarted(true);
-    setCurrentIndex(0);
-    setScore(0);
-    setTimeLeft(GAME_TIME);
-    setGameEnded(false);
-    setSelectedFeet(null);
-    setShowResult(false);
-    setImageError({});
-  };
-
-  // 倒計時
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (gameStarted && !gameEnded && timeLeft > 0) {
-      timer = setInterval(() => {
-        setTimeLeft((prev) => {
-          const newTime = prev - 1;
-          if (newTime <= 0) {
-            setGameEnded(true);
-            return 0;
-          }
-          return newTime;
-        });
-      }, 1000);
-    }
-    return () => {
-      if (timer) clearInterval(timer);
-    };
-  }, [gameStarted, gameEnded]);
-
-  // 選擇答案
-  const handleSelect = (feet: number) => {
-    if (gameEnded || showResult || !gameStarted || timeLeft <= 0) return;
-
-    setSelectedFeet(feet);
-    const currentAnimal = animals[currentIndex];
-    const correct = feet === currentAnimal.feet;
-
-    setIsCorrect(correct);
-    setShowResult(true);
-
-    if (correct) {
-      setScore((prev) => prev + 1);
-    }
-
-    // 顯示結果後，1.5秒後進入下一題（循環題目）
-    setTimeout(() => {
-      if (timeLeft <= 0) {
-        setGameEnded(true);
-      } else {
-        // 循環顯示題目，當達到最後一題時，回到第一題
-        setCurrentIndex((prev) => (prev + 1) % animals.length);
-        setSelectedFeet(null);
-        setShowResult(false);
-      }
-    }, 1500);
-  };
-
-  // 滑鼠移到卡片上時朗讀
-  const handleCardHover = (feet: number) => {
-    speakText(`${feet}隻腳`);
-  };
-
-  const currentAnimal = animals[currentIndex];
-
-  return (
-    <main className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 flex flex-col relative">
-      {/* 返回按鈕 */}
-      <div className="fixed top-4 left-4 z-50 flex gap-2">
-        <button
-          onClick={() => router.push('/')}
-          className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors border border-gray-200"
-          title="返回主頁"
-        >
-          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          <span className="text-sm font-medium text-gray-700">返回主頁</span>
-        </button>
-        
-        <button
-          onClick={() => router.push('/courses/6')}
-          className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors border border-gray-200"
-          title={`返回${getWeekTitle('6')}課程`}
-        >
-          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          <span className="text-sm font-medium text-gray-700">返回{getWeekTitle('6')}</span>
-        </button>
-      </div>
-
-      {/* 主要內容區域 */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 pt-24">
-        {!gameStarted ? (
-          // 開始畫面
-          <div className="text-center max-w-2xl">
-            <h1 className="text-5xl font-bold text-green-800 mb-6">🐾 猜猜我是誰</h1>
-            <p className="text-xl text-gray-700 mb-8">
-              看看動物的圖片，猜猜牠有幾隻腳！
-            </p>
-            <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">遊戲說明</h2>
-              <ul className="text-left space-y-3 text-gray-700">
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 font-bold">✓</span>
-                  <span>看動物圖片，選擇牠有幾隻腳（2隻或4隻）</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 font-bold">✓</span>
-                  <span>答對一題得1分</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 font-bold">✓</span>
-                  <span>滑鼠移到卡片上會朗讀腳的數量</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 font-bold">✓</span>
-                  <span>限時30秒，盡可能答更多的題目（題目會循環顯示）</span>
-                </li>
-              </ul>
-            </div>
-            <button
-              onClick={startGame}
-              className="px-12 py-4 bg-green-500 hover:bg-green-600 text-white text-2xl font-bold rounded-xl shadow-lg transition-all duration-200 transform hover:scale-105"
-            >
-              🎮 開始遊戲
-            </button>
-          </div>
-        ) : gameEnded ? (
-          // 結束畫面
-          <div className="text-center max-w-2xl">
-            <h1 className="text-5xl font-bold text-green-800 mb-6">🎉 遊戲結束！</h1>
-            <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-              <div className="text-6xl mb-4">🏆</div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">你的得分</h2>
-              <div className="text-6xl font-bold text-green-600 mb-4">{score} 題</div>
-              <p className="text-xl text-gray-600">
-                在30秒內答對了 {score} 題！
-              </p>
-              <p className="text-lg text-gray-500 mt-2">
-                {score >= 10 ? "太棒了！表現優異！" : score >= 5 ? "表現不錯！" : "繼續加油！"}
-              </p>
-            </div>
-            <div className="flex gap-4 justify-center">
-              <button
-                onClick={startGame}
-                className="px-8 py-3 bg-green-500 hover:bg-green-600 text-white text-xl font-bold rounded-xl shadow-lg transition-all duration-200"
-              >
-                🔄 再玩一次
-              </button>
-              <button
-                onClick={() => router.push('/courses/6')}
-                className="px-8 py-3 bg-gray-500 hover:bg-gray-600 text-white text-xl font-bold rounded-xl shadow-lg transition-all duration-200"
-              >
-                返回課程
-              </button>
-            </div>
-          </div>
-        ) : (
-          // 遊戲進行中
-          <div className="w-full max-w-4xl">
-            {/* 計分和倒計時 */}
-            <div className="flex justify-between items-center mb-8">
-              <div className="bg-white rounded-xl shadow-lg px-6 py-3">
-                <div className="text-sm text-gray-600">得分</div>
-                <div className="text-3xl font-bold text-green-600">{score}</div>
-              </div>
-              <div className="bg-white rounded-xl shadow-lg px-6 py-3">
-                <div className="text-sm text-gray-600">剩餘時間</div>
-                <div className="text-3xl font-bold text-blue-600">{timeLeft} 秒</div>
-              </div>
-            </div>
-
-            {/* 動物圖片 */}
-            <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 text-center">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">猜猜這隻動物有幾隻腳？</h2>
-              <div className="flex justify-center items-center min-h-[300px]">
-                {currentAnimal && (
-                  <div className="relative w-full h-full flex items-center justify-center">
-                    {!imageError[currentIndex] ? (
-                      <img
-                        src={currentAnimal.image}
-                        alt={currentAnimal.name}
-                        className="max-w-full max-h-[400px] object-contain z-10 relative"
-                        onError={() => {
-                          // 如果圖片載入失敗，記錄錯誤狀態
-                          setImageError((prev) => ({ ...prev, [currentIndex]: true }));
-                        }}
-                      />
-                    ) : (
-                      // 如果圖片載入失敗，顯示動物名稱
-                      <div className="text-6xl font-bold text-gray-600 px-8 py-4 bg-gray-100 rounded-xl">
-                        {currentAnimal.name}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* 答案卡片 */}
-            <div className="flex justify-center gap-6">
-              {[2, 4].map((feet) => (
-                <button
-                  key={feet}
-                  onClick={() => handleSelect(feet)}
-                  onMouseEnter={() => handleCardHover(feet)}
-                  disabled={showResult || gameEnded}
-                  className={`
-                    relative bg-white rounded-2xl shadow-xl p-8 flex-1 max-w-[300px] 
-                    transition-all duration-200 transform
-                    ${showResult
-                      ? feet === currentAnimal.feet
-                        ? 'ring-4 ring-green-500 bg-green-50 scale-105'
-                        : selectedFeet === feet
-                        ? 'ring-4 ring-red-500 bg-red-50 scale-105'
-                        : ''
-                      : 'hover:scale-105 hover:shadow-2xl cursor-pointer'
-                    }
-                    ${showResult ? 'cursor-default' : ''}
-                  `}
-                >
-                  <div className="text-6xl mb-4">🦶</div>
-                  <div className="text-4xl font-bold text-gray-800">{feet} 隻腳</div>
-                  {showResult && (
-                    <>
-                      {feet === currentAnimal.feet && (
-                        <div className="absolute top-4 right-4 text-4xl">✅</div>
-                      )}
-                      {selectedFeet === feet && feet !== currentAnimal.feet && (
-                        <div className="absolute top-4 right-4 text-4xl">❌</div>
-                      )}
-                    </>
-                  )}
-                </button>
-              ))}
-            </div>
-
-            {/* 結果提示 */}
-            {showResult && (
-              <div className={`mt-6 text-center text-2xl font-bold ${
-                isCorrect ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {isCorrect ? '🎉 答對了！' : '❌ 答錯了！'}
-                <div className="text-xl text-gray-600 mt-2">
-                  {currentAnimal.name}有 {currentAnimal.feet} 隻腳
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </main>
-  );
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
+export default function GuessFeetPage() {
+  const [screen, setScreen] = useState<"start" | "game" | "results">("start");
+  const [shuffledAnimals, setShuffledAnimals] = useState<typeof animals>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [answered, setAnswered] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [btnStates, setBtnStates] = useState<Record<number, "correct" | "wrong">>({});
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const speak = useCallback((text: string) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "zh-TW"; u.rate = 1.2; u.pitch = 1.4;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  }, []);
+
+  const endGame = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    setScreen("results");
+  }, []);
+
+  const startGame = useCallback(() => {
+    const shuffled = shuffle(animals);
+    setShuffledAnimals(shuffled);
+    setCurrentIndex(0);
+    setScore(0);
+    setTimeLeft(30);
+    setAnswered(false);
+    setFeedback(null);
+    setBtnStates({});
+    setScreen("game");
+
+    if (timerRef.current) clearInterval(timerRef.current);
+    let t = 30;
+    timerRef.current = setInterval(() => {
+      t--;
+      setTimeLeft(t);
+      if (t <= 0) {
+        clearInterval(timerRef.current!);
+        setScreen("results");
+      }
+    }, 1000);
+  }, []);
+
+  useEffect(() => {
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, []);
+
+  const answerFn = useCallback((feet: number) => {
+    if (answered) return;
+    setAnswered(true);
+    const animal = shuffledAnimals[currentIndex % shuffledAnimals.length];
+    const isCorrect = feet === animal.feet;
+    const otherFeet = feet === 2 ? 4 : 2;
+
+    if (isCorrect) {
+      setScore((prev) => prev + 1);
+      setBtnStates({ [feet]: "correct" });
+      setFeedback("✅");
+    } else {
+      setBtnStates({ [feet]: "wrong", [otherFeet]: "correct" });
+      setFeedback("❌");
+    }
+
+    speak(`${animal.name}有${animal.feet}隻腳`);
+
+    setTimeout(() => {
+      setCurrentIndex((prev) => prev + 1);
+      setAnswered(false);
+      setFeedback(null);
+      setBtnStates({});
+    }, 1200);
+  }, [answered, shuffledAnimals, currentIndex, speak]);
+
+  const getResultMessage = () => {
+    if (score >= 8) return "🏆 太厲害了！動物專家！";
+    if (score >= 5) return "👏 很棒！繼續加油！";
+    if (score >= 3) return "😊 不錯喔！再試試看！";
+    return "💪 加油！下次一定更好！";
+  };
+
+  const currentAnimal = shuffledAnimals.length > 0 ? shuffledAnimals[currentIndex % shuffledAnimals.length] : null;
+
+  const answerBtnStyle = (feet: number): React.CSSProperties => {
+    const state = btnStates[feet];
+    const base: React.CSSProperties = {
+      background: feet === 2 ? "var(--color-postit-blue)" : "var(--color-postit-yellow)",
+      border: "var(--border-width) solid var(--color-border)",
+      borderRadius: "var(--wobble-2)", padding: "var(--space-xl) var(--space-2xl)",
+      cursor: answered ? "default" : "pointer", transition: "all 0.2s ease",
+      boxShadow: "var(--shadow-sketch)", minWidth: 160, textAlign: "center",
+    };
+    if (state === "correct") return { ...base, borderColor: "var(--color-success)", boxShadow: "0 0 0 4px var(--color-success-light), var(--shadow-sketch)" };
+    if (state === "wrong") return { ...base, borderColor: "var(--color-danger)", boxShadow: "0 0 0 4px var(--color-angry-light), var(--shadow-sketch)" };
+    return base;
+  };
+
+  return (
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ flex: 1, overflow: "auto", maxWidth: 700, margin: "0 auto", padding: "var(--space-lg)", width: "100%", textAlign: "center" }}>
+      <div style={{ marginBottom: "var(--space-lg)", textAlign: "left" }}>
+        <Link href="/courses/6" className="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7" /><path d="M19 12H5" /></svg>
+          回到第 7 週
+        </Link>
+      </div>
+
+      <div style={{ marginBottom: "var(--space-xl)" }}>
+        <h1 style={{ fontSize: "var(--font-size-4xl)", fontFamily: "var(--font-heading)", marginBottom: "var(--space-xs)" }}>🐾 猜猜動物腳</h1>
+        <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--font-size-xl)" }}>這隻動物是 2 隻腳還是 4 隻腳？</p>
+      </div>
+
+      {/* Start Screen */}
+      {screen === "start" && (
+        <div style={{ margin: "var(--space-2xl) 0" }}>
+          <span style={{ fontSize: 120, marginBottom: "var(--space-lg)", display: "block" }}>🐾</span>
+          <p style={{ fontSize: "var(--font-size-xl)", color: "var(--color-text-secondary)", marginBottom: "var(--space-xl)" }}>30 秒內答對越多越好！</p>
+          <button className="btn btn-primary btn-lg" onClick={startGame}>🎮 開始遊戲！</button>
+        </div>
+      )}
+
+      {/* Game Screen */}
+      {screen === "game" && currentAnimal && (
+        <>
+          <div style={{ display: "flex", justifyContent: "center", gap: "var(--space-lg)", marginBottom: "var(--space-xl)" }}>
+            <div style={{
+              background: timeLeft <= 10 ? "var(--color-angry-light)" : "var(--color-postit-pink)",
+              border: "var(--border-width) solid var(--color-border)", borderRadius: "var(--wobble-2)",
+              padding: "var(--space-sm) var(--space-lg)", boxShadow: "var(--shadow-sketch-sm)",
+              fontFamily: "var(--font-heading)", fontSize: "var(--font-size-xl)", fontWeight: 700,
+              animation: timeLeft <= 10 ? "pulse 0.5s ease-in-out infinite" : "none",
+            }}>
+              ⏱ {timeLeft} 秒
+            </div>
+            <div style={{ background: "var(--color-bg-card)", border: "var(--border-width) solid var(--color-border)", borderRadius: "var(--wobble-2)", padding: "var(--space-sm) var(--space-lg)", boxShadow: "var(--shadow-sketch-sm)", fontFamily: "var(--font-heading)", fontSize: "var(--font-size-xl)", fontWeight: 700 }}>
+              ✅ {score} 分
+            </div>
+          </div>
+
+          <div style={{ marginBottom: "var(--space-xl)" }}>
+            <div style={{ background: "var(--color-bg-card)", border: "var(--border-width) solid var(--color-border)", borderRadius: "var(--wobble-1)", padding: "var(--space-2xl)", boxShadow: "var(--shadow-sketch)", marginBottom: "var(--space-xl)" }}>
+              <span style={{ fontSize: 100, display: "block", marginBottom: "var(--space-md)" }}>{currentAnimal.emoji}</span>
+              <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-3xl)", fontWeight: 700 }}>{currentAnimal.name}</span>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "center", gap: "var(--space-xl)" }}>
+              <div onClick={() => answerFn(2)} onMouseEnter={() => speak("2隻腳")} style={answerBtnStyle(2)}>
+                <span style={{ fontSize: 48, display: "block", fontFamily: "var(--font-heading)", fontWeight: 700 }}>2</span>
+                <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-xl)", fontWeight: 700 }}>隻腳</span>
+              </div>
+              <div onClick={() => answerFn(4)} onMouseEnter={() => speak("4隻腳")} style={answerBtnStyle(4)}>
+                <span style={{ fontSize: 48, display: "block", fontFamily: "var(--font-heading)", fontWeight: 700 }}>4</span>
+                <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-xl)", fontWeight: 700 }}>隻腳</span>
+              </div>
+            </div>
+
+            {feedback && (
+              <span style={{ fontSize: 60, marginTop: "var(--space-md)", display: "block", animation: "feedbackPop 0.6s ease both" }}>{feedback}</span>
+            )}
+          </div>
+        </>
+      )}
+
+      {/* Results Screen */}
+      {screen === "results" && (
+        <div style={{ background: "var(--color-bg-card)", border: "var(--border-width) solid var(--color-border)", borderRadius: "var(--wobble-1)", padding: "var(--space-2xl)", boxShadow: "var(--shadow-sketch)" }}>
+          <div style={{ fontSize: 80, marginBottom: "var(--space-md)" }}>🎉</div>
+          <div style={{ fontSize: "var(--font-size-5xl)", fontFamily: "var(--font-heading)", fontWeight: 700, color: "var(--color-primary)" }}>{score}</div>
+          <div style={{ fontSize: "var(--font-size-xl)", color: "var(--color-text-muted)", marginBottom: "var(--space-lg)" }}>答對題數</div>
+          <div style={{ fontSize: "var(--font-size-2xl)", fontFamily: "var(--font-heading)", marginBottom: "var(--space-xl)" }}>{getResultMessage()}</div>
+          <button className="btn btn-primary btn-lg" onClick={startGame}>🔄 再玩一次</button>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes feedbackPop { 0% { transform: scale(0); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+      `}</style>
+      </div>
+      <FloatingNav prev={{ href: "/courses/6", label: "課程" }} next={{ href: "/courses/6/storybook", label: "繪本故事" }} />
+    </div>
+  );
+}

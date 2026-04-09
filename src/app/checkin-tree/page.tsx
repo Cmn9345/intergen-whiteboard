@@ -4,20 +4,31 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  getMembers, getCheckins, checkin as apiCheckin,
-  groupMembers,
-  type Member, type CheckinRecord,
+  getStudents, getCheckins, checkin as apiCheckin,
+  groupStudents, getStudentName,
+  type Student, type CheckinRecord,
 } from "@/lib/api";
 
 const SPOTS = [
+  // 頂部 (3)
   { x: 42, y: 9 }, { x: 50, y: 6 }, { x: 57, y: 9 },
+  // 上層左右 (4)
   { x: 30, y: 17 }, { x: 24, y: 25 },
   { x: 68, y: 17 }, { x: 73, y: 25 },
+  // 中層左右 (6)
   { x: 19, y: 33 }, { x: 17, y: 42 }, { x: 24, y: 38 },
   { x: 79, y: 32 }, { x: 80, y: 41 }, { x: 74, y: 37 },
+  // 中間 (3)
   { x: 36, y: 23 }, { x: 63, y: 22 }, { x: 50, y: 19 },
+  // 下層左右 (4)
   { x: 21, y: 49 }, { x: 77, y: 48 },
   { x: 36, y: 53 }, { x: 63, y: 52 },
+  // 額外位置 (10)
+  { x: 44, y: 30 }, { x: 56, y: 30 },
+  { x: 33, y: 38 }, { x: 67, y: 38 },
+  { x: 28, y: 47 }, { x: 72, y: 47 },
+  { x: 50, y: 42 }, { x: 40, y: 46 },
+  { x: 60, y: 46 }, { x: 50, y: 52 },
 ];
 
 const COLORS = [
@@ -25,18 +36,20 @@ const COLORS = [
   "#F5C842", "#5B9BD5", "#C86A2E", "#3A8F4B", "#2D5DA1",
   "#E091C0", "#7BA856", "#D98A3C", "#6A8FC7", "#C75B8F",
   "#8BC34A", "#FF7043", "#26A69A", "#AB47BC", "#5C6BC0",
+  "#E8874A", "#2D5DA1", "#7B5EA7", "#E06B6B", "#3A8F4B",
+  "#F5C842", "#5B9BD5", "#C86A2E", "#E091C0", "#7BA856",
 ];
 
 export default function CheckinTreePage() {
-  const [members, setMembers] = useState<Member[]>([]);
-  const [grouped, setGrouped] = useState<Record<number, Member[]>>({});
+  const [members, setMembers] = useState<Student[]>([]);
+  const [grouped, setGrouped] = useState<Record<string, Student[]>>({});
   const [checkedMap, setCheckedMap] = useState<Record<string, CheckinRecord>>({});
   const [currentWeek, setCurrentWeek] = useState(1);
   const [time, setTime] = useState("");
   const [date, setDate] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerPos, setPickerPos] = useState({ left: 0, top: 0 });
-  const [pickerGroup, setPickerGroup] = useState(1);
+  const [pickerGroup, setPickerGroup] = useState("1");
   const [successName, setSuccessName] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -54,9 +67,9 @@ export default function CheckinTreePage() {
 
   useEffect(() => {
     (async () => {
-      const data = await getMembers();
+      const data = await getStudents();
       setMembers(data);
-      setGrouped(groupMembers(data));
+      setGrouped(groupStudents(data));
     })();
   }, []);
 
@@ -70,32 +83,33 @@ export default function CheckinTreePage() {
   useEffect(() => { loadCheckins(); }, [loadCheckins]);
 
   const checkedNames = Object.keys(checkedMap);
-  const groups = Object.keys(grouped).map(Number).sort((a, b) => a - b);
+  const groups = Object.keys(grouped).sort();
 
   function onSpotClick(idx: number, e: React.MouseEvent) {
     e.stopPropagation();
     if (idx < checkedNames.length) return;
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    let left = rect.left + rect.width / 2 - 140;
+    let left = rect.left + rect.width / 2 - 200;
     let top = rect.bottom + 10;
     if (left < 12) left = 12;
-    if (left + 280 > window.innerWidth - 12) left = window.innerWidth - 292;
-    if (top + 380 > window.innerHeight - 12) top = rect.top - 400;
+    if (left + 400 > window.innerWidth - 12) left = window.innerWidth - 412;
+    if (top + 560 > window.innerHeight - 12) top = rect.top - 570;
     setPickerPos({ left, top });
     setPickerOpen(true);
   }
 
-  async function doCheckin(member: Member) {
+  async function doCheckin(member: Student) {
     try {
-      await apiCheckin(member.name, String(member.group), String(currentWeek));
+      const name = getStudentName(member);
+      await apiCheckin(name, member.group, String(currentWeek));
       setPickerOpen(false);
-      setSuccessName(member.name);
+      setSuccessName(name);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 1500);
       await loadCheckins();
     } catch (err: unknown) {
       setPickerOpen(false);
-      alert(err instanceof Error && err.message === "DUPLICATE" ? `${member.name} 本週已簽到過了` : "簽到失敗，請重試");
+      alert(err instanceof Error && err.message === "DUPLICATE" ? `${name} 本週已簽到過了` : "簽到失敗，請重試");
     }
   }
 
@@ -150,9 +164,9 @@ export default function CheckinTreePage() {
           if (i >= SPOTS.length) return null;
           const pos = SPOTS[i];
           return (
-            <div key={name} className="absolute flex flex-col items-center pointer-events-none" style={{ left: `${pos.x}%`, top: `${pos.y}%`, marginLeft: -26, marginTop: -26, zIndex: 6, animation: `stamp-pop 0.4s cubic-bezier(0.34,1.56,0.64,1) both`, animationDelay: `${i * 60}ms` }}>
-              <div className="flex items-center justify-center text-white" style={{ width: 48, height: 48, borderRadius: "50%", fontWeight: 800, fontSize: 18, background: COLORS[i % COLORS.length], border: "3px solid white", boxShadow: "0 3px 10px rgba(0,0,0,0.2)" }}>{name[0]}</div>
-              <div style={{ marginTop: 3, padding: "2px 10px", background: "rgba(255,255,255,0.92)", borderRadius: 10, fontSize: 11, fontWeight: 700, color: "var(--color-text-primary)", boxShadow: "0 1px 4px rgba(0,0,0,0.1)", whiteSpace: "nowrap" }}>{name}</div>
+            <div key={name} className="absolute flex flex-col items-center pointer-events-none" style={{ left: `${pos.x}%`, top: `${pos.y}%`, marginLeft: -40, marginTop: -40, zIndex: 6, animation: `stamp-pop 0.4s cubic-bezier(0.34,1.56,0.64,1) both`, animationDelay: `${i * 60}ms` }}>
+              <div className="flex items-center justify-center text-white" style={{ width: 72, height: 72, borderRadius: "50%", fontWeight: 800, fontSize: 28, background: COLORS[i % COLORS.length], border: "4px solid white", boxShadow: "0 4px 14px rgba(0,0,0,0.25)" }}>{name[0]}</div>
+              <div style={{ marginTop: 4, padding: "3px 14px", background: "rgba(255,255,255,0.95)", borderRadius: 12, fontSize: 16, fontWeight: 700, color: "var(--color-text-primary)", boxShadow: "0 2px 6px rgba(0,0,0,0.12)", whiteSpace: "nowrap" }}>{name}</div>
             </div>
           );
         })}
@@ -162,27 +176,28 @@ export default function CheckinTreePage() {
       {pickerOpen && (
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0" onClick={() => setPickerOpen(false)} />
-          <div className="absolute flex flex-col overflow-hidden" style={{ left: pickerPos.left, top: pickerPos.top, width: 280, maxHeight: 420, background: "rgba(255,255,255,0.97)", backdropFilter: "blur(12px)", borderRadius: "var(--radius-xl)", boxShadow: "var(--shadow-xl), 0 0 0 1px rgba(0,0,0,0.05)", animation: "scale-in 0.25s cubic-bezier(0.16,1,0.3,1) both" }}>
-            <div className="flex items-center justify-between" style={{ padding: "var(--space-md)", borderBottom: "1px solid var(--color-border-light)" }}>
-              <span style={{ fontWeight: 700, fontFamily: "var(--font-heading)" }}>選擇成員簽到</span>
-              <button onClick={() => setPickerOpen(false)} style={{ width: 32, height: 32, borderRadius: "50%", border: "none", cursor: "pointer", background: "none", color: "var(--color-text-muted)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <div className="absolute flex flex-col overflow-hidden" style={{ left: pickerPos.left, top: pickerPos.top, width: 400, maxHeight: 560, background: "rgba(255,255,255,0.97)", backdropFilter: "blur(12px)", borderRadius: "var(--radius-xl)", boxShadow: "var(--shadow-xl), 0 0 0 1px rgba(0,0,0,0.05)", animation: "scale-in 0.25s cubic-bezier(0.16,1,0.3,1) both" }}>
+            <div className="flex items-center justify-between" style={{ padding: "var(--space-lg)", borderBottom: "1px solid var(--color-border-light)" }}>
+              <span style={{ fontWeight: 700, fontFamily: "var(--font-heading)", fontSize: 24 }}>選擇成員簽到</span>
+              <button onClick={() => setPickerOpen(false)} style={{ width: 40, height: 40, borderRadius: "50%", border: "none", cursor: "pointer", background: "none", color: "var(--color-text-muted)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
-            <div className="flex gap-0.5 overflow-x-auto" style={{ padding: "var(--space-sm) var(--space-md) 0" }}>
+            <div className="flex gap-1 overflow-x-auto shrink-0" style={{ padding: "var(--space-md) var(--space-lg)" }}>
               {groups.map((g) => (
-                <button key={g} onClick={() => setPickerGroup(g)} style={{ padding: "6px 14px", borderRadius: "var(--radius-full)", fontSize: 16, fontWeight: 600, whiteSpace: "nowrap", border: "none", cursor: "pointer", background: g === pickerGroup ? "var(--color-primary)" : "transparent", color: g === pickerGroup ? "white" : "var(--color-text-muted)" }}>第{g}組</button>
+                <button key={g} onClick={() => setPickerGroup(g)} style={{ padding: "10px 20px", borderRadius: "var(--radius-full)", fontSize: 20, fontWeight: 700, whiteSpace: "nowrap", border: "none", cursor: "pointer", background: g === pickerGroup ? "var(--color-primary)" : "transparent", color: g === pickerGroup ? "white" : "var(--color-text-muted)" }}>第 {g} 組</button>
               ))}
             </div>
             <div className="flex-1 overflow-y-auto" style={{ padding: "var(--space-sm)" }}>
               {(grouped[pickerGroup] || []).map((m) => {
-                const isChecked = !!checkedMap[m.name];
+                const mName = getStudentName(m);
+                const isChecked = !!checkedMap[mName];
                 return (
-                  <div key={m.name} onClick={() => !isChecked && doCheckin(m)} className="flex items-center gap-2" style={{ padding: "10px 12px", borderRadius: "var(--radius-md)", cursor: isChecked ? "not-allowed" : "pointer", border: "2px solid transparent", opacity: isChecked ? 0.4 : 1, transition: "all 150ms ease" }}
+                  <div key={m.id} onClick={() => !isChecked && doCheckin(m)} className="flex items-center gap-3" style={{ padding: "14px 16px", borderRadius: "var(--radius-md)", cursor: isChecked ? "not-allowed" : "pointer", border: "2px solid transparent", opacity: isChecked ? 0.4 : 1, transition: "all 150ms ease" }}
                     onMouseEnter={(e) => { if (!isChecked) { e.currentTarget.style.background = "var(--color-primary-lighter)"; e.currentTarget.style.borderColor = "var(--color-primary-light)"; } }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = ""; e.currentTarget.style.borderColor = "transparent"; }}>
-                    <div className="flex items-center justify-center shrink-0" style={{ width: 38, height: 38, borderRadius: "50%", background: "var(--color-postit-yellow)", border: "var(--border-width) solid var(--color-border)", fontWeight: 700, fontFamily: "var(--font-heading)" }}>{m.name[0]}</div>
-                    <span style={{ fontWeight: 700, fontFamily: "var(--font-heading)", flex: 1 }}>{m.name}</span>
+                    <div className="flex items-center justify-center shrink-0" style={{ width: 48, height: 48, borderRadius: "50%", background: "var(--color-postit-yellow)", border: "var(--border-width) solid var(--color-border)", fontWeight: 700, fontFamily: "var(--font-heading)", fontSize: 22 }}>{mName[0]}</div>
+                    <span style={{ fontWeight: 700, fontFamily: "var(--font-heading)", flex: 1, fontSize: 22 }}>{mName}</span>
                     {isChecked && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
                   </div>
                 );

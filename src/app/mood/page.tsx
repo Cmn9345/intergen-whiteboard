@@ -3,9 +3,9 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import {
-  getMembers, getMoods, voteMood as apiVoteMood,
-  groupMembers,
-  type Member, type MoodRecord,
+  getStudents, getMoods, voteMood as apiVoteMood,
+  groupStudents, getStudentName,
+  type Student, type MoodRecord,
 } from "@/lib/api";
 
 type MoodType = "happy" | "sad" | "angry";
@@ -23,21 +23,21 @@ function classifyMood(emotional: string): MoodType {
 }
 
 export default function MoodPage() {
-  const [members, setMembers] = useState<Member[]>([]);
-  const [grouped, setGrouped] = useState<Record<number, Member[]>>({});
+  const [members, setMembers] = useState<Student[]>([]);
+  const [grouped, setGrouped] = useState<Record<string, Student[]>>({});
   const [moods, setMoods] = useState<MoodRecord[]>([]);
   const [votedNames, setVotedNames] = useState<Set<string>>(new Set());
   const [currentWeek, setCurrentWeek] = useState(1);
   const [selectedMood, setSelectedMood] = useState<MoodType | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalGroup, setModalGroup] = useState(1);
-  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [modalGroup, setModalGroup] = useState("1");
+  const [selectedMember, setSelectedMember] = useState<Student | null>(null);
 
   useEffect(() => {
     (async () => {
-      const data = await getMembers();
+      const data = await getStudents();
       setMembers(data);
-      setGrouped(groupMembers(data));
+      setGrouped(groupStudents(data));
     })();
   }, []);
 
@@ -56,7 +56,7 @@ export default function MoodPage() {
   const hPct = (happy.length / total) * 100;
   const sPct = (sad.length / total) * 100;
   const aPct = (angry.length / total) * 100;
-  const groups = Object.keys(grouped).map(Number).sort((a, b) => a - b);
+  const groups = Object.keys(grouped).sort();
 
   function selectMood(mood: MoodType) {
     setSelectedMood(mood);
@@ -66,13 +66,14 @@ export default function MoodPage() {
 
   async function submitVote() {
     if (!selectedMember || !selectedMood) return;
+    const name = getStudentName(selectedMember);
     try {
-      await apiVoteMood(selectedMember.name, String(selectedMember.group), String(currentWeek), MOOD_CFG[selectedMood].emotional);
+      await apiVoteMood(name, selectedMember.group, String(currentWeek), MOOD_CFG[selectedMood].emotional);
       setModalOpen(false);
       await loadMoods();
     } catch (err: unknown) {
       setModalOpen(false);
-      alert(err instanceof Error && err.message === "DUPLICATE" ? `${selectedMember.name} 本週已投票過了` : "投票失敗，請重試");
+      alert(err instanceof Error && err.message === "DUPLICATE" ? `${name} 本週已投票過了` : "投票失敗，請重試");
     }
   }
 
@@ -214,12 +215,13 @@ export default function MoodPage() {
             </div>
             <div className="grid grid-cols-2" style={{ gap: "var(--space-sm)", maxHeight: 340, overflowY: "auto" }}>
               {(grouped[modalGroup] || []).map((m) => {
-                const voted = votedNames.has(m.name);
-                const sel = selectedMember?.name === m.name;
+                const mName = getStudentName(m);
+                const voted = votedNames.has(mName);
+                const sel = selectedMember?.id === m.id;
                 return (
-                  <button key={m.name} onClick={() => !voted && setSelectedMember(m)} disabled={voted} className="flex items-center text-left" style={{ gap: "var(--space-md)", padding: "var(--space-md)", borderRadius: "var(--wobble-3)", border: sel ? "var(--border-width) solid var(--color-primary)" : "2px solid var(--color-border-light)", background: sel ? "var(--color-primary-lighter)" : "var(--color-bg-card)", boxShadow: sel ? "var(--shadow-sketch-sm)" : "none", cursor: voted ? "default" : "pointer", opacity: voted ? 0.5 : 1 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: "50%", border: "var(--border-width) solid var(--color-border)", background: "var(--color-postit-yellow)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontFamily: "var(--font-heading)", fontSize: 20, flexShrink: 0 }}>{m.name[0]}</div>
-                    <span style={{ fontWeight: 700, fontSize: 24, fontFamily: "var(--font-heading)", flex: 1 }}>{m.name}</span>
+                  <button key={m.id} onClick={() => !voted && setSelectedMember(m)} disabled={voted} className="flex items-center text-left" style={{ gap: "var(--space-md)", padding: "var(--space-md)", borderRadius: "var(--wobble-3)", border: sel ? "var(--border-width) solid var(--color-primary)" : "2px solid var(--color-border-light)", background: sel ? "var(--color-primary-lighter)" : "var(--color-bg-card)", boxShadow: sel ? "var(--shadow-sketch-sm)" : "none", cursor: voted ? "default" : "pointer", opacity: voted ? 0.5 : 1 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: "50%", border: "var(--border-width) solid var(--color-border)", background: "var(--color-postit-yellow)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontFamily: "var(--font-heading)", fontSize: 20, flexShrink: 0 }}>{mName[0]}</div>
+                    <span style={{ fontWeight: 700, fontSize: 24, fontFamily: "var(--font-heading)", flex: 1 }}>{mName}</span>
                     {voted && <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
                   </button>
                 );

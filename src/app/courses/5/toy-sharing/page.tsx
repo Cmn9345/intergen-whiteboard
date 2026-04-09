@@ -1,253 +1,137 @@
 "use client";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import { getWeekTitle } from "@/lib/weeks";
 
-// 不同年代的玩具數據
-const toyCategories = [
-  {
-    era: "傳統玩具",
-    icon: "🏮",
-    toys: [
-      { name: "陀螺", description: "用繩子抽轉的木製玩具", emoji: "🪀" },
-      { name: "毽子", description: "用羽毛和銅錢製作的踢毽遊戲", emoji: "🪶" },
-      { name: "竹蜻蜓", description: "用手搓動會飛起來的玩具", emoji: "🪁" },
-      { name: "彈珠", description: "彩色玻璃球，可以玩彈珠遊戲", emoji: "🔵" },
-      { name: "跳房子", description: "在地上畫格子跳躍的遊戲", emoji: "🏠" },
-      { name: "翻花繩", description: "用繩子編織各種圖案的遊戲", emoji: "🪢" }
-    ]
-  },
-  {
-    era: "現代玩具",
-    icon: "🎮",
-    toys: [
-      { name: "樂高積木", description: "可以拼裝各種造型的積木", emoji: "🧱" },
-      { name: "芭比娃娃", description: "可以換衣服的時尚娃娃", emoji: "👸" },
-      { name: "遙控車", description: "用遙控器控制的玩具車", emoji: "🚗" },
-      { name: "電子遊戲", description: "在螢幕上玩的互動遊戲", emoji: "🎯" },
-      { name: "拼圖", description: "將碎片拼成完整圖片的遊戲", emoji: "🧩" },
-      { name: "魔術方塊", description: "可以轉動的彩色方塊", emoji: "🎲" }
-    ]
-  }
-];
+import { useState } from "react";
+import Link from "next/link";
+import FloatingNav from "@/app/courses/_components/FloatingNav";
 
-// 傳統遊戲數據
-const traditionalGames = [
-  {
-    name: "石頭剪刀布",
-    description: "用手勢猜拳的遊戲",
-    emoji: "✂️",
-    rules: "石頭贏剪刀，剪刀贏布，布贏石頭"
-  },
-  {
-    name: "捉迷藏",
-    description: "一個人找，其他人躲的遊戲",
-    emoji: "👁️",
-    rules: "找的人要數到10，其他人要躲起來"
-  },
-  {
-    name: "老鷹捉小雞",
-    description: "老鷹要抓小雞，母雞要保護小雞",
-    emoji: "🐔",
-    rules: "排成一列，最後一個是小雞，要躲開老鷹"
-  },
-  {
-    name: "跳繩",
-    description: "用繩子跳躍的遊戲",
-    emoji: "🪢",
-    rules: "兩個人搖繩，其他人輪流跳"
-  }
+const toys: Record<string, { emoji: string; name: string; desc: string }[]> = {
+  traditional: [
+    { emoji: "🪀", name: "陀螺", desc: "用繩子纏繞後用力甩出" },
+    { emoji: "🪶", name: "毽子", desc: "用腳踢不讓它落地" },
+    { emoji: "🌀", name: "竹蜻蜓", desc: "搓轉讓它飛上天" },
+    { emoji: "🔮", name: "彈珠", desc: "用手指彈射玻璃珠" },
+    { emoji: "⬜", name: "跳房子", desc: "在地上畫格子跳" },
+    { emoji: "🧵", name: "翻花繩", desc: "用繩子變出不同花樣" },
+  ],
+  modern: [
+    { emoji: "🧱", name: "樂高", desc: "用積木拼出任何東西" },
+    { emoji: "👸", name: "芭比娃娃", desc: "幫娃娃換衣服打扮" },
+    { emoji: "🚗", name: "遙控車", desc: "用遙控器操控小車" },
+    { emoji: "🎮", name: "電子遊戲", desc: "在螢幕上玩遊戲" },
+    { emoji: "🧩", name: "拼圖", desc: "把碎片拼成完整圖案" },
+    { emoji: "🧊", name: "魔術方塊", desc: "轉動讓每面同色" },
+  ],
+};
+
+const games = [
+  { emoji: "✊✌️🖐️", name: "猜拳", rules: "石頭剪刀布！\n石頭贏剪刀，剪刀贏布，布贏石頭。\n三局兩勝制！" },
+  { emoji: "🙈", name: "躲貓貓", rules: "一個人當鬼閉眼數到十，其他人趕快找地方躲起來！\n鬼要找到所有人才算贏。" },
+  { emoji: "🦅🐥", name: "老鷹抓小雞", rules: "一個人當老鷹，一個人當母雞，其他人排在母雞後面當小雞。\n老鷹要抓到小雞，母雞要保護小雞！" },
+  { emoji: "🪢", name: "跳繩", rules: "兩個人搖繩子，其他人輪流跳進去！\n看誰跳最多下不被絆到。" },
 ];
 
 export default function ToySharingPage() {
-  const router = useRouter();
   const [selectedEra, setSelectedEra] = useState<string | null>(null);
-  const [currentGame, setCurrentGame] = useState<number | null>(null);
-  const [showGameRules, setShowGameRules] = useState(false);
+  const [showRules, setShowRules] = useState(false);
+  const [rulesTitle, setRulesTitle] = useState("");
+  const [rulesText, setRulesText] = useState("");
 
-  const handleEraClick = (era: string) => {
+  const selectEra = (era: string) => {
     setSelectedEra(era);
   };
 
-  const handleGameClick = (gameIndex: number) => {
-    setCurrentGame(gameIndex);
-    setShowGameRules(true);
-  };
-
-  const handleStartGame = () => {
-    setShowGameRules(false);
-    // 這裡可以添加遊戲開始的邏輯
+  const openRules = (index: number) => {
+    const g = games[index];
+    setRulesTitle(`${g.emoji} ${g.name}`);
+    setRulesText(g.rules);
+    setShowRules(true);
   };
 
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
-      {/* 返回按鈕 */}
-      <div className="fixed top-4 left-4 z-50">
-        <button
-          onClick={() => router.push('/courses/5')}
-          className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-md hover:bg-gray-50 transition-colors border border-gray-200"
-          title={`返回${getWeekTitle('5')}課程`}
-        >
-          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          <span className="text-sm font-medium text-gray-700">返回{getWeekTitle('5')}</span>
-        </button>
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ flex: 1, overflow: "auto", maxWidth: 960, margin: "0 auto", padding: "var(--space-lg)", width: "100%" }}>
+      <div style={{ marginBottom: "var(--space-lg)" }}>
+        <Link href="/courses/5" className="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7" /><path d="M19 12H5" /></svg>
+          回到第 6 週
+        </Link>
       </div>
 
-      <div className="w-full max-w-6xl mx-auto pt-16">
-        <div className="bg-white rounded-2xl shadow p-8">
-          <h1 className="text-3xl font-bold text-center mb-8 text-purple-600">
-            遊戲、玩具分享
-          </h1>
+      <div style={{ textAlign: "center", marginBottom: "var(--space-xl)" }}>
+        <h1 style={{ fontSize: "var(--font-size-4xl)", fontFamily: "var(--font-heading)" }}>🎠 玩具時光機</h1>
+        <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--font-size-xl)", marginTop: "var(--space-xs)" }}>一起來認識不同時代的玩具</p>
+      </div>
 
-          <div className="text-center mb-8">
-            <p className="text-lg text-gray-700 mb-4">
-              讓我們一起分享不同年代的玩具和遊戲，感受時光的變遷！
-            </p>
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 max-w-2xl mx-auto">
-              <h3 className="text-lg font-bold text-purple-800 mb-2">🎯 活動目標</h3>
-              <ul className="text-purple-700 text-sm space-y-1">
-                <li>• 了解不同年代的玩具特色</li>
-                <li>• 分享玩具背後的故事</li>
-                <li>• 體驗傳統遊戲的樂趣</li>
-                <li>• 增進代際間的交流</li>
-              </ul>
+      <div style={{ display: "flex", justifyContent: "center", gap: "var(--space-xl)", marginBottom: "var(--space-2xl)" }}>
+        {[
+          { key: "traditional", emoji: "🏺", name: "古早玩具", bg: "var(--color-postit-yellow)" },
+          { key: "modern", emoji: "🤖", name: "現代玩具", bg: "var(--color-postit-blue)" },
+        ].map((era, i) => (
+          <div key={era.key} onClick={() => selectEra(era.key)} style={{
+            background: selectedEra === era.key ? "var(--color-primary-lighter)" : era.bg,
+            border: `var(--border-width) solid ${selectedEra === era.key ? "var(--color-primary)" : "var(--color-border)"}`,
+            borderRadius: i === 0 ? "var(--wobble-1)" : "var(--wobble-2)",
+            padding: "var(--space-xl) var(--space-2xl)", textAlign: "center", cursor: "pointer",
+            transition: "all 0.2s ease", boxShadow: "var(--shadow-sketch)", minWidth: 200,
+          }}>
+            <span style={{ fontSize: 56, display: "block", marginBottom: "var(--space-sm)" }}>{era.emoji}</span>
+            <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-2xl)", fontWeight: 700 }}>{era.name}</span>
+          </div>
+        ))}
+      </div>
+
+      {selectedEra && (
+        <>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--space-lg)", marginBottom: "var(--space-2xl)", animation: "fadeInUp 0.4s ease both" }}>
+            {toys[selectedEra].map((t, i) => (
+              <div key={i} style={{ background: "var(--color-bg-card)", border: "var(--border-width) solid var(--color-border)", borderRadius: "var(--wobble-2)", padding: "var(--space-lg)", textAlign: "center", boxShadow: "var(--shadow-sketch)", transition: "all 0.2s ease" }}>
+                <span style={{ fontSize: 56, display: "block", marginBottom: "var(--space-sm)" }}>{t.emoji}</span>
+                <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-xl)", fontWeight: 700, marginBottom: "var(--space-xs)", display: "block" }}>{t.name}</span>
+                <span style={{ fontSize: "var(--font-size-base)", color: "var(--color-text-muted)" }}>{t.desc}</span>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ background: "var(--color-postit-green)", border: "var(--border-width) solid var(--color-border)", borderRadius: "var(--wobble-3)", padding: "var(--space-lg)", textAlign: "center", marginBottom: "var(--space-2xl)" }}>
+            <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-xl)", marginBottom: "var(--space-sm)" }}>💬 分享時間</h3>
+            <p style={{ fontSize: "var(--font-size-lg)", color: "var(--color-text-secondary)" }}>和你的夥伴互相介紹自己時代最喜歡的玩具吧！</p>
+          </div>
+        </>
+      )}
+
+      <div style={{ marginTop: "var(--space-xl)" }}>
+        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-2xl)", textAlign: "center", marginBottom: "var(--space-lg)" }}>🎯 傳統遊戲體驗</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "var(--space-lg)" }}>
+          {games.map((g, i) => (
+            <div key={i} onClick={() => openRules(i)} style={{
+              background: "var(--color-bg-card)", border: "var(--border-width) solid var(--color-border)",
+              borderRadius: i % 2 === 0 ? "var(--wobble-1)" : "var(--wobble-2)",
+              padding: "var(--space-xl)", textAlign: "center", cursor: "pointer",
+              transition: "all 0.2s ease", boxShadow: "var(--shadow-sketch)",
+            }}>
+              <span style={{ fontSize: 48, display: "block", marginBottom: "var(--space-sm)" }}>{g.emoji}</span>
+              <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-xl)", fontWeight: 700 }}>{g.name}</span>
             </div>
-          </div>
-
-          {/* 玩具分享區域 */}
-          <div className="space-y-6 mb-8">
-            <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">🪀 玩具時光機</h2>
-            
-            {!selectedEra && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {toyCategories.map((category, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleEraClick(category.era)}
-                    className="p-6 rounded-lg border-2 border-gray-200 hover:border-purple-400 hover:shadow-lg transition-all duration-200 text-center group"
-                  >
-                    <div className="text-5xl mb-4">{category.icon}</div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">{category.era}</h3>
-                    <p className="text-gray-600">點擊探索這個年代的玩具</p>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {selectedEra && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-gray-800">
-                    {toyCategories.find(c => c.era === selectedEra)?.icon} {selectedEra}
-                  </h3>
-                  <button
-                    onClick={() => setSelectedEra(null)}
-                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition-colors"
-                  >
-                    返回選擇
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {toyCategories
-                    .find(c => c.era === selectedEra)
-                    ?.toys.map((toy, index) => (
-                      <div
-                        key={index}
-                        className="bg-white p-4 rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
-                      >
-                        <div className="text-center">
-                          <div className="text-3xl mb-2">{toy.emoji}</div>
-                          <h4 className="font-semibold text-gray-800 mb-1">{toy.name}</h4>
-                          <p className="text-sm text-gray-600">{toy.description}</p>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h4 className="text-lg font-bold text-blue-800 mb-2">💬 分享時間</h4>
-                  <p className="text-blue-700">
-                    請分享您對這些{selectedEra}的經驗和回憶！您玩過哪些？最喜歡哪一個？有什麼有趣的故事嗎？
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 傳統遊戲區域 */}
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">🎮 傳統遊戲體驗</h2>
-            
-            {!showGameRules && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {traditionalGames.map((game, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleGameClick(index)}
-                    className="p-4 rounded-lg border-2 border-gray-200 hover:border-pink-400 hover:shadow-lg transition-all duration-200 text-center group"
-                  >
-                    <div className="text-3xl mb-2">{game.emoji}</div>
-                    <h3 className="font-semibold text-gray-800 mb-1">{game.name}</h3>
-                    <p className="text-sm text-gray-600">{game.description}</p>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {showGameRules && currentGame !== null && (
-              <div className="bg-gradient-to-r from-pink-400 to-purple-500 p-8 rounded-lg text-white text-center">
-                <div className="text-6xl mb-4">{traditionalGames[currentGame].emoji}</div>
-                <h3 className="text-3xl font-bold mb-4">{traditionalGames[currentGame].name}</h3>
-                <p className="text-xl mb-4">{traditionalGames[currentGame].description}</p>
-                
-                <div className="bg-white bg-opacity-20 rounded-lg p-4 mb-6">
-                  <h4 className="text-lg font-bold mb-2">遊戲規則</h4>
-                  <p className="text-sm">{traditionalGames[currentGame].rules}</p>
-                </div>
-
-                <div className="flex justify-center gap-4">
-                  <button
-                    onClick={handleStartGame}
-                    className="px-6 py-3 bg-white text-pink-600 rounded-lg font-bold hover:bg-gray-100 transition-colors"
-                  >
-                    開始遊戲
-                  </button>
-                  <button
-                    onClick={() => setShowGameRules(false)}
-                    className="px-6 py-3 bg-white bg-opacity-20 text-white rounded-lg font-bold hover:bg-opacity-30 transition-colors"
-                  >
-                    返回選擇
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 底部按鈕 */}
-          <div className="flex justify-center mt-8 gap-4">
-            <button
-              onClick={() => router.push('/courses/5')}
-              className="px-6 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold"
-            >
-              返回{getWeekTitle('5')}
-            </button>
-            <button
-              onClick={() => router.push('/courses/6')}
-              className="px-6 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 text-white font-semibold"
-            >
-              下一週課程
-            </button>
-          </div>
+          ))}
         </div>
       </div>
-    </main>
+
+      {showRules && (
+        <div onClick={() => setShowRules(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ background: "linear-gradient(135deg, #667eea, #764ba2)", border: "var(--border-width) solid var(--color-border)", borderRadius: "var(--wobble-1)", padding: "var(--space-2xl)", textAlign: "center", color: "white", maxWidth: 500, width: "90%", boxShadow: "var(--shadow-sketch)", animation: "celebrate 0.5s ease both" }}>
+            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-2xl)", marginBottom: "var(--space-lg)" }}>{rulesTitle}</h2>
+            <p style={{ fontSize: "var(--font-size-xl)", lineHeight: 1.8, marginBottom: "var(--space-lg)", whiteSpace: "pre-line" }}>{rulesText}</p>
+            <button className="btn btn-outline" style={{ color: "white", borderColor: "rgba(255,255,255,0.5)" }} onClick={() => setShowRules(false)}>👍 知道了</button>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes celebrate { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+      `}</style>
+      </div>
+      <FloatingNav prev={{ href: "/courses/5", label: "課程" }} next={{ href: "/courses/5/storybook", label: "繪本故事" }} />
+    </div>
   );
 }
-
-
-
-
-
