@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>職業工具箱 - 代間共學互動平台</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .activity-page { max-width: 960px; margin: 0 auto; padding: var(--space-xl); }
+    .activity-title { text-align: center; margin-bottom: var(--space-xl); }
+    .activity-title h1 { font-size: var(--font-size-4xl); font-family: var(--font-heading); }
+    .activity-title p { color: var(--color-text-secondary); font-size: var(--font-size-xl); margin-top: var(--space-xs); }
+
+    .mode-toggle { display: flex; justify-content: center; gap: var(--space-md); margin-bottom: var(--space-2xl); }
+
+    .professions-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); }
+    .profession-card { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-1); padding: var(--space-xl); text-align: center; cursor: pointer; transition: all var(--transition-fast); box-shadow: var(--shadow-sketch); }
+    .profession-card:nth-child(2n) { border-radius: var(--wobble-2); }
+    .profession-card:nth-child(3n) { border-radius: var(--wobble-3); }
+    .profession-card:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-sketch-hover); }
+    .profession-card.selected { border-color: var(--color-primary); background: var(--color-primary-lighter); }
+    .profession-emoji { font-size: 56px; margin-bottom: var(--space-sm); display: block; }
+    .profession-name { font-family: var(--font-heading); font-size: var(--font-size-2xl); font-weight: 700; }
+
+    .tools-panel { margin-top: var(--space-xl); background: var(--color-postit-yellow); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-2); padding: var(--space-xl); box-shadow: var(--shadow-sketch); display: none; animation: celebrate 0.4s ease both; }
+    .tools-panel.show { display: block; }
+    .tools-panel h2 { font-family: var(--font-heading); font-size: var(--font-size-2xl); margin-bottom: var(--space-lg); text-align: center; }
+    .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-md); }
+    .tool-item { background: var(--color-bg-card); border: 2px solid var(--color-border); border-radius: var(--wobble-3); padding: var(--space-md); text-align: center; box-shadow: var(--shadow-sketch-sm); }
+    .tool-item .tool-emoji { font-size: 40px; display: block; margin-bottom: var(--space-xs); }
+    .tool-item .tool-name { font-family: var(--font-heading); font-weight: 700; }
+
+    .pairs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); }
+    .pair-card { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-2); padding: var(--space-lg); text-align: center; cursor: pointer; transition: all var(--transition-fast); box-shadow: var(--shadow-sketch); }
+    .pair-card:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-sketch-hover); }
+    .pair-emojis { font-size: 48px; margin-bottom: var(--space-md); display: flex; justify-content: center; gap: var(--space-md); }
+    .pair-label { font-family: var(--font-heading); font-size: var(--font-size-xl); font-weight: 700; }
+    .pair-sub { color: var(--color-text-muted); font-size: var(--font-size-base); margin-top: var(--space-xs); }
+
+    .nav-footer { text-align: center; padding: var(--space-xl) 0; }
+
+    @media (max-width: 768px) {
+      .professions-grid, .pairs-grid { grid-template-columns: repeat(2, 1fr); }
+      .tools-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="activity-page">
+      <div style="margin-bottom: var(--space-lg);">
+        <a href="course-detail.html?week=3" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          回到第 3 週
+        </a>
+      </div>
+
+      <div class="activity-title">
+        <h1>🔧 職業工具箱</h1>
+        <p>認識不同職業和他們的工具</p>
+      </div>
+
+      <div class="mode-toggle">
+        <button class="btn btn-primary" id="btn-tools" onclick="setMode('tools')">🔧 工具探索</button>
+        <button class="btn btn-outline" id="btn-pairs" onclick="setMode('pairs')">👫 職業配對</button>
+      </div>
+
+      <div id="tools-mode">
+        <div class="professions-grid stagger" id="professions-grid"></div>
+        <div class="tools-panel" id="tools-panel"></div>
+      </div>
+
+      <div id="pairs-mode" style="display:none;">
+        <div class="pairs-grid stagger" id="pairs-grid"></div>
+      </div>
+
+      <div class="nav-footer">
+        <a href="course-detail.html?week=3" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          回到課程列表
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const professions = [
+      { name: '醫生', emoji: '👨‍⚕️', tools: [
+        { emoji: '🩺', name: '聽診器' }, { emoji: '🌡️', name: '體溫計' },
+        { emoji: '💉', name: '注射器' }, { emoji: '😷', name: '口罩' }
+      ]},
+      { name: '廚師', emoji: '👨‍🍳', tools: [
+        { emoji: '🍲', name: '鍋子' }, { emoji: '🥄', name: '鍋鏟' },
+        { emoji: '🔪', name: '菜刀' }, { emoji: '👨‍🍳', name: '圍裙' }
+      ]},
+      { name: '老師', emoji: '👩‍🏫', tools: [
+        { emoji: '🖊️', name: '粉筆' }, { emoji: '📋', name: '黑板' },
+        { emoji: '📖', name: '書本' }, { emoji: '👓', name: '眼鏡' }
+      ]},
+      { name: '警察', emoji: '👮', tools: [
+        { emoji: '🪪', name: '警徽' }, { emoji: '⛓️', name: '手銬' },
+        { emoji: '📻', name: '對講機' }, { emoji: '🚔', name: '警車' }
+      ]},
+      { name: '消防員', emoji: '🧑‍🚒', tools: [
+        { emoji: '🚒', name: '消防車' }, { emoji: '🪣', name: '水管' },
+        { emoji: '⛑️', name: '安全帽' }, { emoji: '🪜', name: '梯子' }
+      ]},
+      { name: '建築師', emoji: '👷', tools: [
+        { emoji: '📏', name: '尺' }, { emoji: '✏️', name: '鉛筆' },
+        { emoji: '📐', name: '設計圖' }, { emoji: '🧮', name: '計算機' }
+      ]},
+    ];
+
+    const pairsData = [
+      { adult: '👨‍⚕️', child: '🧒‍⚕️', label: '醫生', adultLabel: '大醫生', childLabel: '小醫生' },
+      { adult: '👨‍🍳', child: '🧒‍🍳', label: '廚師', adultLabel: '大廚師', childLabel: '小廚師' },
+      { adult: '👩‍🏫', child: '🧒‍🏫', label: '老師', adultLabel: '大老師', childLabel: '小老師' },
+      { adult: '👮', child: '🧒‍✈️', label: '警察', adultLabel: '大警察', childLabel: '小警察' },
+      { adult: '🧑‍🚒', child: '🧒‍🚒', label: '消防員', adultLabel: '大消防員', childLabel: '小消防員' },
+      { adult: '👷', child: '🧒‍🔧', label: '建築師', adultLabel: '大建築師', childLabel: '小建築師' },
+    ];
+
+    let selectedProfession = null;
+
+    function setMode(mode) {
+      document.getElementById('tools-mode').style.display = mode === 'tools' ? 'block' : 'none';
+      document.getElementById('pairs-mode').style.display = mode === 'pairs' ? 'block' : 'none';
+      document.getElementById('btn-tools').className = mode === 'tools' ? 'btn btn-primary' : 'btn btn-outline';
+      document.getElementById('btn-pairs').className = mode === 'pairs' ? 'btn btn-primary' : 'btn btn-outline';
+    }
+
+    function selectProfession(index) {
+      selectedProfession = index;
+      renderProfessions();
+      const p = professions[index];
+      const panel = document.getElementById('tools-panel');
+      panel.innerHTML = `
+        <h2>${p.emoji} ${p.name}的工具</h2>
+        <div class="tools-grid">
+          ${p.tools.map(t => `
+            <div class="tool-item animate-scale-in">
+              <span class="tool-emoji">${t.emoji}</span>
+              <span class="tool-name">${t.name}</span>
+            </div>
+          `).join('')}
+        </div>`;
+      panel.classList.add('show');
+    }
+
+    function renderProfessions() {
+      document.getElementById('professions-grid').innerHTML = professions.map((p, i) => `
+        <div class="profession-card animate-fade-in ${selectedProfession === i ? 'selected' : ''}" onclick="selectProfession(${i})">
+          <span class="profession-emoji">${p.emoji}</span>
+          <span class="profession-name">${p.name}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderPairs() {
+      document.getElementById('pairs-grid').innerHTML = pairsData.map(p => `
+        <div class="pair-card animate-fade-in">
+          <div class="pair-emojis">
+            <span>${p.adult}</span>
+            <span>↔</span>
+            <span>${p.child}</span>
+          </div>
+          <div class="pair-label">${p.label}</div>
+          <div class="pair-sub">${p.adultLabel} vs ${p.childLabel}</div>
+        </div>
+      `).join('');
+    }
+
+    renderProfessions();
+    renderPairs();
+  </script>
+</body>
+</html>

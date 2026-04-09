@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>情緒表情 - 代間共學互動平台</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .activity-page { max-width: 900px; margin: 0 auto; padding: var(--space-xl); }
+    .activity-title { text-align: center; margin-bottom: var(--space-2xl); }
+    .activity-title h1 { font-size: var(--font-size-4xl); font-family: var(--font-heading); }
+    .activity-title p { color: var(--color-text-secondary); font-size: var(--font-size-xl); margin-top: var(--space-xs); }
+
+    .emotions-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-lg); margin-bottom: var(--space-2xl); }
+    .emotion-card { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-1); padding: var(--space-xl); text-align: center; box-shadow: var(--shadow-sketch); transition: all var(--transition-fast); cursor: pointer; }
+    .emotion-card:nth-child(2) { border-radius: var(--wobble-2); }
+    .emotion-card:nth-child(3) { border-radius: var(--wobble-3); }
+    .emotion-card:nth-child(4) { border-radius: var(--wobble-4); }
+    .emotion-card:hover { transform: translate(-2px, -2px) scale(1.05); box-shadow: var(--shadow-sketch-hover); }
+    .emotion-emoji { font-size: 64px; margin-bottom: var(--space-md); display: block; }
+    .emotion-name { font-family: var(--font-heading); font-size: var(--font-size-2xl); font-weight: 700; }
+
+    .emotion-card:nth-child(1) { background: var(--color-happy-light); }
+    .emotion-card:nth-child(2) { background: var(--color-sad-light); }
+    .emotion-card:nth-child(3) { background: var(--color-angry-light); }
+    .emotion-card:nth-child(4) { background: #FFF3E0; }
+    .emotion-card:nth-child(5) { background: #F3E5F5; }
+
+    .activity-section { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-2); padding: var(--space-xl); box-shadow: var(--shadow-sketch); margin-bottom: var(--space-xl); }
+    .activity-section h2 { font-family: var(--font-heading); font-size: var(--font-size-2xl); margin-bottom: var(--space-lg); }
+    .activity-section ul { list-style: none; display: flex; flex-direction: column; gap: var(--space-md); }
+    .activity-section li { font-size: var(--font-size-xl); color: var(--color-text-secondary); display: flex; align-items: flex-start; gap: var(--space-sm); }
+    .activity-section li::before { content: '🎯 '; flex-shrink: 0; }
+
+    .nav-links { display: flex; justify-content: center; gap: var(--space-lg); flex-wrap: wrap; padding: var(--space-xl) 0; }
+
+    @media (max-width: 768px) {
+      .emotions-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .emotions-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="activity-page">
+      <div style="margin-bottom: var(--space-lg);">
+        <a href="course-detail.html?week=2" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          回到第 2 週
+        </a>
+      </div>
+
+      <div class="activity-title">
+        <h1>😊 認識情緒表情</h1>
+        <p>認識 5 種基本情緒，學習表達自己的心情</p>
+      </div>
+
+      <div class="emotions-grid stagger">
+        <div class="emotion-card animate-fade-in">
+          <span class="emotion-emoji">😄</span>
+          <span class="emotion-name">開心</span>
+        </div>
+        <div class="emotion-card animate-fade-in">
+          <span class="emotion-emoji">😢</span>
+          <span class="emotion-name">難過</span>
+        </div>
+        <div class="emotion-card animate-fade-in">
+          <span class="emotion-emoji">😠</span>
+          <span class="emotion-name">生氣</span>
+        </div>
+        <div class="emotion-card animate-fade-in">
+          <span class="emotion-emoji">😨</span>
+          <span class="emotion-name">害怕</span>
+        </div>
+        <div class="emotion-card animate-fade-in">
+          <span class="emotion-emoji">😲</span>
+          <span class="emotion-name">驚訝</span>
+        </div>
+      </div>
+
+      <div class="activity-section">
+        <h2>🎯 活動目標</h2>
+        <ul>
+          <li>認識 5 種基本情緒</li>
+          <li>學習用表情表達不同的情緒</li>
+          <li>練習觀察他人的表情</li>
+          <li>學會用語言描述自己的心情</li>
+        </ul>
+      </div>
+
+      <div class="activity-section">
+        <h2>💡 活動方式</h2>
+        <ul>
+          <li>看看上面的表情，跟著做出一樣的表情</li>
+          <li>猜猜你的夥伴現在是什麼心情</li>
+          <li>分享一件讓你有這種心情的事</li>
+        </ul>
+      </div>
+
+      <div class="nav-links">
+        <a href="find-partner.html?week=2" class="btn btn-outline">⬅ 找夥伴</a>
+        <a href="emotion-wheel.html" class="btn btn-primary">
+          前往「情緒輪盤」 ➡
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

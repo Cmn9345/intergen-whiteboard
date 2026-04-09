@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>玩具時光機 - 代間共學互動平台</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .activity-page { max-width: 960px; margin: 0 auto; padding: var(--space-xl); }
+    .activity-title { text-align: center; margin-bottom: var(--space-xl); }
+    .activity-title h1 { font-size: var(--font-size-4xl); font-family: var(--font-heading); }
+    .activity-title p { color: var(--color-text-secondary); font-size: var(--font-size-xl); margin-top: var(--space-xs); }
+
+    .era-select { display: flex; justify-content: center; gap: var(--space-xl); margin-bottom: var(--space-2xl); }
+    .era-card { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-1); padding: var(--space-xl) var(--space-2xl); text-align: center; cursor: pointer; transition: all var(--transition-fast); box-shadow: var(--shadow-sketch); min-width: 200px; }
+    .era-card:nth-child(2) { border-radius: var(--wobble-2); }
+    .era-card:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-sketch-hover); }
+    .era-card.selected { border-color: var(--color-primary); background: var(--color-primary-lighter); }
+    .era-card:nth-child(1) { background: var(--color-postit-yellow); }
+    .era-card:nth-child(2) { background: var(--color-postit-blue); }
+    .era-emoji { font-size: 56px; display: block; margin-bottom: var(--space-sm); }
+    .era-name { font-family: var(--font-heading); font-size: var(--font-size-2xl); font-weight: 700; }
+
+    .toys-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-2xl); display: none; }
+    .toys-grid.show { display: grid; animation: fadeInUp 0.4s ease both; }
+    .toy-card { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-2); padding: var(--space-lg); text-align: center; box-shadow: var(--shadow-sketch); transition: all var(--transition-fast); }
+    .toy-card:hover { transform: translate(-1px, -1px); box-shadow: var(--shadow-sketch-hover); }
+    .toy-emoji { font-size: 56px; display: block; margin-bottom: var(--space-sm); }
+    .toy-name { font-family: var(--font-heading); font-size: var(--font-size-xl); font-weight: 700; margin-bottom: var(--space-xs); }
+    .toy-desc { font-size: var(--font-size-base); color: var(--color-text-muted); }
+
+    .share-prompt { background: var(--color-postit-green); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-3); padding: var(--space-lg); text-align: center; margin-bottom: var(--space-2xl); display: none; }
+    .share-prompt.show { display: block; }
+    .share-prompt h3 { font-family: var(--font-heading); font-size: var(--font-size-xl); margin-bottom: var(--space-sm); }
+    .share-prompt p { font-size: var(--font-size-lg); color: var(--color-text-secondary); }
+
+    .games-section { margin-top: var(--space-xl); }
+    .games-section h2 { font-family: var(--font-heading); font-size: var(--font-size-2xl); text-align: center; margin-bottom: var(--space-lg); }
+    .games-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); }
+    .game-card { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-1); padding: var(--space-xl); text-align: center; cursor: pointer; transition: all var(--transition-fast); box-shadow: var(--shadow-sketch); }
+    .game-card:nth-child(2n) { border-radius: var(--wobble-2); }
+    .game-card:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-sketch-hover); }
+    .game-emoji { font-size: 48px; display: block; margin-bottom: var(--space-sm); }
+    .game-name { font-family: var(--font-heading); font-size: var(--font-size-xl); font-weight: 700; }
+
+    .game-rules { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 200; }
+    .game-rules.show { display: flex; }
+    .rules-card { background: linear-gradient(135deg, #667eea, #764ba2); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-1); padding: var(--space-2xl); text-align: center; color: white; max-width: 500px; width: 90%; box-shadow: var(--shadow-sketch); animation: celebrate 0.5s ease both; }
+    .rules-card h2 { font-family: var(--font-heading); font-size: var(--font-size-2xl); margin-bottom: var(--space-lg); }
+    .rules-card p { font-size: var(--font-size-xl); line-height: 1.8; margin-bottom: var(--space-lg); }
+
+    .nav-footer { text-align: center; padding: var(--space-xl) 0; }
+    @media (max-width: 768px) { .toys-grid, .games-grid { grid-template-columns: repeat(2, 1fr); } .era-select { flex-direction: column; align-items: center; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="activity-page">
+      <div style="margin-bottom: var(--space-lg);">
+        <a href="course-detail.html?week=6" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          回到第 6 週
+        </a>
+      </div>
+
+      <div class="activity-title">
+        <h1>🎠 玩具時光機</h1>
+        <p>一起來認識不同時代的玩具</p>
+      </div>
+
+      <div class="era-select">
+        <div class="era-card" onclick="selectEra('traditional')">
+          <span class="era-emoji">🏺</span>
+          <span class="era-name">古早玩具</span>
+        </div>
+        <div class="era-card" onclick="selectEra('modern')">
+          <span class="era-emoji">🤖</span>
+          <span class="era-name">現代玩具</span>
+        </div>
+      </div>
+
+      <div class="toys-grid" id="toys-grid"></div>
+
+      <div class="share-prompt" id="share-prompt">
+        <h3>💬 分享時間</h3>
+        <p>和你的夥伴互相介紹自己時代最喜歡的玩具吧！</p>
+      </div>
+
+      <div class="games-section">
+        <h2>🎯 傳統遊戲體驗</h2>
+        <div class="games-grid stagger" id="games-grid"></div>
+      </div>
+
+      <div class="game-rules" id="game-rules" onclick="closeRules()">
+        <div class="rules-card" onclick="event.stopPropagation()">
+          <h2 id="rules-title"></h2>
+          <p id="rules-text"></p>
+          <button class="btn btn-outline" style="color:white; border-color:rgba(255,255,255,0.5);" onclick="closeRules()">👍 知道了</button>
+        </div>
+      </div>
+
+      <div class="nav-footer">
+        <a href="course-detail.html?week=6" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          回到課程列表
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const toys = {
+      traditional: [
+        { emoji: '🪀', name: '陀螺', desc: '用繩子纏繞後用力甩出' },
+        { emoji: '🪶', name: '毽子', desc: '用腳踢不讓它落地' },
+        { emoji: '🌀', name: '竹蜻蜓', desc: '搓轉讓它飛上天' },
+        { emoji: '🔮', name: '彈珠', desc: '用手指彈射玻璃珠' },
+        { emoji: '⬜', name: '跳房子', desc: '在地上畫格子跳' },
+        { emoji: '🧵', name: '翻花繩', desc: '用繩子變出不同花樣' },
+      ],
+      modern: [
+        { emoji: '🧱', name: '樂高', desc: '用積木拼出任何東西' },
+        { emoji: '👸', name: '芭比娃娃', desc: '幫娃娃換衣服打扮' },
+        { emoji: '🚗', name: '遙控車', desc: '用遙控器操控小車' },
+        { emoji: '🎮', name: '電子遊戲', desc: '在螢幕上玩遊戲' },
+        { emoji: '🧩', name: '拼圖', desc: '把碎片拼成完整圖案' },
+        { emoji: '🧊', name: '魔術方塊', desc: '轉動讓每面同色' },
+      ]
+    };
+
+    const games = [
+      { emoji: '✊✌️🖐️', name: '猜拳', rules: '石頭剪刀布！\n石頭贏剪刀，剪刀贏布，布贏石頭。\n三局兩勝制！' },
+      { emoji: '🙈', name: '躲貓貓', rules: '一個人當鬼閉眼數到十，其他人趕快找地方躲起來！\n鬼要找到所有人才算贏。' },
+      { emoji: '🦅🐥', name: '老鷹抓小雞', rules: '一個人當老鷹，一個人當母雞，其他人排在母雞後面當小雞。\n老鷹要抓到小雞，母雞要保護小雞！' },
+      { emoji: '🪢', name: '跳繩', rules: '兩個人搖繩子，其他人輪流跳進去！\n看誰跳最多下不被絆到。' },
+    ];
+
+    function selectEra(era) {
+      document.querySelectorAll('.era-card').forEach((c, i) => {
+        c.classList.toggle('selected', (i === 0 && era === 'traditional') || (i === 1 && era === 'modern'));
+      });
+
+      const grid = document.getElementById('toys-grid');
+      grid.innerHTML = toys[era].map(t => `
+        <div class="toy-card animate-fade-in">
+          <span class="toy-emoji">${t.emoji}</span>
+          <span class="toy-name">${t.name}</span>
+          <span class="toy-desc">${t.desc}</span>
+        </div>
+      `).join('');
+      grid.classList.add('show');
+      document.getElementById('share-prompt').classList.add('show');
+    }
+
+    document.getElementById('games-grid').innerHTML = games.map((g, i) => `
+      <div class="game-card animate-fade-in" onclick="showRules(${i})">
+        <span class="game-emoji">${g.emoji}</span>
+        <span class="game-name">${g.name}</span>
+      </div>
+    `).join('');
+
+    function showRules(index) {
+      const g = games[index];
+      document.getElementById('rules-title').textContent = `${g.emoji} ${g.name}`;
+      document.getElementById('rules-text').textContent = g.rules;
+      document.getElementById('game-rules').classList.add('show');
+    }
+
+    function closeRules() {
+      document.getElementById('game-rules').classList.remove('show');
+    }
+  </script>
+</body>
+</html>

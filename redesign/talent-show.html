@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>才藝表演 - 代間共學互動平台</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .activity-page { max-width: 900px; margin: 0 auto; padding: var(--space-xl); }
+    .activity-title { text-align: center; margin-bottom: var(--space-xl); }
+    .activity-title h1 { font-size: var(--font-size-4xl); font-family: var(--font-heading); }
+    .activity-title p { color: var(--color-text-secondary); font-size: var(--font-size-xl); margin-top: var(--space-xs); }
+
+    .categories-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); margin-bottom: var(--space-xl); }
+    .category-card { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-1); padding: var(--space-xl); text-align: center; cursor: pointer; transition: all var(--transition-fast); box-shadow: var(--shadow-sketch); }
+    .category-card:nth-child(2n) { border-radius: var(--wobble-2); }
+    .category-card:nth-child(3n) { border-radius: var(--wobble-3); }
+    .category-card:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-sketch-hover); }
+    .category-card.selected { border-color: var(--color-primary); background: var(--color-primary-lighter); }
+    .category-card:nth-child(1) { background: var(--color-postit-pink); }
+    .category-card:nth-child(2) { background: var(--color-postit-blue); }
+    .category-card:nth-child(3) { background: var(--color-postit-yellow); }
+    .category-card:nth-child(4) { background: var(--color-postit-green); }
+    .category-card:nth-child(5) { background: #F3E5F5; }
+    .category-card:nth-child(6) { background: #FFF3E0; }
+    .cat-emoji { font-size: 56px; display: block; margin-bottom: var(--space-sm); }
+    .cat-name { font-family: var(--font-heading); font-size: var(--font-size-2xl); font-weight: 700; margin-bottom: var(--space-xs); }
+    .cat-examples { font-size: var(--font-size-base); color: var(--color-text-muted); }
+
+    .performer-select { text-align: center; margin-bottom: var(--space-xl); display: none; animation: fadeInUp 0.4s ease both; }
+    .performer-select.show { display: block; }
+    .performer-select h2 { font-family: var(--font-heading); font-size: var(--font-size-2xl); margin-bottom: var(--space-lg); }
+    .performer-btns { display: flex; justify-content: center; gap: var(--space-xl); }
+    .performer-btn { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-2); padding: var(--space-xl) var(--space-2xl); text-align: center; cursor: pointer; transition: all var(--transition-fast); box-shadow: var(--shadow-sketch); }
+    .performer-btn:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-sketch-hover); }
+    .performer-btn .p-emoji { font-size: 56px; display: block; margin-bottom: var(--space-sm); }
+    .performer-btn .p-name { font-family: var(--font-heading); font-size: var(--font-size-xl); font-weight: 700; }
+
+    .stage { background: linear-gradient(135deg, #667eea, #764ba2); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-1); padding: var(--space-2xl); text-align: center; color: white; box-shadow: var(--shadow-sketch); margin-bottom: var(--space-xl); display: none; animation: celebrate 0.5s ease both; }
+    .stage.show { display: block; }
+    .stage-emoji { font-size: 100px; display: block; margin-bottom: var(--space-md); }
+    .stage h2 { font-size: var(--font-size-3xl); font-family: var(--font-heading); margin-bottom: var(--space-xs); }
+    .stage p { font-size: var(--font-size-xl); opacity: 0.85; margin-bottom: var(--space-lg); }
+    .stage .audience-tip { background: rgba(255,255,255,0.2); border-radius: var(--wobble-3); padding: var(--space-md); margin-top: var(--space-lg); font-size: var(--font-size-lg); }
+
+    .nav-footer { display: flex; justify-content: center; gap: var(--space-lg); padding: var(--space-xl) 0; flex-wrap: wrap; }
+
+    @media (max-width: 768px) { .categories-grid { grid-template-columns: repeat(2, 1fr); } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="activity-page">
+      <div style="margin-bottom: var(--space-lg);">
+        <a href="course-detail.html?week=5" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          回到第 5 週
+        </a>
+      </div>
+
+      <div class="activity-title">
+        <h1>🎤 才藝表演</h1>
+        <p>選一個才藝類別，大家一起表演吧！</p>
+      </div>
+
+      <div class="categories-grid stagger" id="categories"></div>
+
+      <div class="performer-select" id="performer-select">
+        <h2>誰先表演？</h2>
+        <div class="performer-btns">
+          <div class="performer-btn" onclick="startShow('child')">
+            <span class="p-emoji">👧</span>
+            <span class="p-name">小朋友先</span>
+          </div>
+          <div class="performer-btn" onclick="startShow('elder')">
+            <span class="p-emoji">👴</span>
+            <span class="p-name">長輩先</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage" id="stage">
+        <span class="stage-emoji" id="stage-emoji"></span>
+        <h2 id="stage-title"></h2>
+        <p id="stage-performer"></p>
+        <button class="btn btn-outline" style="color:white; border-color:rgba(255,255,255,0.5);" onclick="endShow()">👏 結束表演</button>
+        <div class="audience-tip">💡 觀眾們，請給表演者掌聲鼓勵！每人 2-3 分鐘表演時間</div>
+      </div>
+
+      <div class="nav-footer">
+        <a href="ensemble.html" class="btn btn-primary">
+          前往「合唱合奏」 ➡
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const categories = [
+      { name: '唱歌', emoji: '🎤', examples: '兒歌、老歌、流行歌、民謠' },
+      { name: '跳舞', emoji: '💃', examples: '民族舞、現代舞、廣場舞、兒童舞' },
+      { name: '說故事', emoji: '📖', examples: '童話、民間故事、生活故事、歷史故事' },
+      { name: '繪畫手工', emoji: '🎨', examples: '畫畫、摺紙、剪紙、書法' },
+      { name: '運動技能', emoji: '🏃', examples: '太極拳、體操、球類、武術' },
+      { name: '樂器演奏', emoji: '🎹', examples: '鋼琴、吉他、口琴、打擊樂' },
+    ];
+
+    let selectedCategory = null;
+
+    function selectCategory(index) {
+      selectedCategory = categories[index];
+      document.querySelectorAll('.category-card').forEach((c, i) => {
+        c.classList.toggle('selected', i === index);
+      });
+      document.getElementById('performer-select').classList.add('show');
+      document.getElementById('stage').classList.remove('show');
+    }
+
+    function startShow(performer) {
+      document.getElementById('stage-emoji').textContent = selectedCategory.emoji;
+      document.getElementById('stage-title').textContent = `${selectedCategory.name}表演`;
+      document.getElementById('stage-performer').textContent =
+        performer === 'child' ? '👧 小朋友正在表演...' : '👴 長輩正在表演...';
+      document.getElementById('stage').classList.add('show');
+    }
+
+    function endShow() {
+      document.getElementById('stage').classList.remove('show');
+      document.getElementById('performer-select').classList.remove('show');
+      selectedCategory = null;
+      document.querySelectorAll('.category-card').forEach(c => c.classList.remove('selected'));
+    }
+
+    document.getElementById('categories').innerHTML = categories.map((c, i) => `
+      <div class="category-card animate-fade-in" onclick="selectCategory(${i})">
+        <span class="cat-emoji">${c.emoji}</span>
+        <span class="cat-name">${c.name}</span>
+        <span class="cat-examples">${c.examples}</span>
+      </div>
+    `).join('');
+  </script>
+</body>
+</html>

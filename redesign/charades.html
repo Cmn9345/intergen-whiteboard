@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>比手畫腳 - 代間共學互動平台</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .game-page { max-width: 800px; margin: 0 auto; padding: var(--space-xl); }
+    .game-title { text-align: center; margin-bottom: var(--space-xl); }
+    .game-title h1 { font-size: var(--font-size-4xl); font-family: var(--font-heading); }
+    .game-title p { color: var(--color-text-secondary); font-size: var(--font-size-xl); margin-top: var(--space-xs); }
+
+    .draw-btn-wrap { text-align: center; margin-bottom: var(--space-2xl); }
+
+    .card-display { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-1); padding: var(--space-2xl); text-align: center; box-shadow: var(--shadow-sketch); margin-bottom: var(--space-xl); display: none; animation: celebrate 0.5s ease both; }
+    .card-display.show { display: block; }
+    .card-emoji { font-size: 100px; margin-bottom: var(--space-md); display: block; }
+    .card-name { font-size: var(--font-size-3xl); font-family: var(--font-heading); font-weight: 700; margin-bottom: var(--space-lg); }
+    .card-actions { display: flex; justify-content: center; gap: var(--space-md); flex-wrap: wrap; }
+
+    .discussion-section { background: var(--color-postit-green); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-2); padding: var(--space-xl); box-shadow: var(--shadow-sketch); margin-bottom: var(--space-xl); display: none; }
+    .discussion-section.show { display: block; }
+    .discussion-section h2 { font-family: var(--font-heading); font-size: var(--font-size-2xl); margin-bottom: var(--space-lg); }
+    .discussion-section p { font-size: var(--font-size-xl); color: var(--color-text-secondary); margin-bottom: var(--space-lg); }
+
+    .family-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); margin-bottom: var(--space-lg); }
+    .family-card { background: var(--color-bg-card); border: 2px solid var(--color-border); border-radius: var(--wobble-3); padding: var(--space-md); text-align: center; cursor: pointer; transition: all var(--transition-fast); box-shadow: var(--shadow-sketch-sm); }
+    .family-card:hover { transform: translate(-1px, -1px); box-shadow: var(--shadow-sketch); }
+    .family-card.selected { border-color: var(--color-primary); background: var(--color-primary-lighter); border-width: 3px; }
+    .family-card .emoji { font-size: 40px; display: block; margin-bottom: var(--space-xs); }
+    .family-card .name { font-family: var(--font-heading); font-weight: 700; font-size: var(--font-size-lg); }
+
+    .selected-result { background: var(--color-postit-yellow); border: 2px solid var(--color-border); border-radius: var(--wobble-2); padding: var(--space-md); margin-top: var(--space-md); }
+    .selected-result h3 { font-family: var(--font-heading); margin-bottom: var(--space-sm); }
+    .selected-chips { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+    .chip { background: var(--color-bg-card); border: 2px solid var(--color-border); border-radius: 20px; padding: var(--space-xs) var(--space-md); font-family: var(--font-heading); font-weight: 700; }
+
+    .reading-indicator { display: inline-flex; align-items: center; gap: var(--space-sm); padding: var(--space-xs) var(--space-md); background: var(--color-postit-blue); border: 2px solid var(--color-border); border-radius: 20px; font-size: var(--font-size-base); animation: pulse 1s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+    .nav-footer { display: flex; justify-content: center; gap: var(--space-lg); padding: var(--space-xl) 0; flex-wrap: wrap; }
+
+    @media (max-width: 480px) { .family-grid { grid-template-columns: repeat(3, 1fr); } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="game-page">
+      <div style="margin-bottom: var(--space-lg);">
+        <a href="course-detail.html?week=4" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          回到第 4 週
+        </a>
+      </div>
+
+      <div class="game-title">
+        <h1>🎭 比手畫腳</h1>
+        <p>抽一張家事卡，猜猜家裡誰在做這件事</p>
+      </div>
+
+      <div class="draw-btn-wrap">
+        <button class="btn btn-primary btn-lg" onclick="drawCard()">🎴 抽一張家事卡</button>
+      </div>
+
+      <div id="reading-indicator" class="reading-indicator" style="display:none;">🔊 正在朗讀...</div>
+
+      <div class="card-display" id="card-display">
+        <span class="card-emoji" id="card-emoji"></span>
+        <div class="card-name" id="card-name"></div>
+        <div class="card-actions">
+          <button class="btn btn-outline" onclick="speakCard()">🔊 再唸一次</button>
+          <button class="btn btn-primary" onclick="showDiscussion()">👨‍👩‍👧‍👦 誰在做這件事？</button>
+        </div>
+      </div>
+
+      <div class="discussion-section" id="discussion">
+        <h2>👨‍👩‍👧‍👦 家裡誰在做「<span id="disc-activity"></span>」？</h2>
+        <p>點選家人的圖示</p>
+        <div class="family-grid" id="family-grid"></div>
+        <div class="selected-result" id="selected-result" style="display:none;">
+          <h3>你選的是：</h3>
+          <div class="selected-chips" id="selected-chips"></div>
+        </div>
+        <div style="text-align: center; margin-top: var(--space-lg);">
+          <button class="btn btn-outline" onclick="drawCard()">🎴 抽下一張</button>
+          <button class="btn btn-ghost" onclick="resetGame()">🔄 重新開始</button>
+        </div>
+      </div>
+
+      <div class="nav-footer">
+        <a href="course-detail.html?week=4" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          回到課程列表
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const activities = [
+      { name: '煮飯', emoji: '🍳' },
+      { name: '掃地', emoji: '🧹' },
+      { name: '洗碗', emoji: '🍽️' },
+      { name: '澆花', emoji: '🌻' },
+      { name: '曬衣服', emoji: '👕' },
+      { name: '說故事', emoji: '📖' },
+      { name: '遛狗', emoji: '🐕' },
+      { name: '修東西', emoji: '🔧' },
+    ];
+
+    const familyMembers = [
+      { name: '爸爸', emoji: '👨' },
+      { name: '媽媽', emoji: '👩' },
+      { name: '阿公', emoji: '👴' },
+      { name: '阿嬤', emoji: '👵' },
+      { name: '哥哥', emoji: '👦' },
+      { name: '姊姊', emoji: '👧' },
+      { name: '弟弟', emoji: '🧒' },
+      { name: '妹妹', emoji: '👶' },
+      { name: '我', emoji: '🙋' },
+    ];
+
+    let currentActivity = null;
+    let selectedMembers = new Set();
+    let hoverTimers = {};
+
+    function speak(text) {
+      if (!('speechSynthesis' in window)) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'zh-TW'; u.rate = 1.2; u.pitch = 1.4;
+      u.onstart = () => document.getElementById('reading-indicator').style.display = 'inline-flex';
+      u.onend = () => document.getElementById('reading-indicator').style.display = 'none';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+
+    function drawCard() {
+      currentActivity = activities[Math.floor(Math.random() * activities.length)];
+      selectedMembers = new Set();
+
+      document.getElementById('card-emoji').textContent = currentActivity.emoji;
+      document.getElementById('card-name').textContent = currentActivity.name;
+      document.getElementById('card-display').classList.add('show');
+      document.getElementById('discussion').classList.remove('show');
+      document.getElementById('selected-result').style.display = 'none';
+
+      // Auto-speak after 3 seconds
+      setTimeout(() => speak(currentActivity.name), 3000);
+    }
+
+    function speakCard() {
+      if (currentActivity) speak(currentActivity.name);
+    }
+
+    function showDiscussion() {
+      document.getElementById('discussion').classList.add('show');
+      document.getElementById('disc-activity').textContent = currentActivity.name;
+      renderFamily();
+    }
+
+    function toggleMember(name) {
+      if (selectedMembers.has(name)) {
+        selectedMembers.delete(name);
+      } else {
+        selectedMembers.add(name);
+      }
+      renderFamily();
+    }
+
+    function renderFamily() {
+      document.getElementById('family-grid').innerHTML = familyMembers.map(m => `
+        <div class="family-card ${selectedMembers.has(m.name) ? 'selected' : ''}"
+             onclick="toggleMember('${m.name}')"
+             onmouseenter="hoverTimers['${m.name}']=setTimeout(()=>speak('${m.name}'),1000)"
+             onmouseleave="clearTimeout(hoverTimers['${m.name}'])">
+          <span class="emoji">${m.emoji}</span>
+          <span class="name">${m.name}</span>
+        </div>
+      `).join('');
+
+      const result = document.getElementById('selected-result');
+      if (selectedMembers.size > 0) {
+        result.style.display = 'block';
+        document.getElementById('selected-chips').innerHTML =
+          [...selectedMembers].map(name => {
+            const m = familyMembers.find(f => f.name === name);
+            return `<span class="chip">${m.emoji} ${m.name}</span>`;
+          }).join('');
+      } else {
+        result.style.display = 'none';
+      }
+    }
+
+    function resetGame() {
+      currentActivity = null;
+      selectedMembers = new Set();
+      document.getElementById('card-display').classList.remove('show');
+      document.getElementById('discussion').classList.remove('show');
+    }
+  </script>
+</body>
+</html>

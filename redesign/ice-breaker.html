@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>破冰遊戲 - 代間共學互動平台</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .activity-page { max-width: 860px; margin: 0 auto; padding: var(--space-xl); }
+    .activity-title { text-align: center; margin-bottom: var(--space-2xl); }
+    .activity-title h1 { font-size: var(--font-size-4xl); font-family: var(--font-heading); transform: rotate(-0.5deg); }
+    .activity-title p { color: var(--color-text-secondary); font-size: var(--font-size-xl); margin-top: var(--space-xs); }
+
+    .steps-indicator { display: flex; justify-content: center; gap: var(--space-lg); margin-bottom: var(--space-2xl); }
+    .step-dot { width: 48px; height: 48px; border-radius: 50%; border: var(--border-width) solid var(--color-border); display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: var(--font-heading); font-size: var(--font-size-xl); background: var(--color-bg-card); transition: all var(--transition-fast); box-shadow: var(--shadow-sketch-sm); }
+    .step-dot.active { background: var(--color-primary); color: white; transform: scale(1.1); }
+    .step-dot.done { background: var(--color-success-light); color: var(--color-success); }
+
+    .step-content { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-1); padding: var(--space-2xl); box-shadow: var(--shadow-sketch); min-height: 300px; }
+    .step-content h2 { font-size: var(--font-size-3xl); font-family: var(--font-heading); margin-bottom: var(--space-lg); display: flex; align-items: center; gap: var(--space-md); }
+    .step-content ul { list-style: none; display: flex; flex-direction: column; gap: var(--space-md); }
+    .step-content li { display: flex; align-items: flex-start; gap: var(--space-md); font-size: var(--font-size-xl); line-height: 1.6; color: var(--color-text-secondary); }
+    .step-content li::before { content: ''; width: 12px; height: 12px; border-radius: 50%; border: 3px solid var(--color-primary); flex-shrink: 0; margin-top: 10px; }
+
+    .step-nav { display: flex; justify-content: space-between; margin-top: var(--space-xl); }
+    .nav-footer { text-align: center; padding: var(--space-xl) 0; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="activity-page">
+      <div style="margin-bottom: var(--space-lg);">
+        <a href="course-detail.html?week=1" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          回到第 1 週
+        </a>
+      </div>
+
+      <div class="activity-title">
+        <h1>🤝 破冰遊戲</h1>
+        <p>認識新朋友，建立小默契</p>
+      </div>
+
+      <div class="steps-indicator" id="steps-indicator"></div>
+      <div class="step-content" id="step-content"></div>
+
+      <div class="step-nav">
+        <button class="btn btn-outline" id="btn-prev" onclick="prevStep()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          上一步
+        </button>
+        <button class="btn btn-primary" id="btn-next" onclick="nextStep()">
+          下一步
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+
+      <div class="nav-footer">
+        <a href="together.html" class="btn btn-secondary">
+          前往「一起動一動」
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const steps = [
+      {
+        title: '👋 自我介紹時間',
+        icon: '👋',
+        items: [
+          '說出自己的名字',
+          '最喜歡的顏色是什麼？',
+          '最喜歡吃什麼食物？',
+          '平常最喜歡做什麼活動？'
+        ]
+      },
+      {
+        title: '🎯 配對小遊戲',
+        icon: '🎯',
+        items: [
+          '小朋友和長輩配對成一組',
+          '互相記住對方的名字',
+          '一起完成簡單的默契挑戰',
+          '建立小組名稱和口號'
+        ]
+      },
+      {
+        title: '💪 信任與鼓勵',
+        icon: '💪',
+        items: [
+          '互相說一句鼓勵的話',
+          '練習用手勢表達「你好棒」',
+          '一起大聲喊出小組口號',
+          '拍手慶祝認識新朋友！'
+        ]
+      }
+    ];
+
+    let currentStep = 0;
+
+    function render() {
+      const ind = document.getElementById('steps-indicator');
+      ind.innerHTML = steps.map((_, i) =>
+        `<div class="step-dot ${i === currentStep ? 'active' : i < currentStep ? 'done' : ''}">${i < currentStep ? '✓' : i + 1}</div>`
+      ).join('');
+
+      const s = steps[currentStep];
+      document.getElementById('step-content').innerHTML = `
+        <h2>${s.title}</h2>
+        <ul>${s.items.map(item => `<li>${item}</li>`).join('')}</ul>
+      `;
+
+      document.getElementById('btn-prev').style.visibility = currentStep === 0 ? 'hidden' : 'visible';
+      document.getElementById('btn-next').textContent = currentStep === steps.length - 1 ? '完成！' : '下一步';
+    }
+
+    function nextStep() {
+      if (currentStep < steps.length - 1) { currentStep++; render(); }
+    }
+    function prevStep() {
+      if (currentStep > 0) { currentStep--; render(); }
+    }
+
+    render();
+  </script>
+</body>
+</html>

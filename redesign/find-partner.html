@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>找夥伴 - 代間共學互動平台</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .game-page { max-width: 1100px; margin: 0 auto; padding: var(--space-xl); }
+    .game-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-lg); flex-wrap: wrap; gap: var(--space-md); }
+    .game-title { text-align: center; margin-bottom: var(--space-lg); }
+    .game-title h1 { font-size: var(--font-size-4xl); font-family: var(--font-heading); }
+    .game-title p { color: var(--color-text-secondary); font-size: var(--font-size-lg); }
+
+    .score-bar { display: flex; align-items: center; justify-content: center; gap: var(--space-xl); margin-bottom: var(--space-xl); }
+    .score-item { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-2); padding: var(--space-sm) var(--space-lg); box-shadow: var(--shadow-sketch-sm); font-family: var(--font-heading); font-size: var(--font-size-xl); font-weight: 700; }
+
+    .game-board { display: grid; grid-template-columns: 1fr 80px 1fr; gap: var(--space-md); align-items: start; }
+    .column-label { text-align: center; font-family: var(--font-heading); font-size: var(--font-size-xl); font-weight: 700; color: var(--color-text-muted); margin-bottom: var(--space-md); }
+    .divider { display: flex; align-items: center; justify-content: center; font-size: var(--font-size-3xl); padding-top: 40px; color: var(--color-text-muted); }
+
+    .animal-grid { display: flex; flex-direction: column; gap: var(--space-md); }
+    .animal-card { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-1); padding: var(--space-md); display: flex; align-items: center; gap: var(--space-md); cursor: pointer; transition: all var(--transition-fast); box-shadow: var(--shadow-sketch-sm); min-height: 80px; }
+    .animal-card:nth-child(2n) { border-radius: var(--wobble-2); }
+    .animal-card:nth-child(3n) { border-radius: var(--wobble-3); }
+    .animal-card:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-sketch); }
+    .animal-card.selected { border-color: var(--color-primary); background: var(--color-primary-lighter); box-shadow: 0 0 0 3px var(--color-primary), var(--shadow-sketch); }
+    .animal-card.matched { opacity: 0.3; pointer-events: none; }
+    .animal-card .emoji { font-size: 40px; flex-shrink: 0; }
+    .animal-card .name { font-family: var(--font-heading); font-size: var(--font-size-xl); font-weight: 700; }
+
+    .feedback-overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 100; pointer-events: none; }
+    .feedback-emoji { font-size: 120px; animation: feedbackPop 0.8s ease-out forwards; }
+    @keyframes feedbackPop { 0% { transform: scale(0); opacity: 1; } 50% { transform: scale(1.3); } 100% { transform: scale(1); opacity: 0; } }
+
+    .celebration { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 200; }
+    .celebration-card { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-1); padding: var(--space-2xl); text-align: center; box-shadow: var(--shadow-sketch); max-width: 400px; animation: celebrate 0.5s ease both; }
+    .celebration-card h2 { font-size: var(--font-size-3xl); font-family: var(--font-heading); margin-bottom: var(--space-md); }
+    .celebration-card .confetti { font-size: 60px; margin-bottom: var(--space-md); }
+
+    .instructions-box { position: fixed; bottom: var(--space-lg); right: var(--space-lg); background: var(--color-postit-yellow); border: 2px solid var(--color-border); border-radius: var(--wobble-3); padding: var(--space-md); font-size: var(--font-size-base); max-width: 250px; box-shadow: var(--shadow-sketch-sm); z-index: 50; }
+    .instructions-box h4 { font-family: var(--font-heading); margin-bottom: var(--space-xs); }
+
+    @media (max-width: 768px) {
+      .game-board { grid-template-columns: 1fr; }
+      .divider { display: none; }
+      .instructions-box { position: static; margin-top: var(--space-lg); max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="game-page">
+      <div class="game-header">
+        <a id="back-link" href="course-detail.html?week=2" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          <span id="back-text">回到課程</span>
+        </a>
+        <button class="btn btn-outline" onclick="resetGame()">🔄 重新開始</button>
+      </div>
+
+      <div class="game-title">
+        <h1>🐣 找夥伴配對遊戲</h1>
+        <p>點選幼年動物，再點選成年動物來配對</p>
+      </div>
+
+      <div class="score-bar">
+        <div class="score-item">🎯 配對：<span id="score">0</span> / <span id="total">9</span></div>
+      </div>
+
+      <div class="game-board">
+        <div>
+          <div class="column-label">🐣 幼年</div>
+          <div class="animal-grid" id="young-grid"></div>
+        </div>
+        <div class="divider">↔</div>
+        <div>
+          <div class="column-label">🦁 成年</div>
+          <div class="animal-grid" id="adult-grid"></div>
+        </div>
+      </div>
+
+      <div id="feedback" class="feedback-overlay" style="display:none;">
+        <div class="feedback-emoji" id="feedback-emoji"></div>
+      </div>
+
+      <div id="celebration" class="celebration" style="display:none;">
+        <div class="celebration-card">
+          <div class="confetti">🎉🎊🎈</div>
+          <h2>太棒了！全部配對成功！</h2>
+          <p style="font-size:var(--font-size-xl); color:var(--color-text-secondary); margin-bottom:var(--space-lg);">你是動物配對大師！</p>
+          <button class="btn btn-primary btn-lg" onclick="resetGame()">🔄 再玩一次</button>
+        </div>
+      </div>
+
+      <div class="instructions-box">
+        <h4>📝 遊戲規則</h4>
+        <p>1. 先點選左邊的幼年動物<br>2. 再點選右邊的成年動物<br>3. 配對成功會有音效提示</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const animalPairs = [
+      { young: '🐢', youngName: '小海龜', adult: '🐢', adultName: '海龜' },
+      { young: '🐤', youngName: '小天鵝', adult: '🦢', adultName: '天鵝' },
+      { young: '🐥', youngName: '小雞', adult: '🐓', adultName: '公雞' },
+      { young: '🐛', youngName: '毛毛蟲', adult: '🦋', adultName: '蝴蝶' },
+      { young: '🐸', youngName: '蝌蚪', adult: '🐸', adultName: '青蛙' },
+      { young: '🦁', youngName: '小獅子', adult: '🦁', adultName: '獅子' },
+      { young: '👶', youngName: '寶寶', adult: '🧑', adultName: '大人' },
+      { young: '🦘', youngName: '小袋鼠', adult: '🦘', adultName: '袋鼠' },
+      { young: '🐧', youngName: '小企鵝', adult: '🐧', adultName: '企鵝' },
+    ];
+
+    let selectedYoung = null;
+    let selectedAdult = null;
+    let matchedPairs = new Set();
+    let youngOrder = [];
+    let adultOrder = [];
+
+    // Sound effects
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      try {
+        if (type === 'correct') {
+          [523.25, 659.25, 783.99].forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = freq;
+            osc.type = 'sine';
+            gain.gain.value = 0.15;
+            osc.start(audioCtx.currentTime + i * 0.12);
+            osc.stop(audioCtx.currentTime + i * 0.12 + 0.2);
+          });
+        } else {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.frequency.value = 200;
+          osc.type = 'sawtooth';
+          gain.gain.value = 0.1;
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.3);
+        }
+      } catch (e) {}
+    }
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function showFeedback(emoji) {
+      const el = document.getElementById('feedback');
+      document.getElementById('feedback-emoji').textContent = emoji;
+      el.style.display = 'flex';
+      setTimeout(() => el.style.display = 'none', 800);
+    }
+
+    function selectYoung(index) {
+      if (matchedPairs.has(index)) return;
+      audioCtx.resume();
+      selectedYoung = index;
+      selectedAdult = null;
+      render();
+    }
+
+    function selectAdult(index) {
+      if (matchedPairs.has(index)) return;
+      if (selectedYoung === null) return;
+      audioCtx.resume();
+      selectedAdult = index;
+
+      const youngPairIndex = youngOrder[selectedYoung];
+      const adultPairIndex = adultOrder[index];
+
+      if (youngPairIndex === adultPairIndex) {
+        matchedPairs.add(selectedYoung);
+        // Mark adult as matched too (store in dataset)
+        document.querySelectorAll('#adult-grid .animal-card')[index].dataset.matched = 'true';
+        playSound('correct');
+        showFeedback('⭕');
+        document.getElementById('score').textContent = matchedPairs.size;
+
+        if (matchedPairs.size === animalPairs.length) {
+          setTimeout(() => document.getElementById('celebration').style.display = 'flex', 500);
+        }
+      } else {
+        playSound('wrong');
+        showFeedback('❌');
+      }
+
+      selectedYoung = null;
+      selectedAdult = null;
+      setTimeout(render, 300);
+    }
+
+    function render() {
+      const youngGrid = document.getElementById('young-grid');
+      youngGrid.innerHTML = youngOrder.map((pairIdx, i) => {
+        const p = animalPairs[pairIdx];
+        const matched = matchedPairs.has(i);
+        const selected = selectedYoung === i;
+        return `<div class="animal-card ${matched ? 'matched' : ''} ${selected ? 'selected' : ''}" onclick="selectYoung(${i})">
+          <span class="emoji">${p.young}</span>
+          <span class="name">${p.youngName}</span>
+        </div>`;
+      }).join('');
+
+      const adultGrid = document.getElementById('adult-grid');
+      adultGrid.innerHTML = adultOrder.map((pairIdx, i) => {
+        const p = animalPairs[pairIdx];
+        // Check if this adult's pair is matched
+        const matchedYoungIdx = youngOrder.indexOf(pairIdx);
+        const matched = matchedPairs.has(matchedYoungIdx);
+        return `<div class="animal-card ${matched ? 'matched' : ''}" onclick="selectAdult(${i})">
+          <span class="emoji">${p.adult}</span>
+          <span class="name">${p.adultName}</span>
+        </div>`;
+      }).join('');
+    }
+
+    function resetGame() {
+      selectedYoung = null;
+      selectedAdult = null;
+      matchedPairs = new Set();
+      youngOrder = shuffle([...Array(animalPairs.length).keys()]);
+      adultOrder = shuffle([...Array(animalPairs.length).keys()]);
+      document.getElementById('score').textContent = '0';
+      document.getElementById('celebration').style.display = 'none';
+      render();
+    }
+
+    // Week param
+    const params = new URLSearchParams(window.location.search);
+    const week = parseInt(params.get('week')) || 2;
+    document.getElementById('back-link').href = `course-detail.html?week=${week}`;
+    document.getElementById('back-text').textContent = `回到第 ${week} 週`;
+
+    resetGame();
+  </script>
+</body>
+</html>

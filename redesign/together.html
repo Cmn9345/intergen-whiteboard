@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>一起動一動 - 代間共學互動平台</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .video-page { max-width: 1000px; margin: 0 auto; padding: var(--space-xl); }
+    .video-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
+    .video-title { text-align: center; margin-bottom: var(--space-xl); }
+    .video-title h1 { font-size: var(--font-size-4xl); font-family: var(--font-heading); transform: rotate(-0.5deg); }
+    .video-title p { color: var(--color-text-secondary); font-size: var(--font-size-xl); margin-top: var(--space-xs); }
+    .video-container { position: relative; width: 100%; padding-bottom: 56.25%; border-radius: var(--wobble-1); border: var(--border-width) solid var(--color-border); overflow: hidden; box-shadow: var(--shadow-sketch); background: #000; }
+    .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+    .video-info { margin-top: var(--space-xl); background: var(--color-postit-yellow); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-2); padding: var(--space-lg); box-shadow: var(--shadow-sketch-sm); }
+    .video-info h3 { font-family: var(--font-heading); font-size: var(--font-size-xl); margin-bottom: var(--space-sm); }
+    .video-info ul { list-style: none; display: flex; flex-direction: column; gap: var(--space-sm); }
+    .video-info li { font-size: var(--font-size-lg); color: var(--color-text-secondary); }
+    .video-info li::before { content: '🎵 '; }
+    .nav-footer { text-align: center; padding: var(--space-xl) 0; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="video-page">
+      <div class="video-header">
+        <a href="course-detail.html?week=1" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          回到第 1 週
+        </a>
+      </div>
+
+      <div class="video-title">
+        <h1>🎶 一起動一動</h1>
+        <p>當我們同在一起，一起唱歌跳舞！</p>
+      </div>
+
+      <div class="video-container">
+        <iframe src="https://www.youtube.com/embed/aP6sr9Kp7FY?feature=oembed" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen title="當我們同在一起"></iframe>
+      </div>
+
+      <div class="video-info">
+        <h3>活動說明</h3>
+        <ul>
+          <li>團體帶動唱：當我們同在一起</li>
+          <li>簡單肢體律動，跟著音樂動起來</li>
+          <li>祖孫一起跳，建立歡樂氣氛</li>
+        </ul>
+      </div>
+
+      <div class="nav-footer">
+        <a href="storybook.html?week=1" class="btn btn-primary">
+          前往「繪本故事」
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>猜猜動物腳 - 代間共學互動平台</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .game-page { max-width: 700px; margin: 0 auto; padding: var(--space-xl); text-align: center; }
+    .game-title h1 { font-size: var(--font-size-4xl); font-family: var(--font-heading); margin-bottom: var(--space-xs); }
+    .game-title p { color: var(--color-text-secondary); font-size: var(--font-size-xl); margin-bottom: var(--space-xl); }
+
+    .game-stats { display: flex; justify-content: center; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+    .stat-item { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-2); padding: var(--space-sm) var(--space-lg); box-shadow: var(--shadow-sketch-sm); font-family: var(--font-heading); font-size: var(--font-size-xl); font-weight: 700; }
+    .stat-timer { background: var(--color-postit-pink); }
+    .stat-timer.warning { background: var(--color-angry-light); animation: pulse 0.5s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+    .start-screen { margin: var(--space-2xl) 0; }
+    .start-screen .big-emoji { font-size: 120px; margin-bottom: var(--space-lg); display: block; }
+
+    .question-area { margin-bottom: var(--space-xl); }
+    .animal-display { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-1); padding: var(--space-2xl); box-shadow: var(--shadow-sketch); margin-bottom: var(--space-xl); }
+    .animal-emoji { font-size: 100px; display: block; margin-bottom: var(--space-md); }
+    .animal-name { font-family: var(--font-heading); font-size: var(--font-size-3xl); font-weight: 700; }
+
+    .answer-btns { display: flex; justify-content: center; gap: var(--space-xl); }
+    .answer-btn { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-2); padding: var(--space-xl) var(--space-2xl); cursor: pointer; transition: all var(--transition-fast); box-shadow: var(--shadow-sketch); min-width: 160px; }
+    .answer-btn:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-sketch-hover); }
+    .answer-btn:nth-child(1) { background: var(--color-postit-blue); }
+    .answer-btn:nth-child(2) { background: var(--color-postit-yellow); }
+    .answer-btn .ans-num { font-size: 48px; display: block; font-family: var(--font-heading); font-weight: 700; }
+    .answer-btn .ans-label { font-family: var(--font-heading); font-size: var(--font-size-xl); font-weight: 700; }
+    .answer-btn.correct { border-color: var(--color-success); box-shadow: 0 0 0 4px var(--color-success-light), var(--shadow-sketch); }
+    .answer-btn.wrong { border-color: var(--color-danger); box-shadow: 0 0 0 4px var(--color-angry-light), var(--shadow-sketch); }
+
+    .feedback-icon { font-size: 60px; margin-top: var(--space-md); display: block; animation: feedbackPop 0.6s ease both; }
+    @keyframes feedbackPop { 0% { transform: scale(0); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+    .results-screen { display: none; }
+    .results-screen.show { display: block; }
+    .results-card { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-1); padding: var(--space-2xl); box-shadow: var(--shadow-sketch); }
+    .results-card .score-big { font-size: var(--font-size-5xl); font-family: var(--font-heading); font-weight: 700; color: var(--color-primary); }
+    .results-card .score-label { font-size: var(--font-size-xl); color: var(--color-text-muted); margin-bottom: var(--space-lg); }
+    .results-card .message { font-size: var(--font-size-2xl); font-family: var(--font-heading); margin-bottom: var(--space-xl); }
+
+    .nav-footer { text-align: center; padding: var(--space-xl) 0; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="game-page">
+      <div style="margin-bottom: var(--space-lg); text-align: left;">
+        <a href="course-detail.html?week=7" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          回到第 7 週
+        </a>
+      </div>
+
+      <div class="game-title">
+        <h1>🐾 猜猜動物腳</h1>
+        <p>這隻動物是 2 隻腳還是 4 隻腳？</p>
+      </div>
+
+      <!-- Start Screen -->
+      <div id="start-screen" class="start-screen">
+        <span class="big-emoji">🐾</span>
+        <p style="font-size:var(--font-size-xl); color:var(--color-text-secondary); margin-bottom:var(--space-xl);">
+          30 秒內答對越多越好！
+        </p>
+        <button class="btn btn-primary btn-lg" onclick="startGame()">🎮 開始遊戲！</button>
+      </div>
+
+      <!-- Game Screen -->
+      <div id="game-screen" style="display:none;">
+        <div class="game-stats">
+          <div class="stat-item stat-timer" id="timer">⏱ 30 秒</div>
+          <div class="stat-item">✅ <span id="score">0</span> 分</div>
+        </div>
+
+        <div class="question-area">
+          <div class="animal-display">
+            <span class="animal-emoji" id="animal-emoji"></span>
+            <span class="animal-name" id="animal-name"></span>
+          </div>
+
+          <div class="answer-btns">
+            <div class="answer-btn" id="btn-2"
+                 onclick="answer(2)"
+                 onmouseenter="speakFeet(2)"
+                 ontouchstart="speakFeet(2)">
+              <span class="ans-num">2</span>
+              <span class="ans-label">隻腳</span>
+            </div>
+            <div class="answer-btn" id="btn-4"
+                 onclick="answer(4)"
+                 onmouseenter="speakFeet(4)"
+                 ontouchstart="speakFeet(4)">
+              <span class="ans-num">4</span>
+              <span class="ans-label">隻腳</span>
+            </div>
+          </div>
+
+          <span class="feedback-icon" id="feedback" style="display:none;"></span>
+        </div>
+      </div>
+
+      <!-- Results Screen -->
+      <div id="results-screen" class="results-screen">
+        <div class="results-card">
+          <div style="font-size:80px; margin-bottom:var(--space-md);">🎉</div>
+          <div class="score-big" id="final-score">0</div>
+          <div class="score-label">答對題數</div>
+          <div class="message" id="result-message"></div>
+          <button class="btn btn-primary btn-lg" onclick="startGame()">🔄 再玩一次</button>
+        </div>
+      </div>
+
+      <div class="nav-footer">
+        <a href="course-detail.html?week=7" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          回到課程列表
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const animals = [
+      { name: '斑馬', emoji: '🦓', feet: 4 },
+      { name: '長頸鹿', emoji: '🦒', feet: 4 },
+      { name: '兔子', emoji: '🐰', feet: 4 },
+      { name: '雞', emoji: '🐔', feet: 2 },
+      { name: '鴨子', emoji: '🦆', feet: 2 },
+      { name: '豬', emoji: '🐷', feet: 4 },
+      { name: '台灣黑熊', emoji: '🐻', feet: 4 },
+      { name: '大象', emoji: '🐘', feet: 4 },
+      { name: '貓', emoji: '🐱', feet: 4 },
+      { name: '狗', emoji: '🐶', feet: 4 },
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+    let timeLeft = 30;
+    let timer = null;
+    let answered = false;
+
+    function speak(text) {
+      if (!('speechSynthesis' in window)) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'zh-TW'; u.rate = 1.2; u.pitch = 1.4;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+
+    function speakFeet(n) {
+      speak(`${n}隻腳`);
+    }
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    let shuffledAnimals = [];
+
+    function startGame() {
+      score = 0;
+      timeLeft = 30;
+      currentIndex = 0;
+      answered = false;
+      shuffledAnimals = shuffle(animals);
+
+      document.getElementById('start-screen').style.display = 'none';
+      document.getElementById('results-screen').classList.remove('show');
+      document.getElementById('game-screen').style.display = 'block';
+      document.getElementById('score').textContent = '0';
+
+      showAnimal();
+      updateTimer();
+
+      clearInterval(timer);
+      timer = setInterval(() => {
+        timeLeft--;
+        updateTimer();
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function updateTimer() {
+      const el = document.getElementById('timer');
+      el.textContent = `⏱ ${timeLeft} 秒`;
+      el.classList.toggle('warning', timeLeft <= 10);
+    }
+
+    function showAnimal() {
+      const animal = shuffledAnimals[currentIndex % shuffledAnimals.length];
+      document.getElementById('animal-emoji').textContent = animal.emoji;
+      document.getElementById('animal-name').textContent = animal.name;
+      document.getElementById('feedback').style.display = 'none';
+      document.getElementById('btn-2').className = 'answer-btn';
+      document.getElementById('btn-4').className = 'answer-btn';
+      answered = false;
+    }
+
+    function answer(feet) {
+      if (answered) return;
+      answered = true;
+
+      const animal = shuffledAnimals[currentIndex % shuffledAnimals.length];
+      const isCorrect = feet === animal.feet;
+      const btnId = `btn-${feet}`;
+      const otherBtnId = `btn-${feet === 2 ? 4 : 2}`;
+
+      if (isCorrect) {
+        score++;
+        document.getElementById('score').textContent = score;
+        document.getElementById(btnId).classList.add('correct');
+        document.getElementById('feedback').textContent = '✅';
+      } else {
+        document.getElementById(btnId).classList.add('wrong');
+        document.getElementById(otherBtnId).classList.add('correct');
+        document.getElementById('feedback').textContent = '❌';
+      }
+      document.getElementById('feedback').style.display = 'block';
+
+      // Speak answer
+      speak(`${animal.name}有${animal.feet}隻腳`);
+
+      setTimeout(() => {
+        currentIndex++;
+        showAnimal();
+      }, 1200);
+    }
+
+    function endGame() {
+      document.getElementById('game-screen').style.display = 'none';
+      document.getElementById('results-screen').classList.add('show');
+      document.getElementById('final-score').textContent = score;
+
+      let msg = '';
+      if (score >= 8) msg = '🏆 太厲害了！動物專家！';
+      else if (score >= 5) msg = '👏 很棒！繼續加油！';
+      else if (score >= 3) msg = '😊 不錯喔！再試試看！';
+      else msg = '💪 加油！下次一定更好！';
+      document.getElementById('result-message').textContent = msg;
+    }
+  </script>
+</body>
+</html>

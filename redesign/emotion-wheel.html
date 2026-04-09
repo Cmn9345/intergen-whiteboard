@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>情緒輪盤 - 代間共學互動平台</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .game-page { max-width: 700px; margin: 0 auto; padding: var(--space-xl); text-align: center; }
+    .game-title h1 { font-size: var(--font-size-4xl); font-family: var(--font-heading); margin-bottom: var(--space-xs); }
+    .game-title p { color: var(--color-text-secondary); font-size: var(--font-size-xl); margin-bottom: var(--space-2xl); }
+
+    .wheel-container { position: relative; width: 360px; height: 360px; margin: 0 auto var(--space-xl); }
+    .wheel-svg { width: 100%; height: 100%; transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99); border-radius: 50%; border: var(--border-width) solid var(--color-border); box-shadow: var(--shadow-sketch); }
+    .wheel-pointer { position: absolute; top: -16px; left: 50%; transform: translateX(-50%); font-size: 36px; z-index: 10; filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.3)); }
+
+    .spin-btn { margin-bottom: var(--space-xl); }
+
+    .result-card { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-1); padding: var(--space-2xl); box-shadow: var(--shadow-sketch); display: none; animation: celebrate 0.5s ease both; }
+    .result-card.show { display: block; }
+    .result-emoji { font-size: 80px; margin-bottom: var(--space-md); }
+    .result-name { font-size: var(--font-size-3xl); font-family: var(--font-heading); font-weight: 700; margin-bottom: var(--space-lg); }
+    .result-questions { text-align: left; background: var(--color-postit-yellow); border: 2px solid var(--color-border); border-radius: var(--wobble-2); padding: var(--space-lg); }
+    .result-questions h3 { font-family: var(--font-heading); margin-bottom: var(--space-md); }
+    .result-questions ul { list-style: none; display: flex; flex-direction: column; gap: var(--space-sm); }
+    .result-questions li { font-size: var(--font-size-lg); color: var(--color-text-secondary); }
+    .result-questions li::before { content: '💬 '; }
+
+    .reading-indicator { display: inline-flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-md); background: var(--color-postit-blue); border: 2px solid var(--color-border); border-radius: var(--wobble-3); font-family: var(--font-heading); font-size: var(--font-size-lg); margin-bottom: var(--space-md); animation: pulse 1s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+    .nav-footer { text-align: center; padding: var(--space-xl) 0; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="game-page">
+      <div style="margin-bottom: var(--space-lg); text-align: left;">
+        <a href="course-detail.html?week=2" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          回到第 2 週
+        </a>
+      </div>
+
+      <div class="game-title">
+        <h1>🎡 情緒輪盤</h1>
+        <p>轉動輪盤，說說你什麼時候會有這種心情</p>
+      </div>
+
+      <div class="wheel-container">
+        <div class="wheel-pointer">▼</div>
+        <svg class="wheel-svg" id="wheel" viewBox="0 0 300 300"></svg>
+      </div>
+
+      <div class="spin-btn">
+        <button class="btn btn-primary btn-lg" id="spinBtn" onclick="spin()">
+          🎰 轉動輪盤！
+        </button>
+      </div>
+
+      <div id="reading-indicator" class="reading-indicator" style="display:none;">
+        🔊 正在朗讀...
+      </div>
+
+      <div class="result-card" id="result">
+        <div class="result-emoji" id="result-emoji"></div>
+        <div class="result-name" id="result-name"></div>
+        <div class="result-questions">
+          <h3>💬 討論問題</h3>
+          <ul id="result-questions"></ul>
+        </div>
+      </div>
+
+      <div class="nav-footer">
+        <a href="course-detail.html?week=2" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          回到課程列表
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const emotions = [
+      { name: '開心', emoji: '😄', color: '#F5C842', questions: ['什麼事情讓你最開心？', '你開心的時候會做什麼？', '分享一件最近讓你開心的事'] },
+      { name: '害怕', emoji: '😨', color: '#EF5350', questions: ['你害怕什麼東西？', '害怕的時候你會怎麼做？', '誰會讓你覺得安心？'] },
+      { name: '難過', emoji: '😢', color: '#5B9BD5', questions: ['什麼時候你會難過？', '難過的時候你會找誰？', '怎樣可以讓自己好起來？'] },
+      { name: '生氣', emoji: '😠', color: '#C62828', questions: ['什麼事情會讓你生氣？', '生氣的時候可以怎麼做？', '有沒有讓你消氣的方法？'] },
+      { name: '驚訝', emoji: '😲', color: '#7E57C2', questions: ['最近有什麼讓你驚訝的事？', '驚訝的時候你會有什麼反應？', '你覺得驚訝是好的還是不好的？'] },
+    ];
+
+    const sectorAngle = 360 / emotions.length;
+    let isSpinning = false;
+    let currentRotation = 0;
+
+    // Draw wheel
+    function drawWheel() {
+      const svg = document.getElementById('wheel');
+      const cx = 150, cy = 150, r = 140;
+      let html = '';
+
+      emotions.forEach((e, i) => {
+        const startAngle = (i * sectorAngle - 90) * Math.PI / 180;
+        const endAngle = ((i + 1) * sectorAngle - 90) * Math.PI / 180;
+        const x1 = cx + r * Math.cos(startAngle);
+        const y1 = cy + r * Math.sin(startAngle);
+        const x2 = cx + r * Math.cos(endAngle);
+        const y2 = cy + r * Math.sin(endAngle);
+        const largeArc = sectorAngle > 180 ? 1 : 0;
+
+        html += `<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${largeArc},1 ${x2},${y2} Z" fill="${e.color}" stroke="#2D2D2D" stroke-width="2"/>`;
+
+        // Text
+        const midAngle = ((i + 0.5) * sectorAngle - 90) * Math.PI / 180;
+        const tx = cx + r * 0.6 * Math.cos(midAngle);
+        const ty = cy + r * 0.6 * Math.sin(midAngle);
+        const textAngle = (i + 0.5) * sectorAngle;
+
+        html += `<text x="${tx}" y="${ty - 8}" text-anchor="middle" fill="white" font-size="28" transform="rotate(${textAngle}, ${tx}, ${ty})">${e.emoji}</text>`;
+        html += `<text x="${tx}" y="${ty + 18}" text-anchor="middle" fill="white" font-size="16" font-weight="bold" font-family="Noto Sans TC" transform="rotate(${textAngle}, ${tx}, ${ty})">${e.name}</text>`;
+      });
+
+      svg.innerHTML = html;
+    }
+
+    function speak(text) {
+      if (!('speechSynthesis' in window)) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'zh-TW';
+      u.rate = 1.2;
+      u.pitch = 1.4;
+      u.volume = 1.0;
+      u.onstart = () => document.getElementById('reading-indicator').style.display = 'inline-flex';
+      u.onend = () => document.getElementById('reading-indicator').style.display = 'none';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+
+    function spin() {
+      if (isSpinning) return;
+      isSpinning = true;
+      document.getElementById('result').classList.remove('show');
+
+      const extraSpins = 5 * 360;
+      const randomAngle = Math.random() * 360;
+      currentRotation += extraSpins + randomAngle;
+
+      const wheel = document.getElementById('wheel');
+      wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+      setTimeout(() => {
+        isSpinning = false;
+        // Determine which sector
+        const normalizedAngle = (360 - (currentRotation % 360)) % 360;
+        const sectorIndex = Math.floor(normalizedAngle / sectorAngle) % emotions.length;
+        const emotion = emotions[sectorIndex];
+
+        document.getElementById('result-emoji').textContent = emotion.emoji;
+        document.getElementById('result-name').textContent = emotion.name;
+        document.getElementById('result-questions').innerHTML = emotion.questions.map(q => `<li>${q}</li>`).join('');
+        document.getElementById('result').classList.add('show');
+
+        // TTS
+        speak(emotion.name);
+        setTimeout(() => speak(`你什麼時候會${emotion.name}？`), 1500);
+      }, 3200);
+    }
+
+    drawWheel();
+  </script>
+</body>
+</html>

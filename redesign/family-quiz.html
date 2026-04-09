@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>家庭小測驗 - 代間共學互動平台</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .game-page { max-width: 700px; margin: 0 auto; padding: var(--space-xl); }
+    .game-title { text-align: center; margin-bottom: var(--space-xl); }
+    .game-title h1 { font-size: var(--font-size-4xl); font-family: var(--font-heading); }
+    .game-title p { color: var(--color-text-secondary); font-size: var(--font-size-xl); margin-top: var(--space-xs); }
+
+    .score-bar { display: flex; justify-content: center; gap: var(--space-xl); margin-bottom: var(--space-xl); }
+    .score-item { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-2); padding: var(--space-sm) var(--space-lg); box-shadow: var(--shadow-sketch-sm); font-family: var(--font-heading); font-size: var(--font-size-xl); font-weight: 700; }
+
+    .question-card { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-1); padding: var(--space-2xl); box-shadow: var(--shadow-sketch); text-align: center; margin-bottom: var(--space-xl); }
+    .question-emoji { font-size: 100px; margin-bottom: var(--space-lg); display: block; }
+    .question-hint { color: var(--color-text-muted); font-size: var(--font-size-lg); font-family: var(--font-heading); margin-top: var(--space-sm); }
+
+    .options-grid { display: flex; flex-direction: column; gap: var(--space-md); margin-bottom: var(--space-xl); }
+    .option-card { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-2); padding: var(--space-lg); display: flex; align-items: center; gap: var(--space-lg); cursor: pointer; transition: all var(--transition-fast); box-shadow: var(--shadow-sketch-sm); font-size: var(--font-size-xl); font-family: var(--font-heading); font-weight: 700; }
+    .option-card:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-sketch); background: var(--color-surface); }
+    .option-card .opt-emoji { font-size: 48px; }
+    .option-card.correct { background: var(--color-success-light); border-color: var(--color-success); animation: bounceIn 0.5s ease; }
+    .option-card.wrong { background: var(--color-angry-light); border-color: var(--color-danger); animation: shake 0.5s ease; }
+    .option-card.disabled { pointer-events: none; opacity: 0.5; }
+
+    @keyframes bounceIn { 0% { transform: scale(0.95); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+
+    .next-btn { text-align: center; }
+    .reading-indicator { display: inline-flex; align-items: center; gap: var(--space-sm); padding: var(--space-xs) var(--space-md); background: var(--color-postit-blue); border: 2px solid var(--color-border); border-radius: 20px; font-size: var(--font-size-base); margin-bottom: var(--space-md); animation: pulse 1s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+    .nav-footer { text-align: center; padding: var(--space-xl) 0; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="game-page">
+      <div style="margin-bottom: var(--space-lg);">
+        <a href="course-detail.html?week=4" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          回到第 4 週
+        </a>
+      </div>
+
+      <div class="game-title">
+        <h1>👨‍👩‍👧‍👦 家庭小測驗</h1>
+        <p>猜猜這是誰？認識家人稱呼</p>
+      </div>
+
+      <div class="score-bar">
+        <div class="score-item">✅ 答對：<span id="score">0</span></div>
+        <div class="score-item">📝 題數：<span id="count">0</span></div>
+      </div>
+
+      <div id="reading-indicator" class="reading-indicator" style="display:none;">🔊 正在朗讀...</div>
+
+      <div class="question-card" id="question-card">
+        <span class="question-emoji" id="q-emoji"></span>
+        <div class="question-hint" id="q-hint"></div>
+      </div>
+
+      <div class="options-grid" id="options-grid"></div>
+
+      <div class="next-btn" id="next-btn" style="display:none;">
+        <button class="btn btn-primary" onclick="nextQuestion()">下一題 ➡</button>
+      </div>
+
+      <div class="nav-footer">
+        <button class="btn btn-outline" onclick="resetGame()">🔄 重新開始</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const members = [
+      { name: '媽媽', emoji: '👩', gender: 'f', hint: '留著長頭髮，溫柔的照顧全家人' },
+      { name: '爸爸', emoji: '👨', gender: 'm', hint: '高高的個子，每天辛苦工作' },
+      { name: '阿嬤', emoji: '👵', gender: 'f', hint: '頭髮白白的，煮的飯最好吃' },
+      { name: '阿公', emoji: '👴', gender: 'm', hint: '戴著眼鏡，喜歡說故事' },
+      { name: '哥哥', emoji: '👦', gender: 'm', hint: '比你高一點，會保護弟弟妹妹' },
+      { name: '姊姊', emoji: '👧', gender: 'f', hint: '綁著辮子，功課很好' },
+      { name: '弟弟', emoji: '🧒', gender: 'm', hint: '最小的男孩，很調皮' },
+      { name: '妹妹', emoji: '👶', gender: 'f', hint: '最小的女孩，很可愛' },
+    ];
+
+    let score = 0;
+    let questionCount = 0;
+    let currentAnswer = null;
+    let answered = false;
+    let hoverTimers = {};
+
+    // Sound via Web Audio
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+      try {
+        if (type === 'correct') {
+          [523.25, 659.25, 783.99].forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.frequency.value = freq; osc.type = 'sine'; gain.gain.value = 0.15;
+            osc.start(audioCtx.currentTime + i * 0.12);
+            osc.stop(audioCtx.currentTime + i * 0.12 + 0.2);
+          });
+        } else {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.frequency.value = 200; osc.type = 'sawtooth'; gain.gain.value = 0.1;
+          osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        }
+      } catch(e) {}
+    }
+
+    function speak(text) {
+      if (!('speechSynthesis' in window)) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'zh-TW'; u.rate = 1.2; u.pitch = 1.4;
+      u.onstart = () => document.getElementById('reading-indicator').style.display = 'inline-flex';
+      u.onend = () => document.getElementById('reading-indicator').style.display = 'none';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function generateQuestion() {
+      answered = false;
+      const correctIdx = Math.floor(Math.random() * members.length);
+      currentAnswer = members[correctIdx];
+
+      // Pick 2 distractors (prefer same gender)
+      const sameGender = members.filter((m, i) => i !== correctIdx && m.gender === currentAnswer.gender);
+      const diffGender = members.filter((m, i) => i !== correctIdx && m.gender !== currentAnswer.gender);
+      const pool = shuffle(sameGender).concat(shuffle(diffGender));
+      const distractors = pool.slice(0, 2);
+      const options = shuffle([currentAnswer, ...distractors]);
+
+      document.getElementById('q-emoji').textContent = currentAnswer.emoji;
+      document.getElementById('q-hint').textContent = currentAnswer.hint;
+
+      const grid = document.getElementById('options-grid');
+      grid.innerHTML = options.map((opt, i) => `
+        <div class="option-card" id="opt-${i}"
+             onclick="answer(${i}, '${opt.name}')"
+             onmouseenter="startHover(${i}, '${opt.name}')"
+             onmouseleave="cancelHover(${i})">
+          <span class="opt-emoji">${opt.emoji}</span>
+          <span>${opt.name}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('next-btn').style.display = 'none';
+      questionCount++;
+      document.getElementById('count').textContent = questionCount;
+    }
+
+    function startHover(i, name) {
+      hoverTimers[i] = setTimeout(() => speak(name), 1000);
+    }
+
+    function cancelHover(i) {
+      clearTimeout(hoverTimers[i]);
+    }
+
+    function answer(optIndex, name) {
+      if (answered) return;
+      answered = true;
+      audioCtx.resume();
+
+      const isCorrect = name === currentAnswer.name;
+      const el = document.getElementById(`opt-${optIndex}`);
+
+      if (isCorrect) {
+        el.classList.add('correct');
+        playSound('correct');
+        score++;
+        document.getElementById('score').textContent = score;
+      } else {
+        el.classList.add('wrong');
+        playSound('wrong');
+        // Highlight correct
+        document.querySelectorAll('.option-card').forEach(card => {
+          if (card.textContent.includes(currentAnswer.name)) card.classList.add('correct');
+        });
+      }
+
+      // Disable all
+      document.querySelectorAll('.option-card').forEach((card, i) => {
+        if (i !== optIndex && !card.classList.contains('correct')) card.classList.add('disabled');
+      });
+
+      document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function nextQuestion() { generateQuestion(); }
+
+    function resetGame() {
+      score = 0; questionCount = 0;
+      document.getElementById('score').textContent = '0';
+      document.getElementById('count').textContent = '0';
+      generateQuestion();
+    }
+
+    generateQuestion();
+  </script>
+</body>
+</html>

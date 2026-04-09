@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系統使用教學 - 代間共學互動平台</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    html, body { height: 100%; overflow: hidden; }
+    .page { height: 100vh; display: flex; flex-direction: column; }
+
+    .slide-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px var(--space-xl); flex-shrink: 0;
+    }
+    .slide-progress {
+      display: flex; align-items: center; gap: var(--space-sm);
+      font-family: var(--font-heading); font-size: var(--font-size-lg); font-weight: 700; color: var(--color-text-muted);
+    }
+    .progress-bar { width: 200px; height: 8px; background: var(--color-border-lighter); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--color-primary); border-radius: 4px; transition: width 0.4s ease; }
+
+    .slide-area { flex: 1; display: flex; align-items: stretch; justify-content: center; padding: 0 var(--space-xl); min-height: 0; }
+
+    .slide {
+      width: 100%; max-width: 1100px;
+      border-radius: var(--wobble-1); border: var(--border-width) solid var(--color-border);
+      box-shadow: var(--shadow-sketch); display: none;
+      padding: var(--space-xl) var(--space-2xl); position: relative;
+      animation: slideIn 0.4s ease both; overflow: hidden;
+    }
+    .slide.active { display: flex; }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+    /* Cover */
+    .slide-cover { background: linear-gradient(135deg, #667eea, #764ba2); flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .slide-cover h2, .slide-cover p { color: white; }
+    .slide-cover .slide-icon { font-size: 96px; margin-bottom: var(--space-lg); }
+    .slide-cover h2 { font-size: var(--font-size-4xl); font-family: var(--font-heading); margin-bottom: var(--space-sm); }
+    .slide-cover p { font-size: var(--font-size-2xl); opacity: 0.85; }
+
+    /* End */
+    .slide-end { background: linear-gradient(135deg, #4CAF50, #81C784); flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .slide-end h2, .slide-end p { color: white; }
+    .slide-end .slide-icon { font-size: 80px; margin-bottom: var(--space-md); }
+    .slide-end h2 { font-size: var(--font-size-3xl); font-family: var(--font-heading); margin-bottom: var(--space-md); }
+    .slide-end p { font-size: var(--font-size-xl); opacity: 0.9; line-height: 2; }
+
+    /* Split layout */
+    .slide-split { flex-direction: row; align-items: stretch; gap: var(--space-xl); }
+    .slide-left { flex: 1; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+    .slide-left .badge-label {
+      display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px;
+      border-radius: 16px; font-size: var(--font-size-base); font-weight: 700;
+      font-family: var(--font-heading); margin-bottom: var(--space-md); border: 2px solid; width: fit-content;
+    }
+    .slide-left h2 { font-size: var(--font-size-4xl); font-family: var(--font-heading); margin-bottom: var(--space-md); }
+    .slide-left > p { font-size: var(--font-size-xl); color: var(--color-text-secondary); margin-bottom: var(--space-lg); line-height: 1.5; }
+    .slide-left .steps { list-style: none; display: flex; flex-direction: column; gap: var(--space-md); flex: 1; justify-content: center; }
+    .slide-left .steps li {
+      display: flex; align-items: center; gap: 14px;
+      font-size: var(--font-size-xl); color: var(--color-text-secondary);
+      background: rgba(255,255,255,0.6); border: 2px solid var(--color-border-lighter);
+      border-radius: 14px; padding: 12px 18px; line-height: 1.4;
+    }
+    .slide-left .steps li .num {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--color-primary);
+      color: white; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-family: var(--font-heading); flex-shrink: 0; font-size: 16px;
+    }
+
+    /* Mockup */
+    .slide-right { flex: 1; display: flex; align-items: center; justify-content: center; min-width: 0; }
+    .mockup-frame {
+      width: 100%; max-width: 480px; border-radius: var(--wobble-2);
+      border: var(--border-width) solid var(--color-border);
+      box-shadow: var(--shadow-sketch); overflow: hidden; background: white;
+    }
+    .mockup-bar {
+      height: 28px; background: var(--color-surface); border-bottom: 2px solid var(--color-border-lighter);
+      display: flex; align-items: center; gap: 6px; padding: 0 12px;
+    }
+    .mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mockup-dot:nth-child(1) { background: #FF6B6B; }
+    .mockup-dot:nth-child(2) { background: #F5C842; }
+    .mockup-dot:nth-child(3) { background: #4CAF50; }
+    .mockup-body { padding: 16px; }
+    .mockup-title { font-family: var(--font-heading); font-weight: 700; font-size: 16px; text-align: center; margin-bottom: 14px; }
+
+    /* Mini components */
+    .mini-home { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .mini-card { border-radius: 10px; border: 2px solid var(--color-border-light); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px 8px; font-size: 14px; font-family: var(--font-heading); font-weight: 700; gap: 6px; }
+    .mini-card img { width: 48px; height: 48px; object-fit: contain; }
+
+    .mini-tree-bg { height: 240px; background: linear-gradient(180deg, #C9E8F5 0%, #D5E8C8 70%, #8CB56A 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 80px; position: relative; }
+    .mini-spot { position: absolute; width: 28px; height: 28px; border-radius: 50%; border: 2.5px dashed rgba(255,255,255,0.6); background: rgba(255,255,255,0.15); }
+    .mini-spot.glow { border-color: white; background: rgba(255,255,255,0.45); animation: spotPulse 2s ease-in-out infinite; }
+    @keyframes spotPulse { 0%,100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.1); opacity: 1; } }
+    .mini-stamp { position: absolute; width: 30px; height: 30px; border-radius: 50%; border: 2.5px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+
+    .mini-thermo { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 14px 0; }
+    .mini-tube { width: 44px; height: 170px; border-radius: 22px; border: 2.5px solid var(--color-border); overflow: hidden; display: flex; flex-direction: column; }
+    .mini-zone { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .mini-zone.hl { outline: 3px solid var(--color-marker-black); outline-offset: -3px; }
+    .mini-labels { display: flex; flex-direction: column; gap: 8px; }
+    .mini-label { font-size: 14px; font-family: var(--font-heading); font-weight: 700; padding: 8px 14px; border-radius: 8px; border: 2px solid var(--color-border-light); }
+
+    .mini-courses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .mini-course { border-radius: 8px; padding: 10px 6px; text-align: center; font-size: 12px; font-family: var(--font-heading); font-weight: 700; border: 2px solid var(--color-border-light); }
+    .mini-course span { font-size: 24px; display: block; margin-bottom: 3px; }
+    .mini-course.hl { border-color: var(--color-primary); border-width: 3px; }
+
+    .mini-act { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 2px solid var(--color-border-light); border-radius: 10px; margin-bottom: 8px; }
+    .mini-act-dot { width: 5px; height: 34px; border-radius: 3px; flex-shrink: 0; }
+    .mini-act-info { flex: 1; }
+    .mini-act-name { font-weight: 700; font-family: var(--font-heading); font-size: 14px; }
+    .mini-act-time { font-size: 12px; color: var(--color-text-muted); }
+    .mini-act-btn { font-size: 12px; padding: 4px 10px; border-radius: 8px; border: 1.5px solid var(--color-border-light); font-weight: 700; flex-shrink: 0; }
+
+    .mockup-hint { text-align: center; font-size: 13px; color: var(--color-text-muted); margin-top: 10px; }
+
+    .slide-number { position: absolute; bottom: 8px; right: 16px; font-family: var(--font-heading); font-size: 13px; color: var(--color-text-muted); }
+
+    .slide-nav {
+      display: flex; align-items: center; justify-content: center; gap: var(--space-lg);
+      padding: 10px var(--space-xl); flex-shrink: 0;
+    }
+    .dots { display: flex; gap: var(--space-sm); }
+    .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--color-border); background: var(--color-bg-card); cursor: pointer; transition: all var(--transition-fast); }
+    .dot.active { background: var(--color-primary); border-color: var(--color-primary); transform: scale(1.2); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="slide-header">
+      <a href="course-detail.html?week=1" class="back-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        回到第 1 週
+      </a>
+      <div class="slide-progress">
+        <span id="slide-num">1 / 7</span>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+    </div>
+
+    <div class="slide-area">
+      <!-- 0: Cover -->
+      <div class="slide slide-cover active">
+        <div class="slide-icon">📺</div>
+        <h2>系統使用教學</h2>
+        <p>認識「代間共學互動平台」的四大功能</p>
+        <div class="slide-number">1 / 7</div>
+      </div>
+
+      <!-- 1: Homepage -->
+      <div class="slide slide-split" style="background:var(--color-postit-yellow);">
+        <div class="slide-left">
+          <div class="badge-label" style="background:var(--color-postit-blue); border-color:var(--color-secondary);">🏠 首頁</div>
+          <h2>平台首頁</h2>
+          <p>打開平台後會看到四個功能按鈕：</p>
+          <ul class="steps">
+            <li><span class="num">🌳</span>簽到樹 — 上課簽到</li>
+            <li><span class="num">😊</span>心情溫度計 — 記錄心情</li>
+            <li><span class="num">📚</span>課程內容 — 每週活動</li>
+            <li><span class="num">🔐</span>人員登入 — 老師管理</li>
+          </ul>
+        </div>
+        <div class="slide-right">
+          <div class="mockup-frame">
+            <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+            <div class="mockup-body">
+              <div class="mockup-title">🌳 代間共學互動平台</div>
+              <div class="mini-home">
+                <div class="mini-card" style="background:var(--color-postit-blue);"><img src="icon-tree.png" alt="">簽到樹</div>
+                <div class="mini-card" style="background:var(--color-postit-yellow);"><img src="icon-thermometer.png" alt="">心情溫度計</div>
+                <div class="mini-card" style="background:var(--color-postit-green);"><img src="icon-book.png" alt="">課程內容</div>
+                <div class="mini-card" style="background:var(--color-postit-pink);"><img src="icon-lock.png" alt="">人員登入</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-number">2 / 7</div>
+      </div>
+
+      <!-- 2: Check-in Tree -->
+      <div class="slide slide-split" style="background:var(--color-postit-green);">
+        <div class="slide-left">
+          <div class="badge-label" style="background:var(--color-success-light); border-color:var(--color-success); color:var(--color-success);">🌳 簽到樹</div>
+          <h2>簽到樹怎麼用？</h2>
+          <p>上課時，點大樹上閃爍的圓圈來簽到：</p>
+          <ul class="steps">
+            <li><span class="num">1</span>點擊樹上<b>閃爍的圓圈</b></li>
+            <li><span class="num">2</span>從名單中找到自己的名字</li>
+            <li><span class="num">3</span>點名字，完成簽到！</li>
+          </ul>
+        </div>
+        <div class="slide-right">
+          <div class="mockup-frame">
+            <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+            <div class="mockup-body">
+              <div class="mini-tree-bg">
+                🌳
+                <div class="mini-spot glow" style="top:12%; left:28%;"></div>
+                <div class="mini-spot glow" style="top:18%; right:22%;"></div>
+                <div class="mini-spot glow" style="top:32%; right:12%;"></div>
+                <div class="mini-spot" style="top:38%; left:12%;"></div>
+                <div class="mini-stamp" style="top:38%; left:15%; background:#E8734A;">王</div>
+                <div class="mini-stamp" style="top:18%; left:48%; background:#3DABB5;">林</div>
+              </div>
+              <div class="mockup-hint">👆 點閃爍圓圈 → 選名字 → 簽到完成</div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-number">3 / 7</div>
+      </div>
+
+      <!-- 3: Mood -->
+      <div class="slide slide-split" style="background:var(--color-postit-pink);">
+        <div class="slide-left">
+          <div class="badge-label" style="background:var(--color-happy-light); border-color:var(--color-happy); color:#B8860B;">😊 心情溫度計</div>
+          <h2>心情溫度計怎麼用？</h2>
+          <p>告訴大家你今天的心情：</p>
+          <ul class="steps">
+            <li><span class="num">1</span>溫度計上有<b>三種心情</b></li>
+            <li><span class="num">2</span>點你的心情（開心/難過/生氣）</li>
+            <li><span class="num">3</span>選名字，投票完成！</li>
+          </ul>
+        </div>
+        <div class="slide-right">
+          <div class="mockup-frame">
+            <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+            <div class="mockup-body">
+              <div class="mockup-title">心情溫度計</div>
+              <div class="mini-thermo">
+                <div class="mini-tube">
+                  <div class="mini-zone hl" style="background:var(--color-happy);">😄</div>
+                  <div class="mini-zone" style="background:var(--color-sad);">😢</div>
+                  <div class="mini-zone" style="background:var(--color-angry);">😠</div>
+                </div>
+                <div class="mini-labels">
+                  <div class="mini-label" style="border-left:4px solid var(--color-happy);">😄 開心 — 今天心情很好</div>
+                  <div class="mini-label" style="border-left:4px solid var(--color-sad);">😢 難過 — 今天有點低落</div>
+                  <div class="mini-label" style="border-left:4px solid var(--color-angry);">😠 生氣 — 今天不太開心</div>
+                </div>
+              </div>
+              <div class="mockup-hint">👆 點心情 → 選名字 → 投票完成</div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-number">4 / 7</div>
+      </div>
+
+      <!-- 4: Courses -->
+      <div class="slide slide-split" style="background:var(--color-postit-blue);">
+        <div class="slide-left">
+          <div class="badge-label" style="background:#F0ECF8; border-color:var(--color-marker-purple); color:var(--color-marker-purple);">📚 課程內容</div>
+          <h2>課程內容怎麼用？</h2>
+          <p>每週有不同活動，點進去就開始：</p>
+          <ul class="steps">
+            <li><span class="num">1</span>在首頁點「課程內容」</li>
+            <li><span class="num">2</span>看到 <b>9 週</b> 的課程卡片</li>
+            <li><span class="num">3</span>點這週的課程看活動清單</li>
+          </ul>
+        </div>
+        <div class="slide-right">
+          <div class="mockup-frame">
+            <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+            <div class="mockup-body">
+              <div class="mockup-title">📚 課程內容</div>
+              <div class="mini-courses">
+                <div class="mini-course hl" style="background:var(--color-postit-green);"><span>🤝</span>相見歡</div>
+                <div class="mini-course" style="background:#F0ECF8;"><span>😊</span>心情溫度計</div>
+                <div class="mini-course" style="background:var(--color-postit-yellow);"><span>💡</span>夢想經驗</div>
+                <div class="mini-course" style="background:var(--color-postit-pink);"><span>👨‍👩‍👧</span>我的家人</div>
+                <div class="mini-course" style="background:var(--color-postit-blue);"><span>🥋</span>功夫大比拼</div>
+                <div class="mini-course" style="background:var(--color-sad-light);"><span>🎠</span>玩具時光機</div>
+                <div class="mini-course" style="background:var(--color-secondary-lighter);"><span>🐾</span>動物大趴踢</div>
+                <div class="mini-course" style="background:var(--color-primary-lighter);"><span>🍳</span>做伙來辦桌</div>
+                <div class="mini-course" style="background:#F3E5F5;"><span>🎉</span>食而聲笑</div>
+              </div>
+              <div class="mockup-hint">👆 選課程 → 看活動 → 開始玩</div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-number">5 / 7</div>
+      </div>
+
+      <!-- 5: Activities -->
+      <div class="slide slide-split" style="background:var(--color-bg-card);">
+        <div class="slide-left">
+          <div class="badge-label" style="background:var(--color-primary-lighter); border-color:var(--color-primary); color:var(--color-primary);">🎮 課程活動</div>
+          <h2>活動有哪些類型？</h2>
+          <p>課程裡有不同類型的活動：</p>
+          <ul class="steps">
+            <li><span class="num">🎬</span><b>影片</b> — YouTube 影片</li>
+            <li><span class="num">📖</span><b>繪本故事</b> — 聽故事、討論</li>
+            <li><span class="num">🎮</span><b>互動遊戲</b> — 配對、轉盤</li>
+            <li><span class="num">🎤</span><b>表演</b> — 才藝、合唱</li>
+          </ul>
+        </div>
+        <div class="slide-right">
+          <div class="mockup-frame">
+            <div class="mockup-bar"><div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div></div>
+            <div class="mockup-body">
+              <div class="mockup-title">第 1 週：相見歡</div>
+              <div class="mini-act">
+                <div class="mini-act-dot" style="background:var(--color-marker-green);"></div>
+                <div class="mini-act-info"><div class="mini-act-name">🤝 破冰遊戲</div><div class="mini-act-time">20 分鐘</div></div>
+                <span class="mini-act-btn" style="background:var(--color-postit-green);">前往 →</span>
+              </div>
+              <div class="mini-act">
+                <div class="mini-act-dot" style="background:var(--color-marker-purple);"></div>
+                <div class="mini-act-info"><div class="mini-act-name">🎶 一起動一動</div><div class="mini-act-time">15 分鐘</div></div>
+                <span class="mini-act-btn" style="background:#F0ECF8;">前往 →</span>
+              </div>
+              <div class="mini-act">
+                <div class="mini-act-dot" style="background:var(--color-marker-orange);"></div>
+                <div class="mini-act-info"><div class="mini-act-name">📖 繪本故事</div><div class="mini-act-time">15 分鐘</div></div>
+                <span class="mini-act-btn" style="background:var(--color-postit-yellow);">前往 →</span>
+              </div>
+              <div class="mini-act">
+                <div class="mini-act-dot" style="background:var(--color-marker-blue);"></div>
+                <div class="mini-act-info"><div class="mini-act-name">📺 系統教學</div><div class="mini-act-time">10 分鐘</div></div>
+                <span class="mini-act-btn" style="background:var(--color-postit-blue);">前往 →</span>
+              </div>
+              <div class="mockup-hint">👆 點「前往」進入活動</div>
+            </div>
+          </div>
+        </div>
+        <div class="slide-number">6 / 7</div>
+      </div>
+
+      <!-- 6: End -->
+      <div class="slide slide-end">
+        <div class="slide-icon">🎉</div>
+        <h2>你學會了！</h2>
+        <p>
+          🌳 簽到樹 — 點樹枝 → 選名字 → 完成簽到<br>
+          😊 心情溫度計 — 選心情 → 選名字 → 投票<br>
+          📚 課程內容 — 選課程 → 選活動 → 開始<br><br>
+          就這麼簡單！現在回到首頁開始使用吧 🙌
+        </p>
+        <div class="slide-number">7 / 7</div>
+      </div>
+    </div>
+
+    <div class="slide-nav">
+      <button class="btn btn-outline" id="btn-prev" onclick="goSlide(currentSlide-1)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+      </button>
+      <div class="dots" id="dots"></div>
+      <button class="btn btn-primary" id="btn-next" onclick="goSlide(currentSlide+1)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const totalSlides = 7;
+    let currentSlide = 0;
+
+    function goSlide(i) {
+      if (i < 0 || i >= totalSlides) return;
+      document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.slide')[i].classList.add('active');
+      currentSlide = i;
+      updateNav();
+    }
+
+    function updateNav() {
+      document.getElementById('slide-num').textContent = `${currentSlide+1} / ${totalSlides}`;
+      document.getElementById('progress-fill').style.width = `${((currentSlide+1)/totalSlides)*100}%`;
+      document.getElementById('btn-prev').style.visibility = currentSlide === 0 ? 'hidden' : 'visible';
+      document.getElementById('btn-next').style.visibility = currentSlide === totalSlides-1 ? 'hidden' : 'visible';
+      document.getElementById('dots').innerHTML = Array.from({length:totalSlides},(_,i) =>
+        `<div class="dot ${i===currentSlide?'active':''}" onclick="goSlide(${i})"></div>`
+      ).join('');
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key==='ArrowRight'||e.key===' ') { e.preventDefault(); goSlide(currentSlide+1); }
+      if (e.key==='ArrowLeft') goSlide(currentSlide-1);
+    });
+
+    updateNav();
+  </script>
+</body>
+</html>

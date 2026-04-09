@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>繪本故事 - 代間共學互動平台</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .video-page { max-width: 1000px; margin: 0 auto; padding: var(--space-xl); }
+    .video-header { display: flex; align-items: center; gap: var(--space-md); margin-bottom: var(--space-lg); }
+    .video-title { text-align: center; margin-bottom: var(--space-xl); }
+    .video-title h1 { font-size: var(--font-size-4xl); font-family: var(--font-heading); transform: rotate(-0.5deg); }
+    .video-title p { color: var(--color-text-secondary); font-size: var(--font-size-xl); margin-top: var(--space-xs); }
+    .video-container { position: relative; width: 100%; padding-bottom: 56.25%; border-radius: var(--wobble-1); border: var(--border-width) solid var(--color-border); overflow: hidden; box-shadow: var(--shadow-sketch); background: #000; }
+    .video-container iframe, .video-container video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+    .story-content { margin-top: var(--space-xl); }
+    .story-card { background: var(--color-bg-card); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-2); padding: var(--space-2xl); box-shadow: var(--shadow-sketch); }
+    .story-card h2 { font-family: var(--font-heading); font-size: var(--font-size-2xl); margin-bottom: var(--space-lg); }
+    .story-card .book-icon { font-size: 80px; text-align: center; margin-bottom: var(--space-lg); animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+    .discussion { margin-top: var(--space-xl); background: var(--color-postit-green); border: var(--border-width) solid var(--color-border); border-radius: var(--wobble-3); padding: var(--space-lg); box-shadow: var(--shadow-sketch-sm); }
+    .discussion h3 { font-family: var(--font-heading); font-size: var(--font-size-xl); margin-bottom: var(--space-md); }
+    .discussion ul { list-style: none; display: flex; flex-direction: column; gap: var(--space-sm); }
+    .discussion li { font-size: var(--font-size-lg); color: var(--color-text-secondary); }
+    .discussion li::before { content: '💭 '; }
+
+    .nav-footer { text-align: center; padding: var(--space-xl) 0; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="video-page">
+      <div class="video-header">
+        <a id="back-link" href="courses.html" class="back-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          <span id="back-text">回到課程</span>
+        </a>
+      </div>
+
+      <div class="video-title">
+        <h1 id="page-title">📖 繪本故事</h1>
+        <p id="page-desc">一起來聽故事吧</p>
+      </div>
+
+      <div id="video-section"></div>
+      <div id="story-section"></div>
+      <div id="discussion-section"></div>
+
+      <div class="nav-footer">
+        <a href="courses.html" class="back-btn" id="footer-back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+          回到課程列表
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const storybookData = {
+      1: {
+        title: '📖 做一個機器人假裝是我',
+        desc: '如果有一個機器人可以代替你，你想讓它做什麼？',
+        type: 'static',
+        discussion: [
+          '如果有機器人代替你，你想讓它做什麼事？',
+          '你覺得機器人能代替「真正的你」嗎？',
+          '什麼事情是只有你自己才能做的？',
+          '你最喜歡故事的哪個部分？'
+        ]
+      },
+      3: {
+        title: '📖 長大後想做什麼',
+        desc: '一起來探索不同的職業夢想',
+        type: 'youtube',
+        videoId: 'EVFPL_qXChU',
+        discussion: [
+          '你長大後想做什麼職業？',
+          '阿公阿嬤以前做什麼工作？',
+          '你覺得哪個職業最有趣？',
+          '如果可以嘗試任何工作一天，你想試什麼？'
+        ]
+      },
+      5: {
+        title: '📖 太多玩具了',
+        desc: '當玩具太多的時候，該怎麼辦呢？',
+        type: 'youtube',
+        videoId: 'Ib_lYcq7rds',
+        discussion: [
+          '你有最喜歡的玩具嗎？是什麼？',
+          '如果玩具太多，你會怎麼做？',
+          '分享玩具給別人，你願意嗎？',
+          '阿公阿嬤小時候玩什麼玩具？'
+        ]
+      },
+      6: {
+        title: '📖 數腳腳',
+        desc: '一起來認識動物的腳',
+        type: 'local',
+        videoSrc: '../public/videos/動物大趴踢.mov',
+        discussion: [
+          '你認識哪些動物的腳？',
+          '為什麼有些動物是 2 隻腳，有些是 4 隻腳？',
+          '你有看過什麼特別的動物嗎？',
+          '如果你是一種動物，你想當什麼？'
+        ]
+      },
+      7: {
+        title: '📖 我的阿公阿嬤是同學',
+        desc: '阿公阿嬤也是你的同學喔！',
+        type: 'youtube',
+        videoId: 'JLawbDGrn_Y',
+        startTime: 141,
+        discussion: [
+          '和阿公阿嬤一起上課感覺如何？',
+          '你最喜歡和阿公阿嬤做什麼事？',
+          '阿公阿嬤教了你什麼？',
+          '你有什麼想教阿公阿嬤的？'
+        ]
+      }
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const week = parseInt(params.get('week')) || 1;
+    const data = storybookData[week];
+
+    // Update back link
+    document.getElementById('back-link').href = `course-detail.html?week=${week}`;
+    document.getElementById('back-text').textContent = `回到第 ${week} 週`;
+
+    if (data) {
+      document.getElementById('page-title').textContent = data.title;
+      document.getElementById('page-desc').textContent = data.desc;
+      document.title = `${data.title} - 代間共學互動平台`;
+
+      // Video section
+      const videoSection = document.getElementById('video-section');
+      if (data.type === 'youtube') {
+        const startParam = data.startTime ? `&start=${data.startTime}` : '';
+        videoSection.innerHTML = `
+          <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/${data.videoId}?feature=oembed${startParam}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen title="繪本故事"></iframe>
+          </div>`;
+      } else if (data.type === 'local') {
+        videoSection.innerHTML = `
+          <div class="video-container">
+            <video controls autoplay src="${data.videoSrc}">您的瀏覽器不支援影片播放</video>
+          </div>`;
+      } else {
+        // Static storybook
+        videoSection.innerHTML = `
+          <div class="story-card">
+            <div class="book-icon">📚</div>
+            <h2 style="text-align:center;">${data.title}</h2>
+            <p style="text-align:center; font-size:var(--font-size-xl); color:var(--color-text-secondary);">${data.desc}</p>
+            <div style="text-align:center; margin-top:var(--space-lg); padding:var(--space-lg); background:var(--color-postit-yellow); border-radius:var(--wobble-2); border:2px solid var(--color-border);">
+              <p style="font-size:var(--font-size-xl);">🎯 請老師帶領大家一起閱讀繪本</p>
+              <p style="color:var(--color-text-muted); margin-top:var(--space-sm);">閱讀完後，一起進行下方的討論活動</p>
+            </div>
+          </div>`;
+      }
+
+      // Discussion section
+      if (data.discussion && data.discussion.length > 0) {
+        document.getElementById('discussion-section').innerHTML = `
+          <div class="discussion">
+            <h3>💬 討論時間</h3>
+            <ul>${data.discussion.map(q => `<li>${q}</li>`).join('')}</ul>
+          </div>`;
+      }
+    } else {
+      document.getElementById('video-section').innerHTML = `
+        <div class="empty-state">
+          <div class="icon-box icon-box-lg" style="background:var(--color-postit-yellow); margin:0 auto var(--space-lg);">📖</div>
+          <p>此週的繪本故事尚未設定</p>
+        </div>`;
+    }
+  </script>
+</body>
+</html>
