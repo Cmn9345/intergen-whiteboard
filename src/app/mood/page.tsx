@@ -17,8 +17,10 @@ const MOOD_CFG: Record<MoodType, { label: string; desc: string; emotional: strin
 };
 
 function classifyMood(emotional: string): MoodType {
-  if (emotional?.includes("happy") || emotional?.includes("sun") || emotional === "開心") return "happy";
-  if (emotional?.includes("angry") || emotional?.includes("storm") || emotional?.includes("rain") || emotional === "生氣") return "angry";
+  if (!emotional) return "sad";
+  if (emotional.includes("angry") || emotional.includes("storm") || emotional.includes("rain") || emotional === "生氣") return "angry";
+  if (emotional.includes("sad") || emotional.includes("cloudy") || emotional === "難過") return "sad";
+  if (emotional.includes("happy") || emotional.includes("sun") || emotional === "開心") return "happy";
   return "sad";
 }
 
