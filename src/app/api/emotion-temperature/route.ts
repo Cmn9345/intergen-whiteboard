@@ -13,7 +13,7 @@ export async function GET(request: Request) {
       params.set('filter', `weekend = "${weekend}"`);
     }
 
-    const res = await fetch(`${API_BASE}/api/pb/emotion_temperature/records?${params}`);
+    const res = await fetch(`${API_BASE}/api/collections/emotion_temperature/records?${params}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const result = await res.json();
 
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     const checkParams = new URLSearchParams({
       filter: `Name = "${Name}" && weekend = "${weekend}"`,
     });
-    const checkRes = await fetch(`${API_BASE}/api/pb/emotion_temperature/records?${checkParams}`);
+    const checkRes = await fetch(`${API_BASE}/api/collections/emotion_temperature/records?${checkParams}`);
     const checkResult = await checkRes.json();
 
     if (checkResult.items && checkResult.items.length > 0) {
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const res = await fetch(`${API_BASE}/api/pb/emotion_temperature/records`, {
+    const res = await fetch(`${API_BASE}/api/collections/emotion_temperature/records`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ Name, group, weekend, emotional }),

@@ -13,7 +13,7 @@ export async function GET(request: Request) {
       params.set('filter', `weekend = "${weekend}"`);
     }
 
-    const res = await fetch(`${API_BASE}/api/pb/signintree/records?${params}`);
+    const res = await fetch(`${API_BASE}/api/collections/signintree/records?${params}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const result = await res.json();
 
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     const checkParams = new URLSearchParams({
       filter: `Name = "${Name}" && weekend = "${weekend}"`,
     });
-    const checkRes = await fetch(`${API_BASE}/api/pb/signintree/records?${checkParams}`);
+    const checkRes = await fetch(`${API_BASE}/api/collections/signintree/records?${checkParams}`);
     const checkResult = await checkRes.json();
 
     if (checkResult.items && checkResult.items.length > 0) {
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     }
 
     // 新增簽到記錄
-    const res = await fetch(`${API_BASE}/api/pb/signintree/records`, {
+    const res = await fetch(`${API_BASE}/api/collections/signintree/records`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ group, Name, weekend, checkinstatus: 'Yes' }),
