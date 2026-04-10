@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const API_BASE = process.env.NEXT_PUBLIC_POCKETBASE_URL || 'http://127.0.0.1:8090';
+const API_BASE = process.env.NEXT_PUBLIC_POCKETBASE_URL || 'https://intergen-pocketbase.fly.dev';
 
 // GET: 獲取指定週次的簽到記錄
 export async function GET(request: Request) {

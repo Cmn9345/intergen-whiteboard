@@ -92,7 +92,7 @@ export interface WeekendPoster {
 // ---- File URL helper ----
 
 export function getPbFileUrl(collectionId: string, recordId: string, filename: string): string {
-  const base = process.env.NEXT_PUBLIC_POCKETBASE_URL || 'http://127.0.0.1:8090';
+  const base = process.env.NEXT_PUBLIC_POCKETBASE_URL || 'https://intergen-pocketbase.fly.dev';
   return `${base}/api/files/${collectionId}/${recordId}/${filename}`;
 }
 
