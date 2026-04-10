@@ -7,6 +7,9 @@ compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
 directory = ".open-next/assets"
 binding = "ASSETS"
 
+[vars]
+NEXT_PUBLIC_POCKETBASE_URL = "https://intergen-pocketbase.fly.dev"
+
 [[services]]
 binding = "WORKER_SELF_REFERENCE"
 service = "intergen-whiteboard"
