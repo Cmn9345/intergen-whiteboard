@@ -1,11 +1,9 @@
 import type { NextConfig } from "next";
-import path from "path";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+
+initOpenNextCloudflareForDev();
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
-  turbopack: {
-    root: path.resolve(__dirname),
-  },
   images: {
     unoptimized: true,
     remotePatterns: [
