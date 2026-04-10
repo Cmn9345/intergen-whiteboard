@@ -7,7 +7,7 @@ const storybookData: Record<number, StorybookData> = {
   1: { title: "做一個機器人假裝是我", desc: "如果有一個機器人可以代替你，你想讓它做什麼？", type: "static", discussion: ["如果有機器人代替你，你想讓它做什麼事？", "你覺得機器人能代替「真正的你」嗎？", "什麼事情是只有你自己才能做的？", "你最喜歡故事的哪個部分？"] },
   3: { title: "長大後想做什麼", desc: "一起來探索不同的職業夢想", type: "youtube", videoId: "EVFPL_qXChU", discussion: ["你長大後想做什麼職業？", "阿公阿嬤以前做什麼工作？", "你覺得哪個職業最有趣？", "如果可以嘗試任何工作一天，你想試什麼？"] },
   5: { title: "太多玩具了", desc: "當玩具太多的時候，該怎麼辦呢？", type: "youtube", videoId: "Ib_lYcq7rds", discussion: ["你有最喜歡的玩具嗎？是什麼？", "如果玩具太多，你會怎麼做？", "分享玩具給別人，你願意嗎？", "阿公阿嬤小時候玩什麼玩具？"] },
-  6: { title: "數腳腳", desc: "一起來認識動物的腳", type: "local", videoSrc: "/videos/動物大趴踢.mov", discussion: ["你認識哪些動物的腳？", "為什麼有些動物是 2 隻腳，有些是 4 隻腳？", "你有看過什麼特別的動物嗎？", "如果你是一種動物，你想當什麼？"] },
+  6: { title: "數腳腳", desc: "一起來認識動物的腳", type: "local", videoSrc: "https://github.com/Cmn9345/intergen-whiteboard/releases/download/v1.0-assets/default.mov", discussion: ["你認識哪些動物的腳？", "為什麼有些動物是 2 隻腳，有些是 4 隻腳？", "你有看過什麼特別的動物嗎？", "如果你是一種動物，你想當什麼？"] },
   7: { title: "我的阿公阿嬤是同學", desc: "阿公阿嬤也是你的同學喔！", type: "youtube", videoId: "JLawbDGrn_Y", startTime: 141, discussion: ["和阿公阿嬤一起上課感覺如何？", "你最喜歡和阿公阿嬤做什麼事？", "阿公阿嬤教了你什麼？", "你有什麼想教阿公阿嬤的？"] },
 };
 
