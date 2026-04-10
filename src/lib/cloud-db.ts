@@ -18,16 +18,23 @@ const createCloudPrismaClient = () => {
   });
 };
 
-// 全域 Prisma 客戶端實例
+// 全域 Prisma 客戶端實例（lazy initialization 避免 build 時拋錯）
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-export const prisma = globalForPrisma.prisma ?? createCloudPrismaClient();
-
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
+function getPrismaClient(): PrismaClient {
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = createCloudPrismaClient();
+  }
+  return globalForPrisma.prisma;
 }
+
+export const prisma = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    return Reflect.get(getPrismaClient(), prop);
+  },
+});
 
 // 資料庫健康檢查
 export async function checkDatabaseHealth(): Promise<{
