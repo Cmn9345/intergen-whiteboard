@@ -84,12 +84,6 @@ export default function CheckinTreePage() {
   const checkedNames = Object.keys(checkedMap);
   const groups = Object.keys(grouped).sort();
 
-  function onSpotClick(idx: number, e: React.MouseEvent) {
-    e.stopPropagation();
-    if (idx < checkedNames.length) return;
-    setPickerOpen(true);
-  }
-
   async function doCheckin(member: Student) {
     try {
       const name = getStudentName(member);
@@ -144,21 +138,16 @@ export default function CheckinTreePage() {
         </div>
       </div>
 
-      {/* Tree */}
-      <div className="absolute z-[2]" style={{ bottom: "5%", left: "50%", transform: "translateX(-50%)", height: "95vh", aspectRatio: "16/9" }}>
-        <Image src="/tree-nobg.png" alt="簽到樹" fill className="object-contain pointer-events-none" style={{ filter: "drop-shadow(0 8px 24px rgba(60,40,20,0.15))" }} priority />
-        {SPOTS.map((pos, i) => {
-          const occupied = i < checkedNames.length;
-          if (occupied) return null;
-          return <div key={i} onClick={(e) => onSpotClick(i, e)} className="absolute rounded-full cursor-pointer checkin-spot" style={{ left: `${pos.x}%`, top: `${pos.y}%`, width: 72, height: 72, marginLeft: -36, marginTop: -36, zIndex: 5, background: "radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.08) 60%, transparent 75%)", border: "2.5px dashed rgba(255,255,255,0.45)", animation: "spot-pulse 2.5s ease-in-out infinite" }} />;
-        })}
+      {/* Tree - click anywhere to open picker */}
+      <div className="absolute z-[2] cursor-pointer" onClick={() => setPickerOpen(true)} style={{ bottom: "5%", left: "50%", transform: "translateX(-50%)", height: "95vh", aspectRatio: "16/9" }}>
+        <Image src="/tree-nobg.png" alt="簽到樹" fill className="object-contain" style={{ filter: "drop-shadow(0 8px 24px rgba(60,40,20,0.15))" }} priority />
         {checkedNames.map((name, i) => {
           if (i >= SPOTS.length) return null;
           const pos = SPOTS[i];
           return (
             <div key={name} className="absolute flex flex-col items-center pointer-events-none" style={{ left: `${pos.x}%`, top: `${pos.y}%`, marginLeft: -40, marginTop: -40, zIndex: 6, animation: `stamp-pop 0.4s cubic-bezier(0.34,1.56,0.64,1) both`, animationDelay: `${i * 60}ms` }}>
-              <div className="flex items-center justify-center text-white checkin-avatar" style={{ width: 72, height: 72, borderRadius: "50%", fontWeight: 800, fontSize: 28, background: COLORS[i % COLORS.length], border: "4px solid white", boxShadow: "0 4px 14px rgba(0,0,0,0.25)" }}>{name[0]}</div>
-              <div className="checkin-name" style={{ marginTop: 4, padding: "3px 14px", background: "rgba(255,255,255,0.95)", borderRadius: 12, fontSize: 16, fontWeight: 700, color: "var(--color-text-primary)", boxShadow: "0 2px 6px rgba(0,0,0,0.12)", whiteSpace: "nowrap" }}>{name}</div>
+              <div className="flex items-center justify-center text-white" style={{ width: 72, height: 72, borderRadius: "50%", fontWeight: 800, fontSize: 28, background: COLORS[i % COLORS.length], border: "4px solid white", boxShadow: "0 4px 14px rgba(0,0,0,0.25)" }}>{name[0]}</div>
+              <div style={{ marginTop: 4, padding: "3px 14px", background: "rgba(255,255,255,0.95)", borderRadius: 12, fontSize: 16, fontWeight: 700, color: "var(--color-text-primary)", boxShadow: "0 2px 6px rgba(0,0,0,0.12)", whiteSpace: "nowrap" }}>{name}</div>
             </div>
           );
         })}
@@ -222,7 +211,7 @@ export default function CheckinTreePage() {
         </span>
         <span className="flex items-center gap-1.5" style={{ fontSize: 16, color: "var(--color-text-muted)" }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 15l-2 5L9 9l11 4-5 2z"/></svg>
-          點擊樹枝簽到
+          點擊大樹簽到
         </span>
       </div>
     </div>
