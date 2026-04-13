@@ -423,7 +423,7 @@ export default function Page() {
                 ))}
               </div>
 
-              <div style={numpadStyle}>
+              <div className="login-numpad" style={numpadStyle}>
                 {['1','2','3','4','5','6','7','8','9'].map(d => (
                   <button
                     key={d}

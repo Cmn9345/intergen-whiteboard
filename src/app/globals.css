@@ -168,3 +168,47 @@ h1, h2, h3, h4, h5, h6 {
   50% { transform: rotate(-0.5deg); }
   75% { transform: rotate(0.5deg); }
 }
+
+/* ============================================
+   Mobile Responsive Overrides
+   ============================================ */
+@media (max-width: 768px) {
+  :root {
+    --font-size-5xl: 36px;
+    --font-size-4xl: 30px;
+    --font-size-3xl: 26px;
+    --font-size-2xl: 22px;
+    --font-size-xl: 18px;
+    --font-size-lg: 16px;
+    --font-size-base: 15px;
+    --space-2xl: 20px;
+    --space-xl: 16px;
+    --space-lg: 12px;
+  }
+
+  /* Global: allow scrolling on all pages */
+  body > div { min-height: 100vh; height: auto !important; overflow: auto !important; }
+  body > div > div { min-height: 100vh; height: auto !important; overflow: auto !important; }
+
+  /* Home page */
+  .home-grid { max-width: 100% !important; gap: 10px !important; padding: 8px 12px !important; }
+  .home-grid .feature-icon { width: 80px !important; height: 80px !important; }
+
+  /* Emotion faces: 5-col → 3 */
+  .emotion-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 10px !important; }
+
+  /* Mood page: 2-col → stack */
+  .mood-body { grid-template-columns: 1fr !important; }
+
+  /* Wheel page: side-by-side → stack */
+  .wheel-layout { flex-direction: column !important; padding: 0 12px 12px !important; }
+  .wheel-container { width: min(90vw, 400px) !important; height: min(90vw, 400px) !important; }
+  .wheel-dots { display: none !important; }
+  .wheel-result { padding-left: 0 !important; padding-top: 16px !important; }
+  .wheel-spin-btn { padding: 12px 28px !important; font-size: 22px !important; }
+
+  /* Checkin tree */
+  .checkin-spot { width: 48px !important; height: 48px !important; margin-left: -24px !important; margin-top: -24px !important; }
+  .checkin-avatar { width: 48px !important; height: 48px !important; font-size: 20px !important; }
+  .checkin-name { font-size: 12px !important; padding: 2px 8px !important; }
+}

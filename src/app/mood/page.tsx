@@ -102,11 +102,11 @@ export default function MoodPage() {
       </header>
 
       {/* Body */}
-      <div className="flex-1 grid grid-cols-2 overflow-hidden" style={{ gap: "var(--space-xl)", padding: "0 var(--space-xl) var(--space-xl)" }}>
+      <div className="flex-1 grid grid-cols-2 overflow-hidden mood-body" style={{ gap: "var(--space-xl)", padding: "0 var(--space-xl) var(--space-xl)" }}>
         {/* Left: Thermometer */}
-        <div className="flex items-center justify-center" style={{ gap: "var(--space-xl)" }}>
-          <div className="relative shrink-0" style={{ width: 140, height: 480 }}>
-            <div className="absolute overflow-hidden" style={{ left: "50%", transform: "translateX(-50%)", width: 64, height: 380, top: 0, borderRadius: "32px 32px 8px 8px", background: "var(--color-bg-card)", border: "var(--border-width) solid var(--color-border)", boxShadow: "var(--shadow-sketch-sm)" }}>
+        <div className="flex items-center justify-center mood-left" style={{ gap: "var(--space-xl)" }}>
+          <div className="relative shrink-0 mood-thermo" style={{ width: 140, height: 480 }}>
+            <div className="absolute overflow-hidden mood-thermo-tube" style={{ left: "50%", transform: "translateX(-50%)", width: 64, height: 380, top: 0, borderRadius: "32px 32px 8px 8px", background: "var(--color-bg-card)", border: "var(--border-width) solid var(--color-border)", boxShadow: "var(--shadow-sketch-sm)" }}>
               {(["happy", "sad", "angry"] as MoodType[]).map((mood) => {
                 const positions = { happy: { top: 0, borderRadius: "28px 28px 0 0" }, sad: { bottom: "33.33%" }, angry: { bottom: 0, borderRadius: "0 0 8px 8px" } };
                 return (
@@ -122,7 +122,7 @@ export default function MoodPage() {
                 );
               })}
             </div>
-            <div className="absolute flex items-center justify-center" style={{ bottom: 0, left: "50%", transform: "translateX(-50%)", width: 100, height: 100, borderRadius: "50%", background: "var(--color-bg-card)", border: "var(--border-width) solid var(--color-border)", boxShadow: "var(--shadow-sketch)", zIndex: 2 }}>
+            <div className="absolute flex items-center justify-center mood-thermo-bulb" style={{ bottom: 0, left: "50%", transform: "translateX(-50%)", width: 100, height: 100, borderRadius: "50%", background: "var(--color-bg-card)", border: "var(--border-width) solid var(--color-border)", boxShadow: "var(--shadow-sketch)", zIndex: 2 }}>
               <div style={{ width: 70, height: 70, borderRadius: "50%", background: selectedMood ? MOOD_CFG[selectedMood].cssColor : "var(--color-happy)", border: "2px solid var(--color-border)", transition: "background 0.3s ease" }} />
             </div>
           </div>
@@ -130,7 +130,7 @@ export default function MoodPage() {
             {(["happy", "sad", "angry"] as MoodType[]).map((mood, i) => {
               const wobbles = ["var(--wobble-1)", "var(--wobble-2)", "var(--wobble-3)"];
               return (
-                <button key={mood} onClick={() => selectMood(mood)} className="flex items-center" style={{ gap: "var(--space-sm)", padding: "var(--space-md) var(--space-lg)", border: "var(--border-width) solid var(--color-border)", borderLeft: `6px solid ${MOOD_CFG[mood].cssColor}`, background: selectedMood === mood ? "var(--color-postit-yellow)" : "var(--color-bg-card)", boxShadow: "var(--shadow-sketch-sm)", borderRadius: wobbles[i], fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 28, cursor: "pointer" }}>
+                <button key={mood} onClick={() => selectMood(mood)} className="flex items-center mood-btn" style={{ gap: "var(--space-sm)", padding: "var(--space-md) var(--space-lg)", border: "var(--border-width) solid var(--color-border)", borderLeft: `6px solid ${MOOD_CFG[mood].cssColor}`, background: selectedMood === mood ? "var(--color-postit-yellow)" : "var(--color-bg-card)", boxShadow: "var(--shadow-sketch-sm)", borderRadius: wobbles[i], fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 28, cursor: "pointer" }}>
                   <div style={{ width: 20, height: 20, borderRadius: "50%", border: "2px solid var(--color-border)", background: MOOD_CFG[mood].cssColor, flexShrink: 0 }} />
                   <div className="flex flex-col text-left">
                     <span>{MOOD_CFG[mood].label}</span>

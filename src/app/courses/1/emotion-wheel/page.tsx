@@ -118,12 +118,12 @@ export default function EmotionWheelPage() {
       </div>
 
       {/* Main content: side by side */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", overflow: "hidden", padding: "0 var(--space-xl) var(--space-lg)" }}>
+      <div className="wheel-layout" style={{ flex: 1, display: "flex", alignItems: "center", overflow: "hidden", padding: "0 var(--space-xl) var(--space-lg)" }}>
 
         {/* Left: Wheel + Button */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
           {/* Wheel Container - enlarged */}
-          <div style={{ position: "relative", width: 560, height: 560, flexShrink: 0 }}>
+          <div className="wheel-container" style={{ position: "relative", width: 560, height: 560, flexShrink: 0 }}>
 
             {/* Outer ring decoration */}
             <div style={{
@@ -144,7 +144,7 @@ export default function EmotionWheelPage() {
             }} />
 
             {/* Pointer arrow at top */}
-            <div style={{
+            <div className="wheel-pointer" style={{
               position: "absolute", top: -32, left: "50%", transform: "translateX(-50%)",
               zIndex: 20, filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))",
             }}>
@@ -202,7 +202,7 @@ export default function EmotionWheelPage() {
               const x = 280 + 290 * Math.cos(angle);
               const y = 280 + 290 * Math.sin(angle);
               return (
-                <div key={i} style={{
+                <div key={i} className="wheel-dots" style={{
                   position: "absolute",
                   left: x - 5, top: y - 5,
                   width: 10, height: 10,
@@ -217,6 +217,7 @@ export default function EmotionWheelPage() {
 
           {/* Spin Button */}
           <button
+            className="wheel-spin-btn"
             onClick={spin}
             disabled={isSpinning}
             style={{
@@ -247,7 +248,7 @@ export default function EmotionWheelPage() {
         </div>
 
         {/* Right: Result panel */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", paddingLeft: "var(--space-2xl)", minWidth: 0 }}>
+        <div className="wheel-result" style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", paddingLeft: "var(--space-2xl)", minWidth: 0 }}>
 
           {/* Reading indicator */}
           {showReading && (

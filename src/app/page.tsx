@@ -41,7 +41,7 @@ export default function Home() {
       </div>
 
       {/* Feature grid - 2x2 */}
-      <div className="grid grid-cols-2" style={{ gap: "var(--space-lg)", maxWidth: 800, margin: "0 auto", padding: "var(--space-md) var(--space-xl)", flex: 1, alignContent: "center" }}>
+      <div className="grid grid-cols-2 home-grid" style={{ gap: "var(--space-lg)", maxWidth: 800, margin: "0 auto", padding: "var(--space-md) var(--space-xl)", flex: 1, alignContent: "center" }}>
         {FEATURES.map((f, i) => (
           <Link key={f.href} href={f.href}
             className="group relative flex flex-col items-center text-center transition-all"
@@ -66,7 +66,7 @@ export default function Home() {
             {i === 2 && <span className="absolute -top-2.5 right-6 w-14 h-5.5 z-[2]" style={{ background: "rgba(216,236,255,0.75)", border: "1px solid rgba(120,160,200,0.4)", transform: "rotate(4deg)" }} />}
 
             {/* Icon */}
-            <div className="flex items-center justify-center overflow-hidden" style={{
+            <div className="flex items-center justify-center overflow-hidden feature-icon" style={{
               width: 140, height: 140, borderRadius: "var(--wobble-2)",
               border: "var(--border-width) solid var(--color-border)",
               background: "var(--color-bg-card)", boxShadow: "var(--shadow-sketch-sm)",

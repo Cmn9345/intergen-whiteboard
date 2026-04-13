@@ -32,7 +32,7 @@ export default function EmotionFacesPage() {
         <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--font-size-xl)", marginTop: "var(--space-xs)" }}>認識 5 種基本情緒，學習表達自己的心情</p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "var(--space-lg)", marginBottom: "var(--space-2xl)" }}>
+      <div className="emotion-grid" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "var(--space-lg)", marginBottom: "var(--space-2xl)" }}>
         {emotions.map((e, i) => (
           <div key={i} style={{
             background: e.bg,

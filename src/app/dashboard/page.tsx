@@ -211,7 +211,7 @@ export default function DashboardPage() {
           </svg>
           快速統計
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: V.spMd, marginBottom: V.spXl }}>
+        <div className="dash-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: V.spMd, marginBottom: V.spXl }}>
           {statLabels.map((label, i) => (
             <div key={label} style={{
               background: statBgs[i], border: `${V.borderWidth} solid ${V.border}`,
@@ -237,7 +237,7 @@ export default function DashboardPage() {
           </svg>
           管理功能
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: V.spLg, marginBottom: V.spXl }}>
+        <div className="dash-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: V.spLg, marginBottom: V.spXl }}>
           {managementCards.map((card, i) => (
             <Link
               key={card.title}

@@ -1,5 +1,5 @@
 main = ".open-next/worker.js"
-name = "intergen-whiteboard"
+name = "intergenwhiteboard"
 compatibility_date = "2026-04-09"
 compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
 
@@ -12,4 +12,4 @@ NEXT_PUBLIC_POCKETBASE_URL = "https://intergen-pocketbase.fly.dev"
 
 [[services]]
 binding = "WORKER_SELF_REFERENCE"
-service = "intergen-whiteboard"
+service = "intergenwhiteboard"

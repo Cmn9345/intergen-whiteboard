@@ -44,7 +44,7 @@ export default function CoursesPage() {
       </header>
 
       {/* Course grid */}
-      <div className="flex-1 grid grid-cols-3 items-center" style={{ gap: "var(--space-md)", maxWidth: "100%", margin: "0 auto", padding: "var(--space-sm) var(--space-xl)", alignContent: "center" }}>
+      <div className="flex-1 grid grid-cols-3 items-center course-list" style={{ gap: "var(--space-md)", maxWidth: "100%", margin: "0 auto", padding: "var(--space-sm) var(--space-xl)", alignContent: "center" }}>
         {COURSES.map((c, i) => (
           <Link key={c.id} href={`/courses/${c.id}`}
             className="flex items-center transition-all"
@@ -60,7 +60,7 @@ export default function CoursesPage() {
             onMouseEnter={(e) => { e.currentTarget.style.transform = "translate(-2px, -2px)"; e.currentTarget.style.boxShadow = "4px 5px 0 rgba(0,0,0,0.12)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "2px 3px 0 rgba(0,0,0,0.08)"; }}>
             {/* Course icon */}
-            <div style={{ width: 96, height: 96, minWidth: 96, borderRadius: "50%", overflow: "hidden", border: "var(--border-width) solid var(--color-border)", background: "var(--color-bg-card)" }}>
+            <div className="course-card-icon" style={{ width: 96, height: 96, minWidth: 96, borderRadius: "50%", overflow: "hidden", border: "var(--border-width) solid var(--color-border)", background: "var(--color-bg-card)" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={`/course-w${c.week}.png`} alt={c.name} style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
