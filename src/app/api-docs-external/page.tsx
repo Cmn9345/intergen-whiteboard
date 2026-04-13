@@ -6,9 +6,9 @@ export default function ExternalAPIDocs() {
   const [activeTab, setActiveTab] = useState('moods');
 
   const tabs = [
-    { id: 'moods', label: '心情記錄 API', icon: '😊' },
-    { id: 'checkins', label: '簽到記錄 API', icon: '✅' },
-    { id: 'analytics', label: '分析數據 API', icon: '📊' },
+    { id: 'moods', label: '心情記錄 API', icon: '♡' },
+    { id: 'checkins', label: '簽到記錄 API', icon: '●' },
+    { id: 'analytics', label: '分析數據 API', icon: '◆' },
   ];
 
   const moodExamples = {
@@ -118,7 +118,7 @@ GET http://localhost:3002/api/external/analytics?type=stats&courseId=COURSE_ID`
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            📚 外部 API 文檔
+            外部 API 文檔
           </h1>
           <p className="text-gray-600 mb-8">
             供 localhost:4000 應用程式使用的 API 端點文檔
@@ -146,7 +146,7 @@ GET http://localhost:3002/api/external/analytics?type=stats&courseId=COURSE_ID`
           <div className="space-y-8">
             {activeTab === 'moods' && (
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">😊 心情記錄 API</h2>
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">心情記錄 API</h2>
                 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
@@ -168,7 +168,7 @@ GET http://localhost:3002/api/external/analytics?type=stats&courseId=COURSE_ID`
 
             {activeTab === 'checkins' && (
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">✅ 簽到記錄 API</h2>
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">簽到記錄 API</h2>
                 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
@@ -190,7 +190,7 @@ GET http://localhost:3002/api/external/analytics?type=stats&courseId=COURSE_ID`
 
             {activeTab === 'analytics' && (
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">📊 分析數據 API</h2>
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">分析數據 API</h2>
                 
                 <div className="space-y-6">
                   <div>

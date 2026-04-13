@@ -97,7 +97,7 @@ export default function MoodStatsPage() {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <div className="text-red-500 text-6xl mb-4"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>
           <div className="text-red-600 text-xl mb-2">載入失敗</div>
           <div className="text-gray-600">{error}</div>
           <button 
@@ -141,15 +141,15 @@ export default function MoodStatsPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-yellow-50 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-yellow-600">{moodData.happy.length}</div>
-              <div className="text-sm text-yellow-800">開心 😊</div>
+              <div className="text-sm text-yellow-800">開心</div>
             </div>
             <div className="bg-blue-50 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-blue-600">{moodData.sad.length}</div>
-              <div className="text-sm text-blue-800">難過 😢</div>
+              <div className="text-sm text-blue-800">難過</div>
             </div>
             <div className="bg-red-50 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-red-600">{moodData.angry.length}</div>
-              <div className="text-sm text-red-800">生氣 😡</div>
+              <div className="text-sm text-red-800">生氣</div>
             </div>
             <div className="bg-gray-50 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-gray-600">{totalVotes}</div>
@@ -163,7 +163,7 @@ export default function MoodStatsPage() {
           {/* 開心區間 */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="text-3xl">😊</div>
+              <div className="text-yellow-500"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-800">開心</h2>
                 <div className="text-sm text-gray-500">{moodData.happy.length} 人</div>
@@ -172,7 +172,7 @@ export default function MoodStatsPage() {
             
             {moodData.happy.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                <div className="text-4xl mb-2">😴</div>
+                <div className="text-gray-400 mb-2"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></div>
                 <div>尚無投票</div>
               </div>
             ) : (
@@ -192,7 +192,7 @@ export default function MoodStatsPage() {
           {/* 難過區間 */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="text-3xl">😢</div>
+              <div className="text-blue-500"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-800">難過</h2>
                 <div className="text-sm text-gray-500">{moodData.sad.length} 人</div>
@@ -201,7 +201,7 @@ export default function MoodStatsPage() {
             
             {moodData.sad.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                <div className="text-4xl mb-2">😴</div>
+                <div className="text-gray-400 mb-2"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></div>
                 <div>尚無投票</div>
               </div>
             ) : (
@@ -221,7 +221,7 @@ export default function MoodStatsPage() {
           {/* 生氣區間 */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="text-3xl">😡</div>
+              <div className="text-red-500"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><path d="M7.5 8 10 9"/><path d="M16.5 8 14 9"/></svg></div>
               <div>
                 <h2 className="text-xl font-semibold text-gray-800">生氣</h2>
                 <div className="text-sm text-gray-500">{moodData.angry.length} 人</div>
@@ -230,7 +230,7 @@ export default function MoodStatsPage() {
             
             {moodData.angry.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                <div className="text-4xl mb-2">😴</div>
+                <div className="text-gray-400 mb-2"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></div>
                 <div>尚無投票</div>
               </div>
             ) : (

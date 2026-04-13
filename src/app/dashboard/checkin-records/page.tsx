@@ -155,7 +155,7 @@ export default function CheckinRecordsPage() {
 
           {records.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
-              <div className="text-6xl mb-4">🌳</div>
+              <div className="text-green-500 mb-4"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 14h2L12 3 5 14h2l-3 7h14Z"/><path d="M12 21v-7"/></svg></div>
               <div className="text-xl mb-2">尚無簽到記錄</div>
               <div className="text-sm">請前往簽到樹進行簽到</div>
               <a

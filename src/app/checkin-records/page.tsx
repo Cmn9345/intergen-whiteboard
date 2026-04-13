@@ -129,7 +129,7 @@ export default function CheckinRecordsPage() {
         {/* 按組別顯示記錄 */}
         {Object.keys(recordsByGroup).length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <div className="text-gray-400 text-6xl mb-4">📝</div>
+            <div className="text-gray-400 mb-4"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg></div>
             <div className="text-gray-600 text-xl mb-2">尚無簽到記錄</div>
             <div className="text-gray-500">請前往簽到樹進行簽到</div>
             <a

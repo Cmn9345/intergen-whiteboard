@@ -25,7 +25,10 @@ export default function EmotionFacesPage() {
       </div>
 
       <div style={{ textAlign: "center", marginBottom: "var(--space-2xl)" }}>
-        <h1 style={{ fontSize: "var(--font-size-4xl)", fontFamily: "var(--font-heading)" }}>😊 認識情緒表情</h1>
+        <h1 style={{ fontSize: "var(--font-size-4xl)", fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", justifyContent: "center", gap: "var(--space-sm)" }}>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          認識情緒表情
+        </h1>
         <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--font-size-xl)", marginTop: "var(--space-xs)" }}>認識 5 種基本情緒，學習表達自己的心情</p>
       </div>
 
@@ -48,22 +51,30 @@ export default function EmotionFacesPage() {
       </div>
 
       <div style={{ background: "var(--color-bg-card)", border: "var(--border-width) solid var(--color-border)", borderRadius: "var(--wobble-2)", padding: "var(--space-xl)", boxShadow: "var(--shadow-sketch)", marginBottom: "var(--space-xl)" }}>
-        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-2xl)", marginBottom: "var(--space-lg)" }}>🎯 活動目標</h2>
+        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-2xl)", marginBottom: "var(--space-lg)", display: "flex", alignItems: "center", gap: "var(--space-sm)" }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          活動目標
+        </h2>
         <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "var(--space-md)", padding: 0 }}>
           {["認識 5 種基本情緒", "學習用表情表達不同的情緒", "練習觀察他人的表情", "學會用語言描述自己的心情"].map((item, i) => (
             <li key={i} style={{ fontSize: "var(--font-size-xl)", color: "var(--color-text-secondary)", display: "flex", alignItems: "flex-start", gap: "var(--space-sm)" }}>
-              <span style={{ flexShrink: 0 }}>🎯</span> {item}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 4 }}><path d="m9 18 6-6-6-6"/></svg>
+              {item}
             </li>
           ))}
         </ul>
       </div>
 
       <div style={{ background: "var(--color-bg-card)", border: "var(--border-width) solid var(--color-border)", borderRadius: "var(--wobble-2)", padding: "var(--space-xl)", boxShadow: "var(--shadow-sketch)", marginBottom: "var(--space-xl)" }}>
-        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-2xl)", marginBottom: "var(--space-lg)" }}>💡 活動方式</h2>
+        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--font-size-2xl)", marginBottom: "var(--space-lg)", display: "flex", alignItems: "center", gap: "var(--space-sm)" }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+          活動方式
+        </h2>
         <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "var(--space-md)", padding: 0 }}>
           {["看看上面的表情，跟著做出一樣的表情", "猜猜你的夥伴現在是什麼心情", "分享一件讓你有這種心情的事"].map((item, i) => (
             <li key={i} style={{ fontSize: "var(--font-size-xl)", color: "var(--color-text-secondary)", display: "flex", alignItems: "flex-start", gap: "var(--space-sm)" }}>
-              <span style={{ flexShrink: 0 }}>🎯</span> {item}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 4 }}><path d="m9 18 6-6-6-6"/></svg>
+              {item}
             </li>
           ))}
         </ul>

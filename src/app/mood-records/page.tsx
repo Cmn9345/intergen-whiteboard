@@ -91,18 +91,17 @@ export default function MoodRecordsPage() {
   };
 
   // 情緒圖標
-  const getEmotionIcon = (emotion: string) => {
-    switch (emotion) {
-      case '開心':
-        return '😊';
-      case '難過':
-        return '😢';
-      case '生氣':
-        return '😠';
-      default:
-        return '😐';
-    }
-  };
+  function EmotionIcon({ emotion, size = 20 }: { emotion: string; size?: number }) {
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        {emotion === '開心' && <><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></>}
+        {emotion === '難過' && <><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></>}
+        {emotion === '生氣' && <><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><path d="M7.5 8 10 9"/><path d="M16.5 8 14 9"/></>}
+        {!['開心', '難過', '生氣'].includes(emotion) && <><line x1="8" y1="15" x2="16" y2="15"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></>}
+      </svg>
+    );
+  }
 
   if (loading) {
     return (
@@ -119,7 +118,7 @@ export default function MoodRecordsPage() {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <div className="text-red-500 mb-4"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>
           <div className="text-red-600 text-xl mb-2">載入失敗</div>
           <div className="text-gray-600">{error}</div>
           <button
@@ -175,7 +174,7 @@ export default function MoodRecordsPage() {
                     key={emotion}
                     className={`flex items-center gap-2 px-4 py-2 rounded-full ${getEmotionColor(emotion)}`}
                   >
-                    <span className="text-xl">{getEmotionIcon(emotion)}</span>
+                    <EmotionIcon emotion={emotion} size={24} />
                     <span className="font-medium">{emotion}</span>
                     <span className="font-bold">({count})</span>
                   </div>
@@ -188,7 +187,7 @@ export default function MoodRecordsPage() {
         {/* 按組別顯示記錄 */}
         {Object.keys(recordsByGroup).length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <div className="text-gray-400 text-6xl mb-4">🌡️</div>
+            <div className="text-gray-400 mb-4"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/></svg></div>
             <div className="text-gray-600 text-xl mb-2">尚無心情記錄</div>
             <div className="text-gray-500">請前往心情溫度計進行投票</div>
             <a
@@ -227,7 +226,7 @@ export default function MoodRecordsPage() {
                             <td className="py-3 px-3 text-gray-800 font-medium">{record.Name}</td>
                             <td className="py-3 px-3">
                               <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${getEmotionColor(record.emotional)}`}>
-                                <span>{getEmotionIcon(record.emotional)}</span>
+                                <EmotionIcon emotion={record.emotional} size={18} />
                                 <span>{record.emotional}</span>
                               </span>
                             </td>

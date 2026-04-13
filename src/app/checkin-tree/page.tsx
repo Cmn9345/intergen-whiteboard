@@ -48,7 +48,6 @@ export default function CheckinTreePage() {
   const [time, setTime] = useState("");
   const [date, setDate] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [pickerPos, setPickerPos] = useState({ left: 0, top: 0 });
   const [pickerGroup, setPickerGroup] = useState("1");
   const [successName, setSuccessName] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
@@ -88,13 +87,6 @@ export default function CheckinTreePage() {
   function onSpotClick(idx: number, e: React.MouseEvent) {
     e.stopPropagation();
     if (idx < checkedNames.length) return;
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    let left = rect.left + rect.width / 2 - 200;
-    let top = rect.bottom + 10;
-    if (left < 12) left = 12;
-    if (left + 400 > window.innerWidth - 12) left = window.innerWidth - 412;
-    if (top + 560 > window.innerHeight - 12) top = rect.top - 570;
-    setPickerPos({ left, top });
     setPickerOpen(true);
   }
 
@@ -176,7 +168,7 @@ export default function CheckinTreePage() {
       {pickerOpen && (
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0" onClick={() => setPickerOpen(false)} />
-          <div className="absolute flex flex-col overflow-hidden" style={{ left: pickerPos.left, top: pickerPos.top, width: 400, maxHeight: 560, background: "rgba(255,255,255,0.97)", backdropFilter: "blur(12px)", borderRadius: "var(--radius-xl)", boxShadow: "var(--shadow-xl), 0 0 0 1px rgba(0,0,0,0.05)", animation: "scale-in 0.25s cubic-bezier(0.16,1,0.3,1) both" }}>
+          <div className="absolute flex flex-col overflow-hidden" style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: 400, maxHeight: 560, background: "rgba(255,255,255,0.97)", backdropFilter: "blur(12px)", borderRadius: "var(--radius-xl)", boxShadow: "var(--shadow-xl), 0 0 0 1px rgba(0,0,0,0.05)", animation: "scale-in 0.25s cubic-bezier(0.16,1,0.3,1) both" }}>
             <div className="flex items-center justify-between" style={{ padding: "var(--space-lg)", borderBottom: "1px solid var(--color-border-light)" }}>
               <span style={{ fontWeight: 700, fontFamily: "var(--font-heading)", fontSize: 24 }}>選擇成員簽到</span>
               <button onClick={() => setPickerOpen(false)} style={{ width: 40, height: 40, borderRadius: "50%", border: "none", cursor: "pointer", background: "none", color: "var(--color-text-muted)", display: "flex", alignItems: "center", justifyContent: "center" }}>

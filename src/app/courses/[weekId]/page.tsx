@@ -32,6 +32,7 @@ const courseData: Record<number, CourseInfo> = {
     name: "心情溫度計", desc: "情緒探索、心情表達、情感連結", hero: "hero-red",
     activities: [
       { title: "找夥伴", theme: "theme-green", duration: "15 分鐘", items: ["動物配對遊戲：找出動物的幼年與成年配對", "烏龜、天鵝、雞、毛毛蟲等 9 種動物", "配對成功有音效回饋"], link: "find-partner" },
+      { title: "如果開心你就跟我拍拍手", theme: "theme-orange", duration: "10 分鐘", items: ["跟著影片一起唱跳", "用拍手、跺腳、握拳表達情緒", "祖孫一起做動作"], link: "clap-along" },
       { title: "情緒表情", theme: "theme-purple", duration: "15 分鐘", items: ["認識 5 種情緒：開心、難過、生氣、害怕、驚訝", "用表情表達情緒", "猜猜對方的心情"], link: "emotion-faces" },
       { title: "情緒輪盤", theme: "theme-red", duration: "20 分鐘", items: ["互動轉盤遊戲，隨機選出情緒", "語音播報情緒名稱", "分享情緒經驗與討論"], link: "emotion-wheel" },
     ],
@@ -98,6 +99,7 @@ const activityRouteMap: Record<string, string> = {
   "storybook": "storybook",
   "whiteboard-tutorial": "whiteboard-tutorial",
   "find-partner": "find-partner",
+  "clap-along": "clap-along",
   "emotion-faces": "emotion-faces",
   "emotion-wheel": "emotion-wheel",
   "toolkit": "toolkit",
