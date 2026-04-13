@@ -116,7 +116,7 @@ export default function CheckinTreePage() {
       </div>
 
       {/* Top bar */}
-      <div className="absolute z-20" style={{ top: "var(--space-lg)", left: "var(--space-lg)", right: "var(--space-lg)", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+      <div className="checkin-topbar absolute z-20" style={{ top: "var(--space-lg)", left: "var(--space-lg)", right: "var(--space-lg)", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div>
           <Link href="/" className="inline-flex items-center gap-2 mb-2"
             style={{ padding: "12px 24px", borderRadius: "var(--wobble-4)", background: "rgba(255,255,255,0.88)", backdropFilter: "blur(10px)", border: "2px solid var(--color-border)", color: "var(--color-text-secondary)", fontWeight: 700, fontFamily: "var(--font-heading)", boxShadow: "var(--shadow-sketch-sm)" }}>
@@ -145,7 +145,7 @@ export default function CheckinTreePage() {
       </div>
 
       {/* Tree */}
-      <div className="absolute z-[2]" style={{ bottom: "5%", left: "50%", transform: "translateX(-50%)", height: "95vh", aspectRatio: "16/9" }}>
+      <div className="checkin-tree-wrap absolute z-[2]" style={{ bottom: "5%", left: "50%", transform: "translateX(-50%)", height: "95vh", aspectRatio: "16/9" }}>
         <Image src="/tree-nobg.png" alt="簽到樹" fill className="object-contain pointer-events-none" style={{ filter: "drop-shadow(0 8px 24px rgba(60,40,20,0.15))" }} priority />
         {SPOTS.map((pos, i) => {
           const occupied = i < checkedNames.length;
@@ -213,7 +213,7 @@ export default function CheckinTreePage() {
       )}
 
       {/* Bottom bar */}
-      <div className="absolute z-20 flex items-center" style={{ bottom: "var(--space-lg)", left: "50%", transform: "translateX(-50%)", gap: "var(--space-lg)", padding: "var(--space-sm) var(--space-lg)", borderRadius: "var(--radius-full)", background: "rgba(255,255,255,0.88)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}>
+      <div className="checkin-bottom absolute z-20 flex items-center" style={{ bottom: "var(--space-lg)", left: "50%", transform: "translateX(-50%)", gap: "var(--space-lg)", padding: "var(--space-sm) var(--space-lg)", borderRadius: "var(--radius-full)", background: "rgba(255,255,255,0.88)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.5)", boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}>
         <span className="flex items-center gap-1.5" style={{ fontSize: 16, color: "var(--color-text-secondary)", fontWeight: 500 }}>
           <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--color-success)", display: "inline-block" }} />已簽到 <strong>{checkedNames.length}</strong> 人
         </span>
