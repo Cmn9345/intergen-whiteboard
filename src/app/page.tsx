@@ -14,7 +14,7 @@ const ROTATIONS = ["-1deg", "0.8deg", "0.5deg", "-0.6deg"];
 
 export default function Home() {
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Hero */}
       <div className="text-center" style={{ padding: "var(--space-lg) var(--space-xl) var(--space-sm)", flexShrink: 0 }}>
         {/* Hero icon */}

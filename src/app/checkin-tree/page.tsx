@@ -100,7 +100,7 @@ export default function CheckinTreePage() {
   }
 
   return (
-    <div className="w-screen h-screen relative select-none overflow-hidden"
+    <div className="w-screen min-h-screen relative select-none"
       style={{ background: "linear-gradient(180deg, #C9E8F5 0%, #E8F4EC 40%, #D5E8C8 70%, #A8C890 100%)" }}>
 
       {/* Ground */}

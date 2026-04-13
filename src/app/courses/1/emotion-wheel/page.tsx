@@ -103,7 +103,7 @@ export default function EmotionWheelPage() {
   }, [isSpinning, speak]);
 
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden", background: "var(--color-bg)" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--color-bg)" }}>
       {/* Top bar */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "var(--space-md) var(--space-xl)", flexShrink: 0 }}>
         <Link href="/courses/1" className="back-btn">

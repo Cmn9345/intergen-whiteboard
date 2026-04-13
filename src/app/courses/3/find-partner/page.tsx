@@ -137,7 +137,7 @@ export default function FindPartnerPage() {
   });
 
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <div style={{ flex: 1, overflow: "auto", maxWidth: 1100, margin: "0 auto", padding: "var(--space-lg)", width: "100%" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-lg)", flexWrap: "wrap", gap: "var(--space-md)" }}>
         <Link href={backHref} className="back-btn">

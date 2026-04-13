@@ -67,7 +67,7 @@ export default function WhiteboardTutorialPage() {
   };
 
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px var(--space-xl)", flexShrink: 0 }}>
         <Link href="/courses/0" className="back-btn">

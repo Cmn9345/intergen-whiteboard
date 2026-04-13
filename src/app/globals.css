@@ -170,5 +170,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================
-   Auto-scale via viewport width=1024.
+   Mobile Responsive
    ============================================ */
+@media (max-width: 768px) {
+  /* Mood page: stack vertically */
+  .mood-body { grid-template-columns: 1fr !important; }
+  /* Emotion wheel: stack vertically */
+  .wheel-layout { flex-direction: column !important; }
+  .wheel-result { padding-left: 0 !important; padding-top: 16px !important; }
+  /* Emotion faces: 5→3 columns */
+  .emotion-grid { grid-template-columns: repeat(3, 1fr) !important; }
+}

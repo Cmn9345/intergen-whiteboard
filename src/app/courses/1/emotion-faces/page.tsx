@@ -15,7 +15,7 @@ const wobbles = ["var(--wobble-1)", "var(--wobble-2)", "var(--wobble-3)", "var(-
 
 export default function EmotionFacesPage() {
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <div style={{ flex: 1, overflow: "auto", maxWidth: 900, margin: "0 auto", padding: "var(--space-lg)", width: "100%" }}>
       <div style={{ marginBottom: "var(--space-lg)" }}>
         <Link href="/courses/1" className="back-btn">

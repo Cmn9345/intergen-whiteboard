@@ -127,7 +127,7 @@ export default function GuessFeetPage() {
   };
 
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <div style={{ flex: 1, overflow: "auto", maxWidth: 700, margin: "0 auto", padding: "var(--space-lg)", width: "100%", textAlign: "center" }}>
       <div style={{ marginBottom: "var(--space-lg)", textAlign: "left" }}>
         <Link href="/courses/6" className="back-btn">

@@ -329,7 +329,7 @@ export default function GamesPage() {
   // Game board
   return (
     <main
-      className="h-screen flex flex-col overflow-hidden"
+      className="min-h-screen flex flex-col"
       style={{ background: "var(--bg)" }}
     >
       {/* Header */}

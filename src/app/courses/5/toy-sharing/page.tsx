@@ -48,7 +48,7 @@ export default function ToySharingPage() {
   };
 
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <div style={{ flex: 1, overflow: "auto", maxWidth: 960, margin: "0 auto", padding: "var(--space-lg)", width: "100%" }}>
       <div style={{ marginBottom: "var(--space-lg)" }}>
         <Link href="/courses/5" className="back-btn">

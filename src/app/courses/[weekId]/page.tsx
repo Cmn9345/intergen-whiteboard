@@ -161,7 +161,7 @@ export default function CourseDetailPage() {
   }
 
   return (
-    <div style={{ background: "var(--color-bg)", backgroundImage: "radial-gradient(circle, #d5cfc5 1px, transparent 1px)", backgroundSize: "32px 32px", height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div style={{ background: "var(--color-bg)", backgroundImage: "radial-gradient(circle, #d5cfc5 1px, transparent 1px)", backgroundSize: "32px 32px", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <div style={{ flex: 1, overflow: "auto" }}>
       {/* Header */}
       <div style={{ padding: "var(--space-xl)" }}>
