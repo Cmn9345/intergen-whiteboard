@@ -170,7 +170,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================
-   Mobile: auto-scale via viewport width=1024
-   No responsive overrides needed — browser
-   scales the entire 1024px layout to fit.
+   Auto-scale via viewport width=1024.
+   Ensure all pages can scroll when content
+   overflows (landscape / small screens).
    ============================================ */
+body > div > div {
+  min-height: 100vh;
+  overflow: auto !important;
+}
