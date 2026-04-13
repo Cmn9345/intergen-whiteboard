@@ -170,14 +170,76 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ============================================
-   Mobile Responsive
+   RWD - Mobile First Responsive Design
+   Breakpoints: mobile <576, tablet 576-992, desktop >992
    ============================================ */
-@media (max-width: 768px) {
-  /* Mood page: stack vertically */
+
+/* --- Mobile (default + small screens) --- */
+@media (max-width: 576px) {
+  :root {
+    --font-size-5xl: 32px;
+    --font-size-4xl: 26px;
+    --font-size-3xl: 22px;
+    --font-size-2xl: 20px;
+    --font-size-xl: 17px;
+    --font-size-lg: 15px;
+    --space-2xl: 16px;
+    --space-xl: 12px;
+    --space-lg: 10px;
+  }
+  /* Home: 2x2 grid smaller */
+  .home-grid { gap: 8px !important; padding: 8px !important; }
+  .feature-icon { width: 80px !important; height: 80px !important; }
+  /* Mood: single column */
+  .mood-body { grid-template-columns: 1fr !important; overflow: visible !important; }
+  .mood-left { flex-direction: row !important; justify-content: center !important; }
+  .mood-thermo { width: 100px !important; height: 320px !important; }
+  .mood-thermo-tube { width: 48px !important; height: 240px !important; }
+  .mood-thermo-bulb { width: 72px !important; height: 72px !important; }
+  .mood-thermo-bulb > div { width: 50px !important; height: 50px !important; }
+  .mood-btn { padding: 10px 14px !important; font-size: 20px !important; }
+  /* Emotion wheel: stack */
+  .wheel-layout { flex-direction: column !important; padding: 0 8px 8px !important; overflow: visible !important; }
+  .wheel-container { width: 300px !important; height: 300px !important; }
+  .wheel-dots { display: none !important; }
+  .wheel-result { padding-left: 0 !important; padding-top: 12px !important; }
+  .wheel-spin-btn { padding: 12px 24px !important; font-size: 20px !important; margin-top: 12px !important; }
+  /* Emotion faces: 5→2 columns */
+  .emotion-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+  /* Course list: 3→1 column */
+  .course-list { grid-template-columns: 1fr !important; gap: 8px !important; }
+  .course-card-icon { width: 56px !important; height: 56px !important; }
+  /* Dashboard */
+  .dash-stats { grid-template-columns: repeat(2, 1fr) !important; }
+  .dash-cards { grid-template-columns: 1fr !important; }
+  /* Login numpad */
+  .login-numpad button { width: 56px !important; height: 56px !important; font-size: 20px !important; }
+  /* Checkin tree */
+  .checkin-topbar { left: 8px !important; right: 8px !important; top: 8px !important; }
+  .checkin-topbar > div:last-child button { width: 28px !important; height: 28px !important; font-size: 12px !important; }
+  .checkin-bottom { gap: 6px !important; padding: 6px 10px !important; }
+  .checkin-bottom span { font-size: 13px !important; }
+}
+
+/* --- Tablet (576px - 992px) --- */
+@media (min-width: 577px) and (max-width: 992px) {
+  /* Mood: single column on tablet portrait */
   .mood-body { grid-template-columns: 1fr !important; }
-  /* Emotion wheel: stack vertically */
+  /* Emotion wheel: stack on narrow tablets */
   .wheel-layout { flex-direction: column !important; }
   .wheel-result { padding-left: 0 !important; padding-top: 16px !important; }
   /* Emotion faces: 5→3 columns */
   .emotion-grid { grid-template-columns: repeat(3, 1fr) !important; }
+  /* Course list: 2 columns */
+  .course-list { grid-template-columns: repeat(2, 1fr) !important; }
+  /* Dashboard: 2 columns */
+  .dash-stats { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* --- Landscape orientation fix --- */
+@media (orientation: landscape) and (max-height: 500px) {
+  .checkin-topbar > div:first-child > a { padding: 6px 12px !important; font-size: 14px !important; }
+  .checkin-topbar > div:first-child .flex { padding: 4px 8px !important; }
+  .checkin-topbar > div:first-child .flex div:first-child { font-size: 20px !important; }
+  .checkin-bottom { bottom: 4px !important; padding: 4px 8px !important; }
 }
