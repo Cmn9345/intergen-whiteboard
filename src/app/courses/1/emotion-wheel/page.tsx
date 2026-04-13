@@ -123,7 +123,7 @@ export default function EmotionWheelPage() {
         {/* Left: Wheel + Button */}
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
           {/* Wheel Container - enlarged */}
-          <div className="wheel-container" style={{ position: "relative", width: 560, height: 560, flexShrink: 0 }}>
+          <div className="wheel-container" style={{ position: "relative", width: 420, height: 420, flexShrink: 0 }}>
 
             {/* Outer ring decoration */}
             <div style={{
