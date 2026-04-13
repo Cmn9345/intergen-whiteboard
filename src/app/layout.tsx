@@ -8,6 +8,11 @@ export const metadata: Metadata = {
   description: "讓祖孫一起學習、一起歡笑",
 };
 
+export const viewport = {
+  width: 1024,
+  initialScale: undefined,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

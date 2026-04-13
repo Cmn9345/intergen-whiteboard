@@ -145,7 +145,7 @@ export default function CheckinTreePage() {
       </div>
 
       {/* Tree */}
-      <div className="checkin-tree-wrap absolute z-[2]" style={{ bottom: "5%", left: "50%", transform: "translateX(-50%)", height: "95vh", aspectRatio: "16/9" }}>
+      <div className="absolute z-[2]" style={{ bottom: "5%", left: "50%", transform: "translateX(-50%)", height: "95vh", aspectRatio: "16/9" }}>
         <Image src="/tree-nobg.png" alt="簽到樹" fill className="object-contain pointer-events-none" style={{ filter: "drop-shadow(0 8px 24px rgba(60,40,20,0.15))" }} priority />
         {SPOTS.map((pos, i) => {
           const occupied = i < checkedNames.length;
