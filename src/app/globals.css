@@ -171,10 +171,4 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ============================================
    Auto-scale via viewport width=1024.
-   Ensure all pages can scroll when content
-   overflows (landscape / small screens).
    ============================================ */
-body > div > div {
-  min-height: 100vh;
-  overflow: auto !important;
-}
