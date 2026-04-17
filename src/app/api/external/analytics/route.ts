@@ -95,12 +95,12 @@ export async function GET(request: NextRequest) {
             totalCourses: courseStats,
           },
           trends: {
-            recentMoods: recentMoods.map(mood => ({
+            recentMoods: recentMoods.map((mood: any) => ({
               value: mood.value,
               date: mood.recordedAt.toISOString().split('T')[0],
             })),
           },
-          checkinStatusDistribution: checkinStatusStats.map(stat => ({
+          checkinStatusDistribution: checkinStatusStats.map((stat: any) => ({
             status: stat.status,
             count: stat._count,
           })),
