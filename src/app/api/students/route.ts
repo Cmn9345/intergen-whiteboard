@@ -2,11 +2,18 @@ import { NextResponse } from 'next/server';
 
 const API_BASE = process.env.NEXT_PUBLIC_POCKETBASE_URL || 'https://intergen-pocketbase.fly.dev';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   try {
-    const res = await fetch(`${API_BASE}/api/students`);
+    const res = await fetch(
+      `${API_BASE}/api/collections/student/records?perPage=500&sort=-created`,
+      { cache: 'no-store' }
+    );
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const records = await res.json();
+    const result = await res.json();
+    const records: any[] = result.items || [];
 
     // 轉換為簽到樹需要的格式
     const colors = ['#e11d48', '#ea580c', '#059669', '#7c3aed', '#dc2626', '#0891b2', '#4f46e5', '#be185d', '#15803d', '#b45309'];
@@ -30,7 +37,9 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json(members);
+    return NextResponse.json(members, {
+      headers: { 'Cache-Control': 'no-store, max-age=0' },
+    });
   } catch (error: any) {
     console.error('Error fetching students:', error);
     return NextResponse.json(
