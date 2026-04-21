@@ -1,14 +1,19 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import pb from "@/lib/pocketbase";
 import {
   getStudents, getCheckins, checkin as apiCheckin,
-  groupStudents, getStudentName,
+  groupStudents, getStudentName, getPbFileUrl,
   type Student, type CheckinRecord,
 } from "@/lib/api";
+
+function getStudentPhotoUrl(s: Student | undefined): string | null {
+  if (!s?.photo || !s.collectionId) return null;
+  return getPbFileUrl(s.collectionId, s.id, s.photo);
+}
 
 const SPOTS = [
   // 頂部 (3)
@@ -110,6 +115,11 @@ export default function CheckinTreePage() {
 
   const checkedNames = Object.keys(checkedMap);
   const groups = Object.keys(grouped).sort();
+  const memberByName = useMemo(() => {
+    const map: Record<string, Student> = {};
+    members.forEach((m) => { map[getStudentName(m)] = m; });
+    return map;
+  }, [members]);
 
   async function doCheckin(member: Student) {
     try {
@@ -171,9 +181,15 @@ export default function CheckinTreePage() {
         {checkedNames.map((name, i) => {
           if (i >= SPOTS.length) return null;
           const pos = SPOTS[i];
+          const photoUrl = getStudentPhotoUrl(memberByName[name]);
           return (
             <div key={name} className="absolute flex flex-col items-center pointer-events-none" style={{ left: `${pos.x}%`, top: `${pos.y}%`, transform: "translate(-50%, -50%)", zIndex: 6, animation: `stamp-pop 0.4s cubic-bezier(0.34,1.56,0.64,1) both`, animationDelay: `${i * 60}ms` }}>
-              <div className="flex items-center justify-center text-white" style={{ width: "clamp(40px, 8cqw, 100px)", height: "clamp(40px, 8cqw, 100px)", borderRadius: "50%", fontWeight: 800, fontSize: "clamp(18px, 3.5cqw, 40px)", background: COLORS[i % COLORS.length], border: "clamp(2px, 0.5cqw, 5px) solid white", boxShadow: "0 0.4cqw 1.6cqw rgba(0,0,0,0.25)" }}>{name[0]}</div>
+              <div className="flex items-center justify-center text-white overflow-hidden" style={{ width: "clamp(40px, 8cqw, 100px)", height: "clamp(40px, 8cqw, 100px)", borderRadius: "50%", fontWeight: 800, fontSize: "clamp(18px, 3.5cqw, 40px)", background: photoUrl ? "white" : COLORS[i % COLORS.length], border: "clamp(2px, 0.5cqw, 5px) solid white", boxShadow: "0 0.4cqw 1.6cqw rgba(0,0,0,0.25)" }}>
+                {photoUrl ? (
+                   
+                  <img src={photoUrl} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                ) : name[0]}
+              </div>
               <div style={{ marginTop: "clamp(2px, 0.4cqw, 6px)", padding: "clamp(2px, 0.4cqw, 5px) clamp(8px, 1.6cqw, 18px)", background: "rgba(255,255,255,0.95)", borderRadius: "clamp(8px, 1.4cqw, 16px)", fontSize: "clamp(11px, 1.8cqw, 22px)", fontWeight: 700, color: "var(--color-text-primary)", boxShadow: "0 0.2cqw 0.6cqw rgba(0,0,0,0.12)", whiteSpace: "nowrap" }}>{name}</div>
             </div>
           );
@@ -185,7 +201,7 @@ export default function CheckinTreePage() {
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0" onClick={() => setPickerOpen(false)} />
           <div className="absolute flex flex-col overflow-hidden" style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: "min(720px, 94vw)", height: "min(760px, 90vh)", background: "rgba(255,255,255,0.97)", backdropFilter: "blur(12px)", borderRadius: "var(--radius-xl)", boxShadow: "var(--shadow-xl), 0 0 0 1px rgba(0,0,0,0.05)", animation: "scale-in 0.25s cubic-bezier(0.16,1,0.3,1) both" }}>
-            <div className="flex items-center justify-between" style={{ padding: "var(--space-lg)", borderBottom: "1px solid var(--color-border-light)" }}>
+            <div className="flex items-center justify-between shrink-0" style={{ padding: "var(--space-lg)", borderBottom: "1px solid var(--color-border-light)" }}>
               <span style={{ fontWeight: 700, fontFamily: "var(--font-heading)", fontSize: "clamp(18px, 2.6vmin, 28px)" }}>選擇成員簽到</span>
               <button onClick={() => setPickerOpen(false)} style={{ width: "clamp(32px, 4.5vmin, 44px)", height: "clamp(32px, 4.5vmin, 44px)", borderRadius: "50%", border: "none", cursor: "pointer", background: "none", color: "var(--color-text-muted)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="60%" height="60%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -196,15 +212,21 @@ export default function CheckinTreePage() {
                 <button key={g} onClick={() => setPickerGroup(g)} style={{ padding: "clamp(8px, 1.4vmin, 14px) clamp(14px, 2.6vmin, 26px)", borderRadius: "var(--radius-full)", fontSize: "clamp(15px, 2vmin, 22px)", fontWeight: 700, whiteSpace: "nowrap", border: "none", cursor: "pointer", background: g === pickerGroup ? "var(--color-primary)" : "transparent", color: g === pickerGroup ? "white" : "var(--color-text-muted)" }}>第 {g} 組</button>
               ))}
             </div>
-            <div className="flex-1 overflow-y-auto" style={{ padding: "var(--space-sm)", display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "var(--space-xs)", alignContent: "start" }}>
+            <div className="flex-1 overflow-y-auto" style={{ padding: "var(--space-sm)", display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "var(--space-xs)", alignContent: "start", minHeight: 0 }}>
               {(grouped[pickerGroup] || []).map((m) => {
                 const mName = getStudentName(m);
                 const isChecked = !!checkedMap[mName];
+                const photoUrl = getStudentPhotoUrl(m);
                 return (
                   <div key={m.id} onClick={() => !isChecked && doCheckin(m)} className="flex items-center gap-3" style={{ padding: "clamp(8px, 1.4vmin, 14px) clamp(10px, 1.8vmin, 16px)", borderRadius: "var(--radius-md)", cursor: isChecked ? "not-allowed" : "pointer", border: "2px solid transparent", opacity: isChecked ? 0.4 : 1, transition: "all 150ms ease" }}
                     onMouseEnter={(e) => { if (!isChecked) { e.currentTarget.style.background = "var(--color-primary-lighter)"; e.currentTarget.style.borderColor = "var(--color-primary-light)"; } }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = ""; e.currentTarget.style.borderColor = "transparent"; }}>
-                    <div className="flex items-center justify-center shrink-0" style={{ width: "clamp(36px, 5vmin, 52px)", height: "clamp(36px, 5vmin, 52px)", borderRadius: "50%", background: "var(--color-postit-yellow)", border: "var(--border-width) solid var(--color-border)", fontWeight: 700, fontFamily: "var(--font-heading)", fontSize: "clamp(16px, 2.4vmin, 24px)" }}>{mName[0]}</div>
+                    <div className="flex items-center justify-center shrink-0 overflow-hidden" style={{ width: "clamp(36px, 5vmin, 52px)", height: "clamp(36px, 5vmin, 52px)", borderRadius: "50%", background: photoUrl ? "white" : "var(--color-postit-yellow)", border: "var(--border-width) solid var(--color-border)", fontWeight: 700, fontFamily: "var(--font-heading)", fontSize: "clamp(16px, 2.4vmin, 24px)" }}>
+                      {photoUrl ? (
+                         
+                        <img src={photoUrl} alt={mName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      ) : mName[0]}
+                    </div>
                     <span style={{ fontWeight: 700, fontFamily: "var(--font-heading)", flex: 1, fontSize: "clamp(15px, 2.2vmin, 22px)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{mName}</span>
                     {isChecked && <svg width="clamp(16px, 2vmin, 22px)" height="clamp(16px, 2vmin, 22px)" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
                   </div>
