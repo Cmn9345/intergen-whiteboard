@@ -212,26 +212,27 @@ export default function CheckinTreePage() {
                 <button key={g} onClick={() => setPickerGroup(g)} style={{ padding: "clamp(8px, 1.4vmin, 14px) clamp(14px, 2.6vmin, 26px)", borderRadius: "var(--radius-full)", fontSize: "clamp(15px, 2vmin, 22px)", fontWeight: 700, whiteSpace: "nowrap", border: "none", cursor: "pointer", background: g === pickerGroup ? "var(--color-primary)" : "transparent", color: g === pickerGroup ? "white" : "var(--color-text-muted)" }}>第 {g} 組</button>
               ))}
             </div>
-            <div className="flex-1 overflow-y-auto" style={{ padding: "var(--space-sm)", display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "var(--space-xs)", alignContent: "start", minHeight: 0 }}>
-              {(grouped[pickerGroup] || []).map((m) => {
-                const mName = getStudentName(m);
-                const isChecked = !!checkedMap[mName];
-                const photoUrl = getStudentPhotoUrl(m);
-                return (
-                  <div key={m.id} onClick={() => !isChecked && doCheckin(m)} className="flex items-center gap-3" style={{ padding: "clamp(8px, 1.4vmin, 14px) clamp(10px, 1.8vmin, 16px)", borderRadius: "var(--radius-md)", cursor: isChecked ? "not-allowed" : "pointer", border: "2px solid transparent", opacity: isChecked ? 0.4 : 1, transition: "all 150ms ease" }}
-                    onMouseEnter={(e) => { if (!isChecked) { e.currentTarget.style.background = "var(--color-primary-lighter)"; e.currentTarget.style.borderColor = "var(--color-primary-light)"; } }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = ""; e.currentTarget.style.borderColor = "transparent"; }}>
-                    <div className="flex items-center justify-center shrink-0 overflow-hidden" style={{ width: "clamp(36px, 5vmin, 52px)", height: "clamp(36px, 5vmin, 52px)", borderRadius: "50%", background: photoUrl ? "white" : "var(--color-postit-yellow)", border: "var(--border-width) solid var(--color-border)", fontWeight: 700, fontFamily: "var(--font-heading)", fontSize: "clamp(16px, 2.4vmin, 24px)" }}>
-                      {photoUrl ? (
-                         
-                        <img src={photoUrl} alt={mName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      ) : mName[0]}
+            <div style={{ flex: "1 1 0", minHeight: 0, overflowY: "auto", overflowX: "hidden", WebkitOverflowScrolling: "touch", overscrollBehavior: "contain" }}>
+              <div style={{ padding: "var(--space-sm)", display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "var(--space-xs)" }}>
+                {(grouped[pickerGroup] || []).map((m) => {
+                  const mName = getStudentName(m);
+                  const isChecked = !!checkedMap[mName];
+                  const photoUrl = getStudentPhotoUrl(m);
+                  return (
+                    <div key={m.id} onClick={() => !isChecked && doCheckin(m)} className="flex items-center gap-3" style={{ padding: "clamp(8px, 1.4vmin, 14px) clamp(10px, 1.8vmin, 16px)", borderRadius: "var(--radius-md)", cursor: isChecked ? "not-allowed" : "pointer", border: "2px solid transparent", opacity: isChecked ? 0.4 : 1, transition: "all 150ms ease" }}
+                      onMouseEnter={(e) => { if (!isChecked) { e.currentTarget.style.background = "var(--color-primary-lighter)"; e.currentTarget.style.borderColor = "var(--color-primary-light)"; } }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = ""; e.currentTarget.style.borderColor = "transparent"; }}>
+                      <div className="flex items-center justify-center shrink-0 overflow-hidden" style={{ width: "clamp(36px, 5vmin, 52px)", height: "clamp(36px, 5vmin, 52px)", borderRadius: "50%", background: photoUrl ? "white" : "var(--color-postit-yellow)", border: "var(--border-width) solid var(--color-border)", fontWeight: 700, fontFamily: "var(--font-heading)", fontSize: "clamp(16px, 2.4vmin, 24px)" }}>
+                        {photoUrl ? (
+                          <img src={photoUrl} alt={mName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        ) : mName[0]}
+                      </div>
+                      <span style={{ fontWeight: 700, fontFamily: "var(--font-heading)", flex: 1, fontSize: "clamp(15px, 2.2vmin, 22px)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{mName}</span>
+                      {isChecked && <svg width="clamp(16px, 2vmin, 22px)" height="clamp(16px, 2vmin, 22px)" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
                     </div>
-                    <span style={{ fontWeight: 700, fontFamily: "var(--font-heading)", flex: 1, fontSize: "clamp(15px, 2.2vmin, 22px)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{mName}</span>
-                    {isChecked && <svg width="clamp(16px, 2vmin, 22px)" height="clamp(16px, 2vmin, 22px)" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
