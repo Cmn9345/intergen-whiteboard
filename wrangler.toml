@@ -1,5 +1,5 @@
 main = ".open-next/worker.js"
-name = "intergenwhiteboard"
+name = "intergenwhiteboard001"
 compatibility_date = "2026-04-09"
 compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
 
