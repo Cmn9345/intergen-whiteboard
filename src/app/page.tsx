@@ -19,7 +19,7 @@ export default function Home() {
       <div className="text-center" style={{ padding: "var(--space-lg) var(--space-xl) var(--space-sm)", flexShrink: 0 }}>
         {/* Hero icon */}
         <div className="mx-auto" style={{
-          width: 100, height: 100, marginBottom: "var(--space-sm)",
+          width: "clamp(72px, 10vmin, 140px)", height: "clamp(72px, 10vmin, 140px)", marginBottom: "var(--space-sm)",
           borderRadius: "var(--wobble-2)", overflow: "hidden",
           border: "var(--border-width) solid var(--color-border)",
           boxShadow: "var(--shadow-sketch)", transform: "rotate(-2deg)",
@@ -41,7 +41,7 @@ export default function Home() {
       </div>
 
       {/* Feature grid - 2x2 */}
-      <div className="grid grid-cols-2 home-grid" style={{ gap: "var(--space-lg)", maxWidth: 800, margin: "0 auto", padding: "var(--space-md) var(--space-xl)", flex: 1, alignContent: "center" }}>
+      <div className="grid grid-cols-2 home-grid" style={{ gap: "var(--space-lg)", maxWidth: "min(1100px, 95vw)", margin: "0 auto", padding: "var(--space-md) var(--space-xl)", flex: 1, alignContent: "center" }}>
         {FEATURES.map((f, i) => (
           <Link key={f.href} href={f.href}
             className="group relative flex flex-col items-center text-center transition-all"
@@ -67,7 +67,7 @@ export default function Home() {
 
             {/* Icon */}
             <div className="flex items-center justify-center overflow-hidden feature-icon" style={{
-              width: 140, height: 140, borderRadius: "var(--wobble-2)",
+              width: "clamp(96px, 16vmin, 200px)", height: "clamp(96px, 16vmin, 200px)", borderRadius: "var(--wobble-2)",
               border: "var(--border-width) solid var(--color-border)",
               background: "var(--color-bg-card)", boxShadow: "var(--shadow-sketch-sm)",
               marginBottom: "var(--space-sm)", flexShrink: 0,
@@ -82,7 +82,7 @@ export default function Home() {
               <h3 style={{ fontSize: "var(--font-size-2xl, 34px)", fontWeight: 700, fontFamily: "var(--font-heading)", marginBottom: 2 }}>{f.title}</h3>
               <p style={{ fontSize: "var(--font-size-lg, 24px)", color: "var(--color-text-secondary)", marginBottom: 0 }}>{f.desc}</p>
               <div className="transition-all group-hover:translate-x-1.5" style={{ marginTop: "var(--space-xs)", color: "var(--color-text-muted)" }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                <svg width="clamp(20px, 3vmin, 36px)" height="clamp(20px, 3vmin, 36px)" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
               </div>
             </div>
           </Link>
