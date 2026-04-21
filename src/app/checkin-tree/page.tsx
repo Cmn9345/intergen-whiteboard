@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import pb from "@/lib/pocketbase";
 import {
   getStudents, getCheckins, checkin as apiCheckin,
   groupStudents, getStudentName,
@@ -64,12 +65,10 @@ export default function CheckinTreePage() {
     return () => clearInterval(id);
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      const data = await getStudents();
-      setMembers(data);
-      setGrouped(groupStudents(data));
-    })();
+  const loadStudents = useCallback(async () => {
+    const data = await getStudents();
+    setMembers(data);
+    setGrouped(groupStudents(data));
   }, []);
 
   const loadCheckins = useCallback(async () => {
@@ -79,7 +78,35 @@ export default function CheckinTreePage() {
     setCheckedMap(map);
   }, [currentWeek]);
 
+  useEffect(() => { loadStudents(); }, [loadStudents]);
   useEffect(() => { loadCheckins(); }, [loadCheckins]);
+
+  // Realtime: refetch immediately whenever PocketBase data changes
+  useEffect(() => {
+    let cancelStudents: (() => void) | undefined;
+    let cancelCheckins: (() => void) | undefined;
+    (async () => {
+      try {
+        const unsubStudents = await pb.collection("student").subscribe("*", () => loadStudents());
+        cancelStudents = () => { void unsubStudents(); };
+        const unsubCheckins = await pb.collection("signintree").subscribe("*", () => loadCheckins());
+        cancelCheckins = () => { void unsubCheckins(); };
+      } catch (err) {
+        console.error("[checkin-tree] realtime subscribe failed:", err);
+      }
+    })();
+    // Polling fallback in case realtime is blocked (every 20s)
+    const poll = setInterval(() => { loadStudents(); loadCheckins(); }, 20000);
+    // Refetch when tab regains focus
+    const onFocus = () => { loadStudents(); loadCheckins(); };
+    window.addEventListener("focus", onFocus);
+    return () => {
+      cancelStudents?.();
+      cancelCheckins?.();
+      clearInterval(poll);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [loadStudents, loadCheckins]);
 
   const checkedNames = Object.keys(checkedMap);
   const groups = Object.keys(grouped).sort();
@@ -157,7 +184,7 @@ export default function CheckinTreePage() {
       {pickerOpen && (
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0" onClick={() => setPickerOpen(false)} />
-          <div className="absolute flex flex-col overflow-hidden" style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: 400, maxHeight: 560, background: "rgba(255,255,255,0.97)", backdropFilter: "blur(12px)", borderRadius: "var(--radius-xl)", boxShadow: "var(--shadow-xl), 0 0 0 1px rgba(0,0,0,0.05)", animation: "scale-in 0.25s cubic-bezier(0.16,1,0.3,1) both" }}>
+          <div className="absolute flex flex-col overflow-hidden" style={{ left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: "min(680px, 92vw)", height: "min(720px, 88vh)", background: "rgba(255,255,255,0.97)", backdropFilter: "blur(12px)", borderRadius: "var(--radius-xl)", boxShadow: "var(--shadow-xl), 0 0 0 1px rgba(0,0,0,0.05)", animation: "scale-in 0.25s cubic-bezier(0.16,1,0.3,1) both" }}>
             <div className="flex items-center justify-between" style={{ padding: "var(--space-lg)", borderBottom: "1px solid var(--color-border-light)" }}>
               <span style={{ fontWeight: 700, fontFamily: "var(--font-heading)", fontSize: 24 }}>選擇成員簽到</span>
               <button onClick={() => setPickerOpen(false)} style={{ width: 40, height: 40, borderRadius: "50%", border: "none", cursor: "pointer", background: "none", color: "var(--color-text-muted)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -169,16 +196,16 @@ export default function CheckinTreePage() {
                 <button key={g} onClick={() => setPickerGroup(g)} style={{ padding: "10px 20px", borderRadius: "var(--radius-full)", fontSize: 20, fontWeight: 700, whiteSpace: "nowrap", border: "none", cursor: "pointer", background: g === pickerGroup ? "var(--color-primary)" : "transparent", color: g === pickerGroup ? "white" : "var(--color-text-muted)" }}>第 {g} 組</button>
               ))}
             </div>
-            <div className="flex-1 overflow-y-auto" style={{ padding: "var(--space-sm)" }}>
+            <div className="flex-1 overflow-y-auto" style={{ padding: "var(--space-sm)", display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "var(--space-xs)", alignContent: "start" }}>
               {(grouped[pickerGroup] || []).map((m) => {
                 const mName = getStudentName(m);
                 const isChecked = !!checkedMap[mName];
                 return (
-                  <div key={m.id} onClick={() => !isChecked && doCheckin(m)} className="flex items-center gap-3" style={{ padding: "14px 16px", borderRadius: "var(--radius-md)", cursor: isChecked ? "not-allowed" : "pointer", border: "2px solid transparent", opacity: isChecked ? 0.4 : 1, transition: "all 150ms ease" }}
+                  <div key={m.id} onClick={() => !isChecked && doCheckin(m)} className="flex items-center gap-3" style={{ padding: "12px 14px", borderRadius: "var(--radius-md)", cursor: isChecked ? "not-allowed" : "pointer", border: "2px solid transparent", opacity: isChecked ? 0.4 : 1, transition: "all 150ms ease" }}
                     onMouseEnter={(e) => { if (!isChecked) { e.currentTarget.style.background = "var(--color-primary-lighter)"; e.currentTarget.style.borderColor = "var(--color-primary-light)"; } }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = ""; e.currentTarget.style.borderColor = "transparent"; }}>
-                    <div className="flex items-center justify-center shrink-0" style={{ width: 48, height: 48, borderRadius: "50%", background: "var(--color-postit-yellow)", border: "var(--border-width) solid var(--color-border)", fontWeight: 700, fontFamily: "var(--font-heading)", fontSize: 22 }}>{mName[0]}</div>
-                    <span style={{ fontWeight: 700, fontFamily: "var(--font-heading)", flex: 1, fontSize: 22 }}>{mName}</span>
+                    <div className="flex items-center justify-center shrink-0" style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--color-postit-yellow)", border: "var(--border-width) solid var(--color-border)", fontWeight: 700, fontFamily: "var(--font-heading)", fontSize: 20 }}>{mName[0]}</div>
+                    <span style={{ fontWeight: 700, fontFamily: "var(--font-heading)", flex: 1, fontSize: 20, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{mName}</span>
                     {isChecked && <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
                   </div>
                 );
