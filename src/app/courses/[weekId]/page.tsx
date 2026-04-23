@@ -40,8 +40,12 @@ const courseData: Record<number, CourseInfo> = {
   3: {
     name: "夢想經驗大碰撞", desc: "職業探索、繪本故事、夢想分享", hero: "hero-purple",
     activities: [
+      { title: "如果開心你就跟我拍拍手", theme: "theme-orange", duration: "10 分鐘", items: ["跟著影片一起唱跳", "用拍手、跺腳、握拳表達情緒", "祖孫一起做動作"], link: "clap-along" },
+      { title: "一起動一動", theme: "theme-purple", duration: "15 分鐘", items: ["團體帶動唱：當我們同在一起", "簡單肢體律動", "祖孫一起跳"], link: "together" },
       { title: "繪本故事", theme: "theme-purple", duration: "15 分鐘", items: ["共讀職業相關繪本", "討論長大後想做什麼", "阿公阿嬤分享工作經驗"], link: "storybook" },
       { title: "職業工具箱", theme: "theme-orange", duration: "20 分鐘", items: ["認識 6 種職業：醫生、廚師、老師、警察、消防員、建築師", "配對職業與工具", "大人職業 vs 小小職業配對遊戲"], link: "toolkit" },
+      { title: "職業迷宮", theme: "theme-blue", duration: "15 分鐘", items: ["方格式迷宮，5 個入口、5 個出口分散四邊", "點擊相鄰方格前進，把職業物品送到對的主人手上", "認識 5 種職業：醫生、廚師、消防員、農夫、老師"], link: "career-maze" },
+      { title: "打勾勾", theme: "theme-red", duration: "10 分鐘", items: ["跟著影片一起唱「打勾勾」", "祖孫勾小指頭，說出想一起完成的夢想", "分享過去有印象的小約定"], link: "pinky-promise" },
     ],
   },
   4: {
@@ -109,6 +113,8 @@ const activityRouteMap: Record<string, string> = {
   "ensemble": "ensemble",
   "toy-sharing": "toy-sharing",
   "guess-feet": "guess-feet",
+  "career-maze": "career-maze",
+  "pinky-promise": "pinky-promise",
 };
 
 const HERO_BG: Record<string, string> = {
