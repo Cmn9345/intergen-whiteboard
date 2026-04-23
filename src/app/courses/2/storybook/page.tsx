@@ -5,7 +5,7 @@ export default function Page() {
   return (
     <>
       <StorybookPage weekNum={3} backLink="/courses/2" />
-      <FloatingNav prev={{ href: "/courses/2", label: "課程" }} next={{ href: "/courses/2/toolkit", label: "職業工具箱" }} />
+      <FloatingNav prev={{ href: "/courses/2/together", label: "一起動一動" }} next={{ href: "/courses/2/toolkit", label: "職業工具箱" }} />
     </>
   );
 }
