@@ -7,11 +7,8 @@ const COURSES = [
   { week: 2, id: "1", name: "心情溫度計", desc: "情緒探索、心情表達、情感連結" },
   { week: 3, id: "2", name: "夢想經驗大碰撞", desc: "職業探索、繪本故事、夢想分享" },
   { week: 4, id: "3", name: "我的家人", desc: "家人稱呼、你演我猜、家庭照" },
-  { week: 5, id: "4", name: "功夫大比拼", desc: "才藝表演、合唱合奏、互相欣賞" },
-  { week: 6, id: "5", name: "玩具時光機", desc: "古早玩具、現代玩具、傳統遊戲" },
-  { week: 7, id: "6", name: "動物大趴踢", desc: "猜猜動物腳、繪本故事、動物派對" },
-  { week: 8, id: "7", name: "做伙來辦桌", desc: "烹飪體驗、繪本故事、合作料理" },
-  { week: 9, id: "8", name: "食而聲笑", desc: "課程回顧、成果發表、歡樂結業" },
+  { week: 5, id: "4", name: "玩具時光機", desc: "古早玩具、現代玩具、傳統遊戲" },
+  { week: 6, id: "5", name: "時而聲笑", desc: "課程回顧、成果發表、歡樂結業" },
 ];
 
 const CARD_COLORS = [
@@ -19,10 +16,7 @@ const CARD_COLORS = [
   "#F0ECF8",
   "var(--color-postit-yellow)",
   "var(--color-postit-pink)",
-  "var(--color-postit-blue)",
   "var(--color-sad-light)",
-  "var(--color-secondary-lighter)",
-  "var(--color-primary-lighter)",
   "#F3E5F5",
 ];
 
@@ -39,7 +33,7 @@ export default function CoursesPage() {
         </div>
         <div>
           <h1 style={{ fontSize: "var(--font-size-2xl, 34px)", fontWeight: 700, fontFamily: "var(--font-heading)", transform: "rotate(-0.5deg)" }}>課程內容</h1>
-          <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--font-size-base, 20px)" }}>9 週代間共學精彩課程</p>
+          <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--font-size-base, 20px)" }}>6 週代間共學精彩課程</p>
         </div>
       </header>
 

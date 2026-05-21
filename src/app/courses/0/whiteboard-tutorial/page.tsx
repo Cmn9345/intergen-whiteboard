@@ -208,7 +208,7 @@ export default function WhiteboardTutorialPage() {
               <p style={{ fontSize: "var(--font-size-xl)", color: "var(--color-text-secondary)", marginBottom: "var(--space-lg)", lineHeight: 1.5 }}>每週有不同活動，點進去就開始：</p>
               <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "var(--space-md)", flex: 1, justifyContent: "center", padding: 0 }}>
                 <li style={stepItemStyle}><span style={numStyle}>1</span>在首頁點「課程內容」</li>
-                <li style={stepItemStyle}><span style={numStyle}>2</span>看到 <b>9 週</b> 的課程卡片</li>
+                <li style={stepItemStyle}><span style={numStyle}>2</span>看到 <b>6 週</b> 的課程卡片</li>
                 <li style={stepItemStyle}><span style={numStyle}>3</span>點這週的課程看活動清單</li>
               </ul>
             </div>
@@ -221,11 +221,8 @@ export default function WhiteboardTutorialPage() {
                     { emoji: "😊", name: "心情溫度計", bg: "#F0ECF8", hl: false },
                     { emoji: "💡", name: "夢想經驗", bg: "var(--color-postit-yellow)", hl: false },
                     { emoji: "👨‍👩‍👧", name: "我的家人", bg: "var(--color-postit-pink)", hl: false },
-                    { emoji: "🥋", name: "功夫大比拼", bg: "var(--color-postit-blue)", hl: false },
                     { emoji: "🎠", name: "玩具時光機", bg: "var(--color-sad-light)", hl: false },
-                    { emoji: "🐾", name: "動物大趴踢", bg: "var(--color-secondary-lighter)", hl: false },
-                    { emoji: "🍳", name: "做伙來辦桌", bg: "var(--color-primary-lighter)", hl: false },
-                    { emoji: "🎉", name: "食而聲笑", bg: "#F3E5F5", hl: false },
+                    { emoji: "🎉", name: "時而聲笑", bg: "#F3E5F5", hl: false },
                   ].map((c, i) => (
                     <div key={i} style={{ borderRadius: 8, padding: "10px 6px", textAlign: "center", fontSize: 12, fontFamily: "var(--font-heading)", fontWeight: 700, border: c.hl ? "3px solid var(--color-primary)" : "2px solid var(--color-border-light)", background: c.bg }}>
                       <span style={{ fontSize: 24, display: "block", marginBottom: 3 }}>{c.emoji}</span>{c.name}

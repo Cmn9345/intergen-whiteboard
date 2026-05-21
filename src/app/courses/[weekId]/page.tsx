@@ -15,6 +15,7 @@ type CourseInfo = {
   name: string;
   desc: string;
   hero: string;
+  poster?: string;
   activities: Activity[];
 };
 
@@ -49,45 +50,30 @@ const courseData: Record<number, CourseInfo> = {
     ],
   },
   4: {
-    name: "我的家人", desc: "家人稱呼、你演我猜、家庭照", hero: "hero-orange",
+    name: "我的家人", desc: "家人稱呼、你演我猜、誰陪我來", hero: "hero-orange",
     activities: [
+      { title: "一起動一動", theme: "theme-purple", duration: "15 分鐘", items: ["團體帶動唱：當我們同在一起", "簡單肢體律動", "祖孫一起跳"], link: "together" },
       { title: "找夥伴", theme: "theme-green", duration: "15 分鐘", items: ["認識 8 種家人稱呼：爸爸、媽媽、阿公、阿嬤等", "看描述猜家人角色", "計分挑戰與音效回饋"], link: "find-partner" },
-      { title: "家庭小測驗", theme: "theme-purple", duration: "15 分鐘", items: ["回答家庭趣味問題", "了解彼此的家庭故事", "分享家庭照片"], link: "family-quiz" },
-      { title: "比手畫腳", theme: "theme-orange", duration: "15 分鐘", items: ["用肢體語言表達家人角色", "祖孫合作猜題", "觀察力與想像力訓練"], link: "charades" },
+      { title: "家人稱呼拉霸機", theme: "theme-purple", duration: "15 分鐘", items: ["兩軸拉霸：左軸圖片、右軸文字", "10 種家人稱呼：爸爸、媽媽、爺爺、奶奶、外公、外婆、哥哥、姐姐、弟弟、妹妹", "停下後朗讀稱呼與描述（例：奶奶——爸爸的媽媽，爺爺的老婆）"], link: "family-quiz" },
+      { title: "你演我猜", theme: "theme-orange", duration: "15 分鐘", items: ["仿轉盤抽題卡，6 項家事題目", "煮飯、掃地、洗碗、澆花、曬衣服、洗衣服", "幼老組合上來把抽中的家事演出來，朗讀題目"], link: "charades" },
+      { title: "今天是誰陪我來", theme: "theme-blue", duration: "10 分鐘", items: ["點選卡片：爸媽、爺奶、外公外婆、兒女、孫子孫女、配偶、機構人員、好朋友、自己一人", "可多選，建立今日陪伴的全家福", "朗讀「今天是 ___ 陪我來」"], link: "who-came" },
+      { title: "一家人", theme: "theme-red", duration: "15 分鐘", items: ["跟著影片合唱《一家人》", "感受家庭的溫暖與連結", "祖孫一起感受家人之愛"], link: "family-song" },
     ],
   },
   5: {
-    name: "功夫大比拼", desc: "才藝表演、合唱合奏、互相欣賞", hero: "hero-red",
+    name: "玩具時光機", desc: "帶動唱、自編繪本、傳統童玩、一家人手語", hero: "hero-teal", poster: "/course-w5-poster.png",
     activities: [
-      { title: "才藝表演", theme: "theme-red", duration: "25 分鐘", items: ["6 種才藝類別：唱歌、跳舞、說故事、繪畫手工、運動技能、樂器演奏", "小朋友 vs 長輩表演", "2-3 分鐘表演時間，觀眾互動"], link: "talent-show" },
-      { title: "合唱合奏", theme: "theme-blue", duration: "20 分鐘", items: ["河馬歌、A Ram Sam Sam 等 6 首歌曲", "搭配 YouTube 影片一起唱", "擁抱世界擁抱你、人人做環保、捏泥巴、丟丟銅仔"], link: "ensemble" },
+      { title: "一起動一動", theme: "theme-purple", duration: "10 分鐘", items: ["團體帶動唱，跟著影片律動", "簡單肢體動作，活絡身體", "祖孫一起跳，建立歡樂氣氛"], link: "together" },
+      { title: "玩具時光機（自編繪本）", theme: "theme-purple", duration: "10 分鐘", items: ["翻頁式自編繪本共讀", "走進祖孫共玩時光的小故事", "讀完一起分享自己的玩具回憶"], link: "toy-time-machine" },
+      { title: "童玩製作 — 傳聲筒", theme: "theme-orange", duration: "20 分鐘", items: ["跟著步驟動手做傳聲筒", "認識聲音傳遞的原理", "祖孫合作完成、彼此通話玩遊戲"], link: "string-phone" },
+      { title: "一家人手語", theme: "theme-red", duration: "10 分鐘", items: ["跟著影片學唱《一家人》並比手語", "感受家人之間的愛與連結", "祖孫一起比劃，留下溫暖回憶"], link: "family-sign" },
     ],
   },
   6: {
-    name: "玩具時光機", desc: "古早玩具、現代玩具、傳統遊戲", hero: "hero-teal",
+    name: "時而聲笑", desc: "課程回顧、成果發表、歡樂結業", hero: "hero-purple",
     activities: [
-      { title: "玩具分享", theme: "theme-teal", duration: "20 分鐘", items: ["古早玩具：陀螺、毽子、竹蜻蜓、彈珠、跳房子、翻花繩", "現代玩具：樂高、芭比娃娃、遙控車、電子遊戲、拼圖、魔術方塊", "祖孫互相介紹自己時代的玩具"], link: "toy-sharing" },
-      { title: "繪本故事", theme: "theme-purple", duration: "15 分鐘", items: ["共讀玩具相關繪本", "討論最喜歡的玩具與回憶", "分享玩具背後的故事"], link: "storybook" },
-    ],
-  },
-  7: {
-    name: "動物大趴踢", desc: "猜猜動物腳、繪本故事、動物派對", hero: "hero-green",
-    activities: [
-      { title: "猜猜動物腳", theme: "theme-green", duration: "20 分鐘", items: ["10 種動物：斑馬、長頸鹿、兔子、雞、鴨、豬、熊、大象、貓、狗", "猜猜是 2 隻腳還是 4 隻腳", "30 秒計時挑戰，語音播報答案"], link: "guess-feet" },
-      { title: "繪本故事", theme: "theme-orange", duration: "15 分鐘", items: ["共讀動物相關繪本", "認識不同動物的特徵", "最喜歡的動物分享"], link: "storybook" },
-    ],
-  },
-  8: {
-    name: "做伙來辦桌", desc: "烹飪體驗、繪本故事、合作料理", hero: "hero-orange",
-    activities: [
-      { title: "繪本故事", theme: "theme-orange", duration: "15 分鐘", items: ["共讀料理相關繪本", "阿公阿嬤的拿手菜分享", "討論家裡過年過節的菜色"], link: "storybook" },
-      { title: "合作料理", theme: "theme-green", duration: "25 分鐘", items: ["祖孫一起準備簡單料理", "認識食材與烹飪步驟", "擺盤與分享美食"], link: null },
-    ],
-  },
-  9: {
-    name: "食而聲笑", desc: "課程回顧、成果發表、歡樂結業", hero: "hero-purple",
-    activities: [
-      { title: "課程回顧", theme: "theme-purple", duration: "15 分鐘", items: ["回顧 9 週精彩活動照片", "最喜歡的課程票選", "分享學到最多的事情"], link: null },
+      { title: "一家人", theme: "theme-red", duration: "15 分鐘", items: ["跟著影片合唱《一家人》", "感受家庭的溫暖與連結", "祖孫一起感受家人之愛"], link: "family-song" },
+      { title: "課程回顧", theme: "theme-purple", duration: "15 分鐘", items: ["回顧 6 週精彩活動照片", "最喜歡的課程票選", "分享學到最多的事情"], link: null },
       { title: "成果發表", theme: "theme-green", duration: "20 分鐘", items: ["各組上台分享收穫", "祖孫一起表演或展示作品", "頒發結業證書"], link: null },
       { title: "歡樂時光", theme: "theme-orange", duration: "15 分鐘", items: ["大家一起享用點心", "互相祝福與合照留念", "期待下次再見"], link: null },
     ],
@@ -109,12 +95,17 @@ const activityRouteMap: Record<string, string> = {
   "toolkit": "toolkit",
   "family-quiz": "family-quiz",
   "charades": "charades",
+  "who-came": "who-came",
   "talent-show": "talent-show",
   "ensemble": "ensemble",
   "toy-sharing": "toy-sharing",
+  "toy-time-machine": "toy-time-machine",
+  "string-phone": "string-phone",
+  "family-sign": "family-sign",
   "guess-feet": "guess-feet",
   "career-maze": "career-maze",
   "pinky-promise": "pinky-promise",
+  "family-song": "family-song",
 };
 
 const HERO_BG: Record<string, string> = {
@@ -177,20 +168,30 @@ export default function CourseDetailPage() {
         </Link>
       </div>
 
-      {/* Hero */}
-      <div style={{ padding: "0 var(--space-xl) var(--space-xl)", maxWidth: 860, margin: "0 auto" }}>
-        <div style={{ borderRadius: "var(--wobble-1)", border: "var(--border-width) solid var(--color-border)", padding: "var(--space-2xl)", boxShadow: "var(--shadow-sketch)", background: HERO_BG[course.hero] }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-xs)", padding: "8px 16px", borderRadius: "var(--wobble-2)", background: "rgba(255,255,255,0.25)", border: "2px solid rgba(255,255,255,0.4)", color: "white", fontWeight: 700, fontSize: "var(--font-size-base)", fontFamily: "var(--font-heading)", marginBottom: "var(--space-md)" }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            第 {weekNum} 週
+      {/* Hero — hidden when poster is provided (poster carries its own title) */}
+      {!course.poster && (
+        <div style={{ padding: "0 var(--space-xl) var(--space-xl)", maxWidth: 860, margin: "0 auto" }}>
+          <div style={{ borderRadius: "var(--wobble-1)", border: "var(--border-width) solid var(--color-border)", padding: "var(--space-2xl)", boxShadow: "var(--shadow-sketch)", background: HERO_BG[course.hero] }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-xs)", padding: "8px 16px", borderRadius: "var(--wobble-2)", background: "rgba(255,255,255,0.25)", border: "2px solid rgba(255,255,255,0.4)", color: "white", fontWeight: 700, fontSize: "var(--font-size-base)", fontFamily: "var(--font-heading)", marginBottom: "var(--space-md)" }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              第 {weekNum} 週
+            </div>
+            <h1 style={{ fontSize: "var(--font-size-4xl, 48px)", fontWeight: 700, fontFamily: "var(--font-heading)", color: "white", marginBottom: "var(--space-xs)", transform: "rotate(-0.5deg)" }}>{course.name}</h1>
+            <p style={{ fontSize: "var(--font-size-xl, 24px)", color: "rgba(255,255,255,0.85)" }}>{course.desc}</p>
           </div>
-          <h1 style={{ fontSize: "var(--font-size-4xl, 48px)", fontWeight: 700, fontFamily: "var(--font-heading)", color: "white", marginBottom: "var(--space-xs)", transform: "rotate(-0.5deg)" }}>{course.name}</h1>
-          <p style={{ fontSize: "var(--font-size-xl, 24px)", color: "rgba(255,255,255,0.85)" }}>{course.desc}</p>
         </div>
-      </div>
+      )}
 
-      {/* Activities */}
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 var(--space-xl) var(--space-2xl)", display: "flex", flexDirection: "column", gap: "var(--space-lg)" }}>
+      {/* Body: poster + activities (side-by-side when poster exists, otherwise activities only) */}
+      <div style={{ maxWidth: course.poster ? 1320 : 860, margin: "0 auto", padding: "0 var(--space-xl) var(--space-2xl)", display: "grid", gridTemplateColumns: course.poster ? "minmax(280px, 1fr) minmax(0, 1.2fr)" : "1fr", gap: "var(--space-xl)", alignItems: "start" }}>
+        {course.poster && (
+          <div style={{ position: "sticky", top: "var(--space-lg)", borderRadius: "var(--wobble-1)", border: "var(--border-width) solid var(--color-border)", overflow: "hidden", boxShadow: "var(--shadow-sketch)", background: "var(--color-bg-card)" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={course.poster} alt={`第 ${weekNum} 週 ${course.name} 流程`} style={{ width: "100%", display: "block" }} />
+          </div>
+        )}
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-lg)" }}>
         {course.activities.map((act, i) => {
           const isOpen = openIndex === i;
           const colors = THEME_COLORS[act.theme] || THEME_COLORS["theme-green"];
@@ -239,6 +240,7 @@ export default function CourseDetailPage() {
             </div>
           );
         })}
+        </div>
       </div>
 
       {/* Footer */}

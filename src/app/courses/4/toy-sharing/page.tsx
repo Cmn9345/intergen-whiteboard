@@ -51,9 +51,9 @@ export default function ToySharingPage() {
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <div style={{ flex: 1, overflow: "auto", maxWidth: 960, margin: "0 auto", padding: "var(--space-lg)", width: "100%" }}>
       <div style={{ marginBottom: "var(--space-lg)" }}>
-        <Link href="/courses/5" className="back-btn">
+        <Link href="/courses/4" className="back-btn">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7" /><path d="M19 12H5" /></svg>
-          回到第 6 週
+          回到第 5 週
         </Link>
       </div>
 
@@ -131,7 +131,7 @@ export default function ToySharingPage() {
         @keyframes celebrate { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
       `}</style>
       </div>
-      <FloatingNav prev={{ href: "/courses/5", label: "課程" }} next={{ href: "/courses/5/storybook", label: "繪本故事" }} />
+      <FloatingNav prev={{ href: "/courses/4/together", label: "一起動一動" }} next={{ href: "/courses/4/toy-time-machine", label: "玩具時光機" }} />
     </div>
   );
 }
